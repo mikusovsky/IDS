@@ -4,153 +4,148 @@ using System.Drawing;
 
 namespace IDS
 {
-    class Vehicle
-    {
-        public Point p1;
-        public Point p2;
-        public bool counted;
-        public double size;
-        public Point predictionP;
-        public Point secondPredictionP;
-        public int numberOfFrames;
-        public bool tracked;
-        public Point firstPosition;
-        public Point perspectiveStartCountedAreaPoint;
-        Point positionOnStartCountedArea;
-        public Point perspectiveFirstPosition;
-        public Point countPosition;
-        public Point perspectiveCountPosition;
-        public double speed;
-        public int type;
-        public Rectangle countBB;
-        public Rectangle perspectiveCountBB;
-        int numberOfMissingFrames;
-        bool used;
-        int numberOfFrameStartCountedArea;
-         
+   class Vehicle
+   {
+      public Point P1;
+      public Point P2;
+      public bool Counted;
+      public double Size;
+      public Point PredictionP;
+      public Point SecondPredictionP;
+      public int NumberOfFrames;
+      public bool Tracked;
+      public Point FirstPosition;
+      public Point PerspectiveStartCountedAreaPoint;
+      Point _positionOnStartCountedArea;
+      public Point PerspectiveFirstPosition;
+      public Point CountPosition;
+      public Point PerspectiveCountPosition;
+      public double Speed;
+      public int Type;
+      public Rectangle CountBB;
+      public Rectangle PerspectiveCountBB;
+      private int _numberOfMissingFrames;
+      private bool _used;
+      private int _numberOfFrameStartCountedArea;
 
-        public Vehicle(Point p1, Point p2)
-        {
-            this.p1 = p1;
-            this.p2 = p2;
-            counted = false;
-            size = 0;
-            predictionP = new Point();
-            secondPredictionP = new Point();
-            firstPosition = new Point();
-            positionOnStartCountedArea = new Point();
-            countPosition = new Point();
-            numberOfFrames = 0;
-            tracked = false;
-            speed = 0;
-            type = 0;
-            numberOfMissingFrames = 0;
-            used = false;
-            numberOfFrameStartCountedArea = 0;
-            
-        }
 
-        public void setPredictionP(int x, int y)
-        {
-            predictionP.X = x;
-            predictionP.Y = y;
-        }
+      public Vehicle(Point p1, Point p2)
+      {
+         P1 = p1;
+         P2 = p2;
+         Counted = false;
+         Size = 0;
+         PredictionP = new Point();
+         SecondPredictionP = new Point();
+         FirstPosition = new Point();
+         _positionOnStartCountedArea = new Point();
+         CountPosition = new Point();
+         NumberOfFrames = 0;
+         Tracked = false;
+         Speed = 0;
+         Type = 0;
+         _numberOfMissingFrames = 0;
+         _used = false;
+         _numberOfFrameStartCountedArea = 0;
+      }
 
-        public void setSecondPredictionP(int x, int y)
-        {
-            secondPredictionP.X = x;
-            secondPredictionP.Y = y;
-        }
-     
-        public void setCountBB()
-        {
-            int height = Math.Abs(p1.Y - p2.Y);
-            int width = Math.Abs(p1.X - p2.X);
-            countBB = new Rectangle(p1.X, p1.Y, width, height);
-        }
+      public void SetPredictionP(int x, int y)
+      {
+         PredictionP.X = x;
+         PredictionP.Y = y;
+      }
 
-        public void setCountPosition()
-        {
-            countPosition = p2;
-        }
+      public void SetSecondPredictionP(int x, int y)
+      {
+         SecondPredictionP.X = x;
+         SecondPredictionP.Y = y;
+      }
 
-        public void setPerspectivePoints(Matrix<float> matrix)
-        {
-            setPerspectiveCountPoint(matrix);
-            setPerspectiveStartCountedArea(matrix);
-            setPerspectiveCountBB(matrix);
-        }
+      public void SetCountBB()
+      {
+         int height = Math.Abs(P1.Y - P2.Y);
+         int width = Math.Abs(P1.X - P2.X);
+         CountBB = new Rectangle(P1.X, P1.Y, width, height);
+      }
 
-        public void setSpeed()
-        {
-            double tmpDistance = Math.Sqrt(Math.Pow(perspectiveStartCountedAreaPoint.Y - perspectiveCountPosition.Y, 2));
-            tmpDistance = PerspectiveTransform.convertDistanceToPerspective(tmpDistance);
-            double time = (1/(double)MainForm.FPS)*(double)(numberOfFrames - numberOfFrameStartCountedArea);
-            speed = Math.Round((tmpDistance / time) * 3.6 , 2);
-        }
+      public void SetCountPosition()
+      {
+         CountPosition = P2;
+      }
 
-        public void setSize()
-        {
-            size = Math.Round(PerspectiveTransform.convertDistanceToPerspective(perspectiveCountBB.Height) * 0.4, 2);
-        }
+      public void SetPerspectivePoints(Matrix<float> matrix)
+      {
+         _SetPerspectiveCountPoint(matrix);
+         _SetPerspectiveStartCountedArea(matrix);
+         _SetPerspectiveCountBB(matrix);
+      }
 
-        private void setPerspectiveCountBB(Matrix<float> matrix)
-        {
-            Matrix<float> tmp = PerspectiveTransform.perspectiveTransformPoint(countBB.X, countBB.Y, matrix);
-            Point tmpLT = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
+      public void SetSpeed()
+      {
+         double tmpDistance = Math.Sqrt(Math.Pow(PerspectiveStartCountedAreaPoint.Y - PerspectiveCountPosition.Y, 2));
+         tmpDistance = PerspectiveTransform.ConvertDistanceToPerspective(tmpDistance);
+         double time = (1 / (double)MainForm.FPS) * (double)(NumberOfFrames - NumberOfFrameStartCountedArea);
+         Speed = Math.Round((tmpDistance / time) * 3.6, 2);
+      }
 
-            tmp = PerspectiveTransform.perspectiveTransformPoint(countBB.X + countBB.Width, countBB.Y, matrix);
-            Point tmpRT = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
+      public void SetSize()
+      {
+         Size = Math.Round(PerspectiveTransform.ConvertDistanceToPerspective(PerspectiveCountBB.Height) * 0.4, 2);
+      }
 
-            tmp = PerspectiveTransform.perspectiveTransformPoint(countBB.X, countBB.Y + countBB.Height, matrix);
-            Point tmpLB = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
+      private void _SetPerspectiveCountBB(Matrix<float> matrix)
+      {
+         Matrix<float> tmp = PerspectiveTransform.PerspectiveTransformPoint(CountBB.X, CountBB.Y, matrix);
+         Point tmpLT = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
 
-            tmp = PerspectiveTransform.perspectiveTransformPoint(countBB.X + countBB.Width, countBB.Y + countBB.Height, matrix);
-            Point tmpRB = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
+         tmp = PerspectiveTransform.PerspectiveTransformPoint(CountBB.X + CountBB.Width, CountBB.Y, matrix);
+         Point tmpRT = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
 
-            int height = tmpLB.Y - tmpLT.Y;
-            int width = tmpRB.X - tmpLB.X;
-            perspectiveCountBB = new Rectangle(tmpLT.X, tmpLT.Y, width, height); 
+         tmp = PerspectiveTransform.PerspectiveTransformPoint(CountBB.X, CountBB.Y + CountBB.Height, matrix);
+         Point tmpLB = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
 
-        }
+         tmp = PerspectiveTransform.PerspectiveTransformPoint(CountBB.X + CountBB.Width, CountBB.Y + CountBB.Height, matrix);
+         Point tmpRB = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
 
-        private void setPerspectiveCountPoint(Matrix<float> matrix)
-        {
-            Matrix<float> tmp = PerspectiveTransform.perspectiveTransformPoint(countPosition.X, countPosition.Y, matrix);
-            perspectiveCountPosition = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
-        }
+         int height = tmpLB.Y - tmpLT.Y;
+         int width = tmpRB.X - tmpLB.X;
+         PerspectiveCountBB = new Rectangle(tmpLT.X, tmpLT.Y, width, height);
+      }
 
-        private void setPerspectiveStartCountedArea(Matrix<float> matrix)
-        {
-            Matrix<float> tmp = PerspectiveTransform.perspectiveTransformPoint(positionOnStartCountedArea.X, positionOnStartCountedArea.Y, matrix);
-            perspectiveStartCountedAreaPoint = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
-        }
+      private void _SetPerspectiveCountPoint(Matrix<float> matrix)
+      {
+         Matrix<float> tmp = PerspectiveTransform.PerspectiveTransformPoint(CountPosition.X, CountPosition.Y, matrix);
+         PerspectiveCountPosition = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
+      }
 
-        public int NumberOfMissingFrames
-        {
-            get {return numberOfMissingFrames; }
-            set { numberOfMissingFrames = value; }
-        }
+      private void _SetPerspectiveStartCountedArea(Matrix<float> matrix)
+      {
+         Matrix<float> tmp = PerspectiveTransform.PerspectiveTransformPoint(_positionOnStartCountedArea.X, _positionOnStartCountedArea.Y, matrix);
+         PerspectiveStartCountedAreaPoint = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
+      }
 
-        public bool isUsed
-        {
-            get { return used; }
-            set { used = value; }
-        }
+      public int NumberOfMissingFrames
+      {
+         get { return _numberOfMissingFrames; }
+         set { _numberOfMissingFrames = value; }
+      }
 
-        public int NumberOfFrameStartCountedArea
-        {
-            get { return numberOfFrameStartCountedArea; }
-            set { numberOfFrameStartCountedArea = value; }
-        }
+      public bool IsUsed
+      {
+         get { return _used; }
+         set { _used = value; }
+      }
 
-        public Point PositionOnStartCountedArea
-        {
-            get { return positionOnStartCountedArea; }
-            set { positionOnStartCountedArea = value; }
+      public int NumberOfFrameStartCountedArea
+      {
+         get { return _numberOfFrameStartCountedArea; }
+         set { _numberOfFrameStartCountedArea = value; }
+      }
 
-        }
-
-    }
-    
+      public Point PositionOnStartCountedArea
+      {
+         get { return _positionOnStartCountedArea; }
+         set { _positionOnStartCountedArea = value; }
+      }
+   }
 }

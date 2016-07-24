@@ -2,31 +2,31 @@
 
 namespace IDS
 {
-    //trieda na definovanie predneho svetlometu vozidla
-    class Headlight
-    {
-        bool paired;
-        public Point p1;
-        public Point p2;
-        public int Height 
-        {
-            get { return p2.Y - p1.Y; }
-        }
-        public int Width  
-        {
-            get { return p2.X - p1.X; }
-        }
+   //trieda na definovanie predneho svetlometu vozidla
+   class Headlight
+   {
+      bool _paired;
+      public Point P1;
+      public Point P2;
+      public int Height
+      {
+         get { return P2.Y - P1.Y; }
+      }
+      public int Width
+      {
+         get { return P2.X - P1.X; }
+      }
 
-        public Headlight(Point p1, Point p2)
-        {
-            this.p1 = p1;
-            this.p2 = p2;
-            paired = false;
-        }
-        public bool Paired
-        {
-            get { return paired; }
-            set { paired = value; }
-        }
-    }
+      public Headlight(Point p1, Point p2)
+      {
+         P1 = p1;
+         P2 = p2;
+         _paired = false;
+      }
+      public bool Paired
+      {
+         get { return _paired; }
+         set { _paired = value; }
+      }
+   }
 }

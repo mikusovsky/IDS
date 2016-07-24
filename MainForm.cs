@@ -129,7 +129,7 @@ namespace IDS
 
             boundingBoxes = new List<Rectangle>();
 
-            homogMatrix = PerspectiveTransform.findHomographyMatrix(roadPoints);
+            homogMatrix = PerspectiveTransform.FindHomographyMatrix(roadPoints);
             setPerspectiveMeasureDistance(homogMatrix);
             consoleText.Text = "";
             stopButton.Text = "Stop";
@@ -222,10 +222,10 @@ namespace IDS
         //vypocitanie pozicie referencnych bodov v vtacom pohlade
         private void setPerspectiveMeasurePoints(Matrix<float> matrix)
         {
-            Matrix<float> tmp = PerspectiveTransform.perspectiveTransformPoint(measurePoint1.X, measurePoint1.Y, matrix);
+            Matrix<float> tmp = PerspectiveTransform.PerspectiveTransformPoint(measurePoint1.X, measurePoint1.Y, matrix);
             perspectiveMeasurePoint1 = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
 
-            tmp = PerspectiveTransform.perspectiveTransformPoint(measurePoint2.X, measurePoint2.Y, matrix);
+            tmp = PerspectiveTransform.PerspectiveTransformPoint(measurePoint2.X, measurePoint2.Y, matrix);
             perspectiveMeasurePoint2 = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
         }
 
@@ -317,14 +317,14 @@ namespace IDS
         //metoda sa trackovanie pohybujucich sa objektov
         private void trackingVehicles()
         {
-            tracking.findPrevBB();
+            tracking.FindPrevBb();
             if (showTmpImages)
             {
                 CvInvoke.cvCopy(frame, contoursImage, IntPtr.Zero);
-                // CvInvoke.cvShowImage("predikcia", tracking.drawPrediction(contoursImage));
+                // CvInvoke.cvShowImage("predikcia", tracking.DrawPrediction(contoursImage));
             }
 
-            List<Vehicle> newCountedVehicles = tracking.setStatisticParam(homogMatrix);
+            List<Vehicle> newCountedVehicles = tracking.SetStatisticParam(homogMatrix);
 
             foreach (RoadLane lane in roadLanes)
             {
@@ -333,21 +333,21 @@ namespace IDS
             
             foreach (Vehicle v in newCountedVehicles)
             {
-                int centerPoint = (int)((v.p1.X + v.p2.X) / 2);
+                int centerPoint = (int)((v.P1.X + v.P2.X) / 2);
                 string tmpText;
                 foreach (RoadLane lane in roadLanes)
                 {
                     if (centerPoint < lane.LanePoints[2].X)
                     {
-                        if (v.size < MAX_SIZE_OF_PRIVATE_CAR)
+                        if (v.Size < MAX_SIZE_OF_PRIVATE_CAR)
                         {
                             lane.NumberOfPrivateCars++;
-                            tmpText = tracking.vehiclesCount.ToString() + "- Osobné v., \t r: " + v.speed.ToString();
+                            tmpText = tracking.VehiclesCount.ToString() + "- Osobné v., \t r: " + v.Speed.ToString();
                         }
                         else
                         {
                             lane.NumberOfTrucks++;
-                            tmpText = tracking.vehiclesCount.ToString() + "- Nákladné v.,\t r: " + v.speed.ToString();
+                            tmpText = tracking.VehiclesCount.ToString() + "- Nákladné v.,\t r: " + v.Speed.ToString();
                         }
 
                         consoleText.Text = tmpText + " km/h \r\n" + consoleText.Text;
@@ -358,16 +358,16 @@ namespace IDS
 
             }
 
-            foreach (Vehicle v in tracking.currentVehicles)
+            foreach (Vehicle v in tracking.CurrentVehicles)
             {
-                if ((v.p2.Y > v.firstPosition.Y) && v.numberOfFrames > 4)
+                if ((v.P2.Y > v.FirstPosition.Y) && v.NumberOfFrames > 4)
                 {
-                    Rectangle rect = new Rectangle((int)v.p1.X, (int)v.p1.Y, (int)v.p2.X - (int)v.p1.X, (int)v.p2.Y - (int)v.p1.Y);
+                    Rectangle rect = new Rectangle((int)v.P1.X, (int)v.P1.Y, (int)v.P2.X - (int)v.P1.X, (int)v.P2.Y - (int)v.P1.Y);
                     frame.Draw(rect, new Bgr(Color.LightGreen), 2);
                 }
             }
 
-            tracking.moveListCurrentToPrev();
+            tracking.MoveListCurrentToPrev();
 
             //LineSegment2D line = new LineSegment2D(new Point(0, START_COUNTED_AREA), new Point(frame.Width, START_COUNTED_AREA));
             //frame.Draw(line, new Bgr(255, 255, 255), 1);
@@ -694,7 +694,7 @@ namespace IDS
 
                     if ((bb.Y > minYTracking) && ((bb.Y + bb.Height) < maxYTracking))
                     {
-                        tracking.addCurrentVehicle(bb);
+                        tracking.AddCurrentVehicle(bb);
                     }
                     BBImage.Draw(bb, new Bgr(Color.Yellow), 1);
                 }
@@ -708,7 +708,7 @@ namespace IDS
 
                     if ((bb.Y > minYTracking) && ((bb.Y + bb.Height) < maxYTracking))
                     {
-                        pairLights.addHeadlight(bb);
+                        pairLights.AddHeadlight(bb);
                     }
                     BBImage.Draw(bb, new Bgr(Color.Yellow), 1);
                 }
@@ -717,14 +717,14 @@ namespace IDS
             if (!dayScene)
             {
                 List<Rectangle> vehiclesBB;
-                vehiclesBB = pairLights.createVehiclesBB();
+                vehiclesBB = pairLights._CreateVehiclesBB();
 
                 foreach (Rectangle rect in vehiclesBB)
                 {
-                    tracking.addCurrentVehicle(rect);
+                    tracking.AddCurrentVehicle(rect);
                 }
 
-                pairLights.clearList();
+                pairLights._ClearList();
             }
 
         }
