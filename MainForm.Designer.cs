@@ -54,7 +54,7 @@
             this.openFileButton.TabIndex = 0;
             this.openFileButton.Text = "Načítať video";
             this.openFileButton.UseVisualStyleBackColor = true;
-            this.openFileButton.Click += new System.EventHandler(this.openFileButton_Click);
+            this.openFileButton.Click += new System.EventHandler(this._OpenFileButton_Click);
             // 
             // consoleText
             // 
@@ -115,7 +115,7 @@
             this.stopButton.TabIndex = 7;
             this.stopButton.Text = "Stop";
             this.stopButton.UseVisualStyleBackColor = true;
-            this.stopButton.Click += new System.EventHandler(this.stopButton_Click);
+            this.stopButton.Click += new System.EventHandler(this._StopButton_Click);
             // 
             // label3
             // 

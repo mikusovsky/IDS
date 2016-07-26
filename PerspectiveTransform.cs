@@ -45,7 +45,7 @@ namespace IDS
       //konvertovanie vzdialenosti do vzdialenosti v vtacom pohlade
       static public double ConvertDistanceToPerspective(double dist)
       {
-         return (dist / MainForm.perspectiveMeasureDistance) * MainForm.realDistance;
+         return (dist / MainForm.PerspectiveMeasureDistance) * MainForm.RealDistance;
       }
    }
 }

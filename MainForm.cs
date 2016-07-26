@@ -18,65 +18,65 @@ namespace IDS
 {
     public partial class MainForm : Form
     {
-        System.Windows.Forms.Timer My_Timer;
+        System.Windows.Forms.Timer _myTimer;
         Capture _capture;
 
-        Image<Bgr, Byte> frame;
-        Image<Bgr, Byte> prevFrame;
-        Image<Bgr, Byte> contoursImage;
-        Image<Bgr, Byte> BBImage;
-        Image<Bgr, Byte> foregroundFrame;
-        Image<Bgr, Byte> backgroundFrame;
-        Image<Bgr, Byte> tempBgrFrame;
-        Image<Bgr, Byte> birdEye;
+        Image<Bgr, Byte> _frame;
+        Image<Bgr, Byte> _prevFrame;
+        Image<Bgr, Byte> _contoursImage;
+        Image<Bgr, Byte> _bbImage;
+        Image<Bgr, Byte> _foregroundFrame;
+        Image<Bgr, Byte> _backgroundFrame;
+        Image<Bgr, Byte> _tempBgrFrame;
+        Image<Bgr, Byte> _birdEye;
         
-        Image<Gray, Byte> canny;
-        Image<Gray, Byte> foregroundGrayFrame;
-        Image<Gray, Byte> tempGrayFrame;
-        Image<Gray, Byte> tempGrayBackgroundFrame;
+        Image<Gray, Byte> _canny;
+        Image<Gray, Byte> _foregroundGrayFrame;
+        Image<Gray, Byte> _tempGrayFrame;
+        Image<Gray, Byte> _tempGrayBackgroundFrame;
 
-        Image<Bgr, float> floatFrame;
-        Image<Bgr, float> floatBackgroundFrame;
+        Image<Bgr, float> _floatFrame;
+        Image<Bgr, float> _floatBackgroundFrame;
         
-        Matrix<float> homogMatrix;
+        Matrix<float> _homogMatrix;
 
-        MCvGaussBGStatModelParams mogParams;
-        BGStatModel<Bgr> bgModel;
+        MCvGaussBGStatModelParams _mogParams;
+        BGStatModel<Bgr> _bgModel;
         
-        bool startFrameCapture;
-        bool initializedVariables = false;
-        bool createBackgroundImage;
-        bool showTmpImages;
-        bool isDayScene;
-        bool firstFrame;
-        bool paused;
+        bool _startFrameCapture;
+        bool _initializedVariables = false;
+        bool _createBackgroundImage;
+        bool _showTmpImages;
+        bool _isDayScene;
+        bool _firstFrame;
+        bool _paused;
 
-        int frameNumber;
-        int minYTracking;
-        int maxYTracking;
-        int learningTime;
-        int mergeDistance;
+        int _frameNumber;
+        int _minYTracking;
+        int _maxYTracking;
+        int _learningTime;
+        int _mergeDistance;
 
-        List<Rectangle> boundingBoxes;
-        BackgroundSubstractorMOG2 mogDetector;
-        TrackingVehicles tracking;
-        PairingHeadlights pairLights;
+        List<Rectangle> _boundingBoxes;
+        BackgroundSubstractorMOG2 _mogDetector;
+        TrackingVehicles _tracking;
+        PairingHeadlights _pairLights;
 
-        List<Point> roadPoints;
-        List<Point> roadDistancePoints;
-        Point measurePoint1;
-        Point measurePoint2;
-        Point perspectiveMeasurePoint1;
-        Point perspectiveMeasurePoint2;
-        List<RoadLane> roadLanes;
-        Stopwatch sw;
+        List<Point> _roadPoints;
+        List<Point> _roadDistancePoints;
+        Point _measurePoint1;
+        Point _measurePoint2;
+        Point _perspectiveMeasurePoint1;
+        Point _perspectiveMeasurePoint2;
+        List<RoadLane> _roadLanes;
+        Stopwatch _sw;
         
-        int maxWidthOfRoadLane;
-        int minBoundingBoxWidth;
+        int _maxWidthOfRoadLane;
+        int _minBoundingBoxWidth;
 
         static public int FPS;
-        static public double perspectiveMeasureDistance = 0;
-        static public double realDistance = 1;
+        static public double PerspectiveMeasureDistance = 0;
+        static public double RealDistance = 1;
         static public int FRAME_NUMBER_TO_COUNT = 15;
         static public int BIRD_EYE_WIDTH = 300;
         static public int BIRD_EYE_HEIGHT = 400;
@@ -96,258 +96,256 @@ namespace IDS
         }
 
         //inicializacia premennych
-        private void setStartInitVariables()
+        private void _SetStartInitVariables()
         {
-            if (!initializedVariables)
+            if (!_initializedVariables)
             {
-                initVariables();
-                initializedVariables = true;
+                _InitVariables();
+                _initializedVariables = true;
             }
 
             //consoleText.Text = "sirka pruhu: " + maxWidthOfRoadLane.ToString();
-            My_Timer.Interval = 1000 / FPS;
+            _myTimer.Interval = 1000 / FPS;
             //My_Timer.Interval = 1;
 
-            My_Timer.Tick += new EventHandler(My_Timer_Tick);
-            My_Timer.Start();
+            _myTimer.Tick += new EventHandler(_MyTimerTick);
+            _myTimer.Start();
 
-            paused = false;
+            _paused = false;
         }
         
-        private void initVariables()
+        private void _InitVariables()
         {
-            My_Timer = new System.Windows.Forms.Timer();
+            _myTimer = new System.Windows.Forms.Timer();
 
-            mogDetector = new BackgroundSubstractorMOG2(30, 50, false);
-            tracking = new TrackingVehicles(roadLanes[0].MaxWidth);
-            pairLights = new PairingHeadlights(roadLanes[0].MaxWidth);
+            _mogDetector = new BackgroundSubstractorMOG2(30, 50, false);
+            _tracking = new TrackingVehicles(_roadLanes[0].MaxWidth);
+            _pairLights = new PairingHeadlights(_roadLanes[0].MaxWidth);
 
-            measurePoint1 = new Point();
-            measurePoint2 = new Point(); ;
-            perspectiveMeasurePoint1 = new Point();
-            perspectiveMeasurePoint2 = new Point();
+            _measurePoint1 = new Point();
+            _measurePoint2 = new Point(); ;
+            _perspectiveMeasurePoint1 = new Point();
+            _perspectiveMeasurePoint2 = new Point();
 
-            boundingBoxes = new List<Rectangle>();
+            _boundingBoxes = new List<Rectangle>();
 
-            homogMatrix = PerspectiveTransform.FindHomographyMatrix(roadPoints);
-            setPerspectiveMeasureDistance(homogMatrix);
+            _homogMatrix = PerspectiveTransform.FindHomographyMatrix(_roadPoints);
+            _SetPerspectiveMeasureDistance(_homogMatrix);
             consoleText.Text = "";
             stopButton.Text = "Stop";
 
-            initImage();
-            initBool();
-            initMogParams();
-            initInt();
+            _InitImage();
+            _InitBool();
+            _InitMogParams();
+            _InitInt();
         }
 
-        private void initImage()
+        private void _InitImage()
         {
-            FRAME_HEIGHT = frame.Height;
-            FRAME_WIDTH = frame.Width;
-            prevFrame = new Image<Bgr, Byte>(frame.Size);
-            contoursImage = new Image<Bgr, Byte>(frame.Size);
-            BBImage = new Image<Bgr, Byte>(frame.Size);
-            foregroundFrame = new Image<Bgr, Byte>(frame.Size);
-            backgroundFrame = new Image<Bgr, Byte>(frame.Size);
-            foregroundGrayFrame = new Image<Gray, Byte>(frame.Size);
-            tempBgrFrame = new Image<Bgr, Byte>(frame.Size);
-            tempGrayFrame = new Image<Gray, Byte>(frame.Size);
-            tempGrayBackgroundFrame = new Image<Gray, Byte>(frame.Size);
-            birdEye = new Image<Bgr, byte>(BIRD_EYE_WIDTH, BIRD_EYE_HEIGHT);
-            canny = new Image<Gray, Byte>(frame.Size);
+            FRAME_HEIGHT = _frame.Height;
+            FRAME_WIDTH = _frame.Width;
+            _prevFrame = new Image<Bgr, Byte>(_frame.Size);
+            _contoursImage = new Image<Bgr, Byte>(_frame.Size);
+            _bbImage = new Image<Bgr, Byte>(_frame.Size);
+            _foregroundFrame = new Image<Bgr, Byte>(_frame.Size);
+            _backgroundFrame = new Image<Bgr, Byte>(_frame.Size);
+            _foregroundGrayFrame = new Image<Gray, Byte>(_frame.Size);
+            _tempBgrFrame = new Image<Bgr, Byte>(_frame.Size);
+            _tempGrayFrame = new Image<Gray, Byte>(_frame.Size);
+            _tempGrayBackgroundFrame = new Image<Gray, Byte>(_frame.Size);
+            _birdEye = new Image<Bgr, byte>(BIRD_EYE_WIDTH, BIRD_EYE_HEIGHT);
+            _canny = new Image<Gray, Byte>(_frame.Size);
 
-            floatFrame = new Image<Bgr, float>(frame.Size);
-            floatBackgroundFrame = new Image<Bgr, float>(frame.Size);
+            _floatFrame = new Image<Bgr, float>(_frame.Size);
+            _floatBackgroundFrame = new Image<Bgr, float>(_frame.Size);
         }
 
-        private void initInt()
+        private void _InitInt()
         {
-            maxWidthOfRoadLane = roadLanes[0].MaxWidth;
-            minYTracking = (int)Math.Round(0.05 * FRAME_HEIGHT);
-            maxYTracking = roadLanes[0].LanePoints[3].Y;
-            learningTime = LEARNING_TIME_IN_SEC * FPS;
-            frameNumber = 0;
-            mergeDistance = (int)(maxWidthOfRoadLane * 0.1); //15
-            minBoundingBoxWidth = (int)(0.2 * maxWidthOfRoadLane);
+            _maxWidthOfRoadLane = _roadLanes[0].MaxWidth;
+            _minYTracking = (int)Math.Round(0.05 * FRAME_HEIGHT);
+            _maxYTracking = _roadLanes[0].LanePoints[3].Y;
+            _learningTime = LEARNING_TIME_IN_SEC * FPS;
+            _frameNumber = 0;
+            _mergeDistance = (int)(_maxWidthOfRoadLane * 0.1); //15
+            _minBoundingBoxWidth = (int)(0.2 * _maxWidthOfRoadLane);
             
-            int laneHeight = roadLanes[0].LanePoints[3].Y - roadLanes[0].LanePoints[0].Y;
-            START_COUNTED_AREA = (int)(roadLanes[0].LanePoints[0].Y + (0.6 * laneHeight));
-            END_COUNTED_AREA = (int)(roadLanes[0].LanePoints[0].Y + (0.85 * laneHeight));
+            int laneHeight = _roadLanes[0].LanePoints[3].Y - _roadLanes[0].LanePoints[0].Y;
+            START_COUNTED_AREA = (int)(_roadLanes[0].LanePoints[0].Y + (0.6 * laneHeight));
+            END_COUNTED_AREA = (int)(_roadLanes[0].LanePoints[0].Y + (0.85 * laneHeight));
             MAX_SIZE_OF_PRIVATE_CAR = 8;
         }
 
-        private void initMogParams()
+        private void _InitMogParams()
         {
-            mogParams = new MCvGaussBGStatModelParams();
-            mogParams.win_size = 50;
-            mogParams.n_gauss = 2;
-            mogParams.bg_threshold = 0.6;
-            mogParams.std_threshold = 2.5;
-            mogParams.minArea = 5;
-            mogParams.weight_init = 0.05;
-            mogParams.variance_init = 30;
+            _mogParams = new MCvGaussBGStatModelParams();
+            _mogParams.win_size = 50;
+            _mogParams.n_gauss = 2;
+            _mogParams.bg_threshold = 0.6;
+            _mogParams.std_threshold = 2.5;
+            _mogParams.minArea = 5;
+            _mogParams.weight_init = 0.05;
+            _mogParams.variance_init = 30;
         }
 
-        private void initBool()
+        private void _InitBool()
         {
-            startFrameCapture = true;
-            createBackgroundImage = false;
-            paused = false;
-            firstFrame = true;
+            _startFrameCapture = true;
+            _createBackgroundImage = false;
+            _paused = false;
+            _firstFrame = true;
         }
 
         //inicializacia prveho framu
-        private void inicializationFirstFrame()
+        private void _InicializationFirstFrame()
         {
-            startFrameCapture = false;
-            CvInvoke.cvCopy(frame, prevFrame, IntPtr.Zero);
-            bgModel = new BGStatModel<Bgr>(frame, ref mogParams);
+            _startFrameCapture = false;
+            CvInvoke.cvCopy(_frame, _prevFrame, IntPtr.Zero);
+            _bgModel = new BGStatModel<Bgr>(_frame, ref _mogParams);
         }
 
         //nastavenie referencnej vzdialenosti vo vtacom pohlade
-        private void setPerspectiveMeasureDistance(Matrix<float> matrix)
+        private void _SetPerspectiveMeasureDistance(Matrix<float> matrix)
         {
-            setMeasurePoints();
-            setPerspectiveMeasurePoints(matrix);
-            perspectiveMeasureDistance = Math.Sqrt(Math.Pow(perspectiveMeasurePoint1.X - perspectiveMeasurePoint2.X, 2)
-                + Math.Pow(perspectiveMeasurePoint1.Y - perspectiveMeasurePoint2.Y, 2));
+            _SetMeasurePoints();
+            _SetPerspectiveMeasurePoints(matrix);
+            PerspectiveMeasureDistance = Math.Sqrt(Math.Pow(_perspectiveMeasurePoint1.X - _perspectiveMeasurePoint2.X, 2)
+                + Math.Pow(_perspectiveMeasurePoint1.Y - _perspectiveMeasurePoint2.Y, 2));
         }
 
-        private void setMeasurePoints()
+        private void _SetMeasurePoints()
         {
-            measurePoint1 = roadDistancePoints[0];
-            measurePoint2 = roadDistancePoints[1];
+            _measurePoint1 = _roadDistancePoints[0];
+            _measurePoint2 = _roadDistancePoints[1];
         }
 
         //vypocitanie pozicie referencnych bodov v vtacom pohlade
-        private void setPerspectiveMeasurePoints(Matrix<float> matrix)
+        private void _SetPerspectiveMeasurePoints(Matrix<float> matrix)
         {
-            Matrix<float> tmp = PerspectiveTransform.PerspectiveTransformPoint(measurePoint1.X, measurePoint1.Y, matrix);
-            perspectiveMeasurePoint1 = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
+            Matrix<float> tmp = PerspectiveTransform.PerspectiveTransformPoint(_measurePoint1.X, _measurePoint1.Y, matrix);
+            _perspectiveMeasurePoint1 = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
 
-            tmp = PerspectiveTransform.PerspectiveTransformPoint(measurePoint2.X, measurePoint2.Y, matrix);
-            perspectiveMeasurePoint2 = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
+            tmp = PerspectiveTransform.PerspectiveTransformPoint(_measurePoint2.X, _measurePoint2.Y, matrix);
+            _perspectiveMeasurePoint2 = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
         }
 
         //hlavna metoda na spracovanie kazdeho framu
-        private void My_Timer_Tick(object sender, EventArgs e)
+        private void _MyTimerTick(object sender, EventArgs e)
         {
-            sw = Stopwatch.StartNew();
+            _sw = Stopwatch.StartNew();
 
-            frame = _capture.QueryFrame();
+            _frame = _capture.QueryFrame();
 
-            if (frame != null)
+            if (_frame != null)
             {
-                if (startFrameCapture)
+                if (_startFrameCapture)
                 {
-                    inicializationFirstFrame();
+                    _InicializationFirstFrame();
                     return;
                 }
 
-                if (isDayScene)
+                if (_isDayScene)
                 {
-                    dayScene();
+                    _DayScene();
                 }
                 else
                 {
-                    nightScene();
+                    _NightScene();
                 }
 
                 //CvInvoke.cvCopy(frame.WarpPerspective(homogMatrix, BIRD_EYE_WIDTH, BIRD_EYE_HEIGHT, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC, Emgu.CV.CvEnum.WARP.CV_WARP_DEFAULT, new Bgr(0, 0, 0)), birdEye, IntPtr.Zero);
                 //CvInvoke.cvShowImage("vtaci pohlad", birdEye);
 
-                trackingVehicles();
+                _TrackingVehicles();
                                 
-                updateStatisticalData();
-                sw.Stop();
+                _UpdateStatisticalData();
+                _sw.Stop();
 
-                int actualFPS = (int)(1000 / sw.Elapsed.TotalMilliseconds);
+                int actualFPS = (int)(1000 / _sw.Elapsed.TotalMilliseconds);
                 fpsLabel.Text = actualFPS.ToString() + "fps";
                 //Console.WriteLine(actualFPS+ "fps");
 
-                frameNumber++;
+                _frameNumber++;
             }
             else
             {
-                My_Timer.Stop();
+                _myTimer.Stop();
                 MessageBox.Show("Koniec videa");
                 openFileButton.Enabled = true;
             }
         }
 
         //aktualizovanie zobrazovanych statistickych udajov 
-        private void updateStatisticalData()
+        private void _UpdateStatisticalData()
         {
             string name;
             Label lb;
             int sumCars = 0;
             int sumTrucks = 0;
 
-            for (int i = 0; i < roadLanes.Count; i++)
+            for (int i = 0; i < _roadLanes.Count; i++)
             {
                 name = "lane" + (i + 1).ToString() + "Cars";
-                lb = (Label)this.Controls[name];
-                lb.Text = roadLanes[i].NumberOfPrivateCars.ToString();
+                lb = (Label)Controls[name];
+                lb.Text = _roadLanes[i].NumberOfPrivateCars.ToString();
 
                 name = "lane" + (i + 1).ToString() + "Trucks";
-                lb = (Label)this.Controls[name];
-                lb.Text = roadLanes[i].NumberOfTrucks.ToString();
+                lb = (Label)Controls[name];
+                lb.Text = _roadLanes[i].NumberOfTrucks.ToString();
 
                 name = "lane" + (i + 1).ToString() + "Sum";
-                lb = (Label)this.Controls[name];
-                lb.Text = roadLanes[i].NumberOfCars.ToString();
+                lb = (Label)Controls[name];
+                lb.Text = _roadLanes[i].NumberOfCars.ToString();
 
-                sumCars += roadLanes[i].NumberOfPrivateCars;
-                sumTrucks += roadLanes[i].NumberOfTrucks;
+                sumCars += _roadLanes[i].NumberOfPrivateCars;
+                sumTrucks += _roadLanes[i].NumberOfTrucks;
 
             }
 
-            lb = (Label)this.Controls["sumCars"];
+            lb = (Label)Controls["sumCars"];
             lb.Text = sumCars.ToString();
 
-            lb = (Label)this.Controls["sumTrucks"];
+            lb = (Label)Controls["sumTrucks"];
             lb.Text = sumTrucks.ToString();
 
-            lb = (Label)this.Controls["totalSum"];
+            lb = (Label)Controls["totalSum"];
             lb.Text = (sumCars + sumTrucks).ToString();
-
-
         }
 
         //metoda sa trackovanie pohybujucich sa objektov
-        private void trackingVehicles()
+        private void _TrackingVehicles()
         {
-            tracking.FindPrevBb();
-            if (showTmpImages)
+            _tracking.FindPrevBb();
+            if (_showTmpImages)
             {
-                CvInvoke.cvCopy(frame, contoursImage, IntPtr.Zero);
+                CvInvoke.cvCopy(_frame, _contoursImage, IntPtr.Zero);
                 // CvInvoke.cvShowImage("predikcia", tracking.DrawPrediction(contoursImage));
             }
 
-            List<Vehicle> newCountedVehicles = tracking.SetStatisticParam(homogMatrix);
+            List<Vehicle> newCountedVehicles = _tracking.SetStatisticParam(_homogMatrix);
 
-            foreach (RoadLane lane in roadLanes)
+            foreach (RoadLane lane in _roadLanes)
             {
-                frame.DrawPolyline(lane.LanePoints.ToArray(), true, new Bgr(Color.Yellow), 2);
+                _frame.DrawPolyline(lane.LanePoints.ToArray(), true, new Bgr(Color.Yellow), 2);
             }
             
             foreach (Vehicle v in newCountedVehicles)
             {
                 int centerPoint = (int)((v.P1.X + v.P2.X) / 2);
                 string tmpText;
-                foreach (RoadLane lane in roadLanes)
+                foreach (RoadLane lane in _roadLanes)
                 {
                     if (centerPoint < lane.LanePoints[2].X)
                     {
                         if (v.Size < MAX_SIZE_OF_PRIVATE_CAR)
                         {
                             lane.NumberOfPrivateCars++;
-                            tmpText = tracking.VehiclesCount.ToString() + "- Osobné v., \t r: " + v.Speed.ToString();
+                            tmpText = _tracking.VehiclesCount.ToString() + "- Osobné v., \t r: " + v.Speed.ToString();
                         }
                         else
                         {
                             lane.NumberOfTrucks++;
-                            tmpText = tracking.VehiclesCount.ToString() + "- Nákladné v.,\t r: " + v.Speed.ToString();
+                            tmpText = _tracking.VehiclesCount.ToString() + "- Nákladné v.,\t r: " + v.Speed.ToString();
                         }
 
                         consoleText.Text = tmpText + " km/h \r\n" + consoleText.Text;
@@ -358,159 +356,159 @@ namespace IDS
 
             }
 
-            foreach (Vehicle v in tracking.CurrentVehicles)
+            foreach (Vehicle v in _tracking.CurrentVehicles)
             {
                 if ((v.P2.Y > v.FirstPosition.Y) && v.NumberOfFrames > 4)
                 {
                     Rectangle rect = new Rectangle((int)v.P1.X, (int)v.P1.Y, (int)v.P2.X - (int)v.P1.X, (int)v.P2.Y - (int)v.P1.Y);
-                    frame.Draw(rect, new Bgr(Color.LightGreen), 2);
+                    _frame.Draw(rect, new Bgr(Color.LightGreen), 2);
                 }
             }
 
-            tracking.MoveListCurrentToPrev();
+            _tracking.MoveListCurrentToPrev();
 
             //LineSegment2D line = new LineSegment2D(new Point(0, START_COUNTED_AREA), new Point(frame.Width, START_COUNTED_AREA));
             //frame.Draw(line, new Bgr(255, 255, 255), 1);
             //line = new LineSegment2D(new Point(0, END_COUNTED_AREA), new Point(frame.Width, END_COUNTED_AREA));
             //frame.Draw(line, new Bgr(255, 255, 255), 1);
 
-            if (createBackgroundImage)
+            if (_createBackgroundImage)
             {
                 string s = "VYTVARAM POZADIE";
                 MCvFont font = new MCvFont(FONT.CV_FONT_HERSHEY_PLAIN, 1, 1);
                 Point p = new Point(15, 15);
-                frame.Draw(s, ref font, p, new Bgr(Color.Yellow));
+                _frame.Draw(s, ref font, p, new Bgr(Color.Yellow));
             }
             
-            CvInvoke.cvShowImage("Monitoring", frame);
+            CvInvoke.cvShowImage("Monitoring", _frame);
         }
 
         //metoda na identifikaciu objektu pocas dna
-        private void dayScene()
+        private void _DayScene()
         {
-            createForegroundFrame("avg");   //frameDiff, mog, mix, MOG2, avg
-            if (createBackgroundImage)
+            _CreateForegroundFrame("avg");   //frameDiff, mog, mix, MOG2, avg
+            if (_createBackgroundImage)
             {
-                if (showTmpImages)
+                if (_showTmpImages)
                 {
-                    CvInvoke.cvShowImage("Popredie", foregroundGrayFrame);
+                    CvInvoke.cvShowImage("Popredie", _foregroundGrayFrame);
                 }
                 // spravit hlasku vytvara sa pozadie
                 return;
             }
 
-            if (showTmpImages)
+            if (_showTmpImages)
             {
-                CvInvoke.cvShowImage("Popredie", foregroundGrayFrame);
+                CvInvoke.cvShowImage("Popredie", _foregroundGrayFrame);
             }
 
-            Image<Gray, Byte> tmpForeground = foregroundGrayFrame.Clone();
-            Image<Gray, Byte> tmpMask = new Image<Gray, byte>(frame.Size);
-            Image<Gray, Byte> tmpSmooth = new Image<Gray, byte>(frame.Size);
-            Image<Gray, Byte> tmpThresh = new Image<Gray, byte>(frame.Size);
-            Image<Gray, Byte> tmpMorp = new Image<Gray, byte>(frame.Size);
+            Image<Gray, Byte> tmpForeground = _foregroundGrayFrame.Clone();
+            Image<Gray, Byte> tmpMask = new Image<Gray, byte>(_frame.Size);
+            Image<Gray, Byte> tmpSmooth = new Image<Gray, byte>(_frame.Size);
+            Image<Gray, Byte> tmpThresh = new Image<Gray, byte>(_frame.Size);
+            Image<Gray, Byte> tmpMorp = new Image<Gray, byte>(_frame.Size);
 
-            for (int i = 0; i < roadLanes.Count; i++)
+            for (int i = 0; i < _roadLanes.Count; i++)
             {
-                foregroundGrayFrame = tmpForeground.Clone();
+                _foregroundGrayFrame = tmpForeground.Clone();
 
-                createMask2(i);
-                tmpMask += foregroundGrayFrame;
+                _CreateMask2(i);
+                tmpMask += _foregroundGrayFrame;
 
-                if (showTmpImages)
+                if (_showTmpImages)
                 {
                     CvInvoke.cvShowImage("maska", tmpMask);
                 }
 
-                createSmoothFrame();
-                tmpSmooth += foregroundGrayFrame;
+                _CreateSmoothFrame();
+                tmpSmooth += _foregroundGrayFrame;
 
-                createTresholdFrame();
-                tmpThresh += foregroundGrayFrame;
+                _CreateTresholdFrame();
+                tmpThresh += _foregroundGrayFrame;
 
-                createMorphologyFrameOnDay();
-                tmpMorp += foregroundGrayFrame;
+                _CreateMorphologyFrameOnDay();
+                tmpMorp += _foregroundGrayFrame;
 
-                if (showTmpImages)
+                if (_showTmpImages)
                 {
                     CvInvoke.cvShowImage("po morfologii", tmpMorp);
                 }
 
                 if (i == 0)
                 {
-                    createBoundingBox(true, true);
+                    _CreateBoundingBox(true, true);
                 }
                 else
                 {
-                    createBoundingBox(true, false);
+                    _CreateBoundingBox(true, false);
                 }
 
-                if (showTmpImages)
+                if (_showTmpImages)
                 {
-                    CvInvoke.cvShowImage("Boundingboxy", BBImage);
+                    CvInvoke.cvShowImage("Boundingboxy", _bbImage);
                 }
             }
         }
 
         //metoda na identifikaciu objektu pocas noci
-        private void nightScene()
+        private void _NightScene()
         {
-            foregroundGrayFrame = frame.Convert<Gray, Byte>();
-            if (showTmpImages)
+            _foregroundGrayFrame = _frame.Convert<Gray, Byte>();
+            if (_showTmpImages)
             {
-                CvInvoke.cvShowImage("Gray Image", foregroundGrayFrame);
+                CvInvoke.cvShowImage("Gray Image", _foregroundGrayFrame);
             }
 
-            foregroundGrayFrame = foregroundGrayFrame.ThresholdBinary(new Gray(240), new Gray(255));
+            _foregroundGrayFrame = _foregroundGrayFrame.ThresholdBinary(new Gray(240), new Gray(255));
 
-            Image<Gray, Byte> roadMask = new Image<Gray, Byte>(frame.Size);
+            Image<Gray, Byte> roadMask = new Image<Gray, Byte>(_frame.Size);
 
-            roadMask.FillConvexPoly(roadPoints.ToArray(), new Gray(255));
+            roadMask.FillConvexPoly(_roadPoints.ToArray(), new Gray(255));
             //CvInvoke.cvAnd(foregroundGrayFrame, roadMask, foregroundGrayFrame, IntPtr.Zero);
 
-            if (showTmpImages)
+            if (_showTmpImages)
             {
-                CvInvoke.cvShowImage("Threshold Image", foregroundGrayFrame);
+                CvInvoke.cvShowImage("Threshold Image", _foregroundGrayFrame);
             }
 
-            int kernelSize = (int)Math.Ceiling(maxWidthOfRoadLane * 0.03); //TODO
+            int kernelSize = (int)Math.Ceiling(_maxWidthOfRoadLane * 0.03); //TODO
             StructuringElementEx kernel = new StructuringElementEx(kernelSize, kernelSize, 1, 1, Emgu.CV.CvEnum.CV_ELEMENT_SHAPE.CV_SHAPE_ELLIPSE);
-            CvInvoke.cvMorphologyEx(foregroundGrayFrame, foregroundGrayFrame, IntPtr.Zero, kernel, CV_MORPH_OP.CV_MOP_CLOSE, 1);// TODO skusit vacsie cislo
+            CvInvoke.cvMorphologyEx(_foregroundGrayFrame, _foregroundGrayFrame, IntPtr.Zero, kernel, CV_MORPH_OP.CV_MOP_CLOSE, 1);// TODO skusit vacsie cislo
 
-            if (showTmpImages)
+            if (_showTmpImages)
             {
-                CvInvoke.cvShowImage("Morfologia", foregroundGrayFrame);
+                CvInvoke.cvShowImage("Morfologia", _foregroundGrayFrame);
             }
 
-            createBoundingBox(false, true);
+            _CreateBoundingBox(false, true);
 
-            if (showTmpImages)
+            if (_showTmpImages)
             {
-                CvInvoke.cvShowImage("Boundingboxy", BBImage);
+                CvInvoke.cvShowImage("Boundingboxy", _bbImage);
             }
         }
 
         //vytvorenie masky pre popredie
-        private void createMask2(int indexRoadLane)
+        private void _CreateMask2(int indexRoadLane)
         {
-            foregroundGrayFrame._ThresholdBinary(new Gray(40), new Gray(255));
+            _foregroundGrayFrame._ThresholdBinary(new Gray(40), new Gray(255));
 
-            Image<Gray, Byte> roadMask = new Image<Gray, byte>(frame.Size);
-            roadMask.FillConvexPoly(roadLanes[indexRoadLane].LanePoints.ToArray(), new Gray(255));
+            Image<Gray, Byte> roadMask = new Image<Gray, byte>(_frame.Size);
+            roadMask.FillConvexPoly(_roadLanes[indexRoadLane].LanePoints.ToArray(), new Gray(255));
 
-            CvInvoke.cvAnd(foregroundGrayFrame, roadMask, foregroundGrayFrame, IntPtr.Zero);
+            CvInvoke.cvAnd(_foregroundGrayFrame, roadMask, _foregroundGrayFrame, IntPtr.Zero);
 
-            canny = cannyMask();
-            if (showTmpImages)
+            _canny = _CannyMask();
+            if (_showTmpImages)
             {
-                CvInvoke.cvShowImage("canny v pruhu" + indexRoadLane, canny);
+                CvInvoke.cvShowImage("canny v pruhu" + indexRoadLane, _canny);
             }
         }
 
         //najdenie hran
-        private Image<Gray, Byte> cannyMask()
+        private Image<Gray, Byte> _CannyMask()
         {
-            Image<Gray, Byte> gray = foregroundGrayFrame.PyrDown().PyrUp();
+            Image<Gray, Byte> gray = _foregroundGrayFrame.PyrDown().PyrUp();
             //Image<Gray, Byte> cannyGray1 = gray.Canny(new Gray(50), new Gray(50));
             Image<Gray, Byte> cannyGray1 = gray.Canny(50, 50);
             Image<Gray, Byte> cannyGray2 = cannyGray1.Clone();
@@ -524,218 +522,213 @@ namespace IDS
         }
 
         //vyhladenie obrazu
-        private void createSmoothFrame()
+        private void _CreateSmoothFrame()
         {
-            int size = (int)Math.Ceiling(maxWidthOfRoadLane * 0.07);
-            foregroundGrayFrame = foregroundGrayFrame.SmoothBlur(size, size);
+            int size = (int)Math.Ceiling(_maxWidthOfRoadLane * 0.07);
+            _foregroundGrayFrame = _foregroundGrayFrame.SmoothBlur(size, size);
         }
 
         //vykonanie morfologickych operacii na obraze
-        private void createMorphologyFrameOnDay()
+        private void _CreateMorphologyFrameOnDay()
         {
-            int size = (int)Math.Ceiling(maxWidthOfRoadLane * 0.05);
+            int size = (int)Math.Ceiling(_maxWidthOfRoadLane * 0.05);
             int anchor = size / 2;
             StructuringElementEx kernel = new StructuringElementEx(size, size, anchor, anchor, Emgu.CV.CvEnum.CV_ELEMENT_SHAPE.CV_SHAPE_RECT);
-            CvInvoke.cvMorphologyEx(foregroundGrayFrame, foregroundGrayFrame, IntPtr.Zero, kernel, CV_MORPH_OP.CV_MOP_CLOSE, 1);
+            CvInvoke.cvMorphologyEx(_foregroundGrayFrame, _foregroundGrayFrame, IntPtr.Zero, kernel, CV_MORPH_OP.CV_MOP_CLOSE, 1);
         }
 
         //prahovanie obrazu
-        private void createTresholdFrame()
+        private void _CreateTresholdFrame()
         {
-            foregroundGrayFrame = foregroundGrayFrame.ThresholdBinary(new Gray(80), new Gray(255));
+            _foregroundGrayFrame = _foregroundGrayFrame.ThresholdBinary(new Gray(80), new Gray(255));
         }
 
         //identifikovanie popredia
-        private void createForegroundFrame(string type)
+        private void _CreateForegroundFrame(string type)
         {
             if (type.CompareTo("mog") == 0)
             {
-                foregroundGrayFrame = createMOG();
+                _foregroundGrayFrame = _CreateMOG();
             }
             else if (type.CompareTo("frameDiff") == 0)
             {
-                foregroundFrame = createDiffFrame();
-                foregroundGrayFrame = foregroundFrame.Convert<Gray, Byte>();
-                CvInvoke.cvCopy(frame, prevFrame, IntPtr.Zero);
+                _foregroundFrame = _CreateDiffFrame();
+                _foregroundGrayFrame = _foregroundFrame.Convert<Gray, Byte>();
+                CvInvoke.cvCopy(_frame, _prevFrame, IntPtr.Zero);
             }
             else if (type.CompareTo("mix") == 0)
             {
-                tempGrayFrame = createDiffFrame().Convert<Gray, Byte>();
-                CvInvoke.cvCopy(frame, prevFrame, IntPtr.Zero);
-                CvInvoke.cvAnd(createMOG(), tempGrayFrame, foregroundGrayFrame, IntPtr.Zero);
+                _tempGrayFrame = _CreateDiffFrame().Convert<Gray, Byte>();
+                CvInvoke.cvCopy(_frame, _prevFrame, IntPtr.Zero);
+                CvInvoke.cvAnd(_CreateMOG(), _tempGrayFrame, _foregroundGrayFrame, IntPtr.Zero);
             }
             else if (type.CompareTo("MOG2") == 0)
             {
-                foregroundGrayFrame = createMOG2();
+                _foregroundGrayFrame = _CreateMOG2();
             }
             else if (type.CompareTo("avg") == 0)
             {
-                foregroundGrayFrame = createAvg();
+                _foregroundGrayFrame = _CreateAvg();
             }
-
         }
 
-        private Image<Gray, Byte> createAvg()
+        private Image<Gray, Byte> _CreateAvg()
         {
-            Image<Bgr, Byte> temp = new Image<Bgr, Byte>(frame.Size);
+            Image<Bgr, Byte> temp = new Image<Bgr, Byte>(_frame.Size);
 
-            if (firstFrame)
+            if (_firstFrame)
             {
-                firstFrame = false;
-                floatFrame = frame.Convert<Bgr, float>();
-                CvInvoke.cvCopy(floatFrame, floatBackgroundFrame, IntPtr.Zero);
-                createBackgroundImage = true;
+                _firstFrame = false;
+                _floatFrame = _frame.Convert<Bgr, float>();
+                CvInvoke.cvCopy(_floatFrame, _floatBackgroundFrame, IntPtr.Zero);
+                _createBackgroundImage = true;
             }
             else
             {
-                floatFrame = frame.Convert<Bgr, float>();
+                _floatFrame = _frame.Convert<Bgr, float>();
 
-                if (frameNumber < learningTime)
+                if (_frameNumber < _learningTime)
                 {
-                    floatBackgroundFrame.RunningAvg(floatFrame, 0.01);
-                    createBackgroundImage = true;
+                    _floatBackgroundFrame.RunningAvg(_floatFrame, 0.01);
+                    _createBackgroundImage = true;
                 }
                 else
                 {
-                    floatBackgroundFrame.RunningAvg(floatFrame, LEARNING_RATE);
-                    createBackgroundImage = false;
+                    _floatBackgroundFrame.RunningAvg(_floatFrame, LEARNING_RATE);
+                    _createBackgroundImage = false;
                 }
-                backgroundFrame = floatBackgroundFrame.Convert<Bgr, Byte>();
-                CvInvoke.cvShowImage("pozadie", backgroundFrame);
-                CvInvoke.cvAbsDiff(frame, backgroundFrame, temp);
+                _backgroundFrame = _floatBackgroundFrame.Convert<Bgr, Byte>();
+                CvInvoke.cvShowImage("pozadie", _backgroundFrame);
+                CvInvoke.cvAbsDiff(_frame, _backgroundFrame, temp);
             }
-
             return temp.Convert<Gray, Byte>();
         }
 
-        private Image<Gray, Byte> createMOG()
+        private Image<Gray, Byte> _CreateMOG()
         {
-            if (frameNumber < learningTime)
+            if (_frameNumber < _learningTime)
             {
-                createBackgroundImage = true;
+                _createBackgroundImage = true;
             }
             else
             {
-                createBackgroundImage = false;
+                _createBackgroundImage = false;
             }
-            bgModel.Update(frame, -1);
-            return bgModel.ForgroundMask;
+            _bgModel.Update(_frame, -1);
+            return _bgModel.ForgroundMask;
 
         }
 
-        private Image<Gray, Byte> createMOG2()
+        private Image<Gray, Byte> _CreateMOG2()
         {
-            if (frameNumber < learningTime)
+            if (_frameNumber < _learningTime)
             {
-                mogDetector.Update(frame);
-                createBackgroundImage = true;
-
+                _mogDetector.Update(_frame);
+                _createBackgroundImage = true;
             }
             else
             {
-                mogDetector.Update(frame, 0.1);
-                createBackgroundImage = false;
+                _mogDetector.Update(_frame, 0.1);
+                _createBackgroundImage = false;
             }
-
-            return mogDetector.ForgroundMask;
+            return _mogDetector.ForgroundMask;
         }
 
-        private Image<Bgr, Byte> createDiffFrame()
+        private Image<Bgr, Byte> _CreateDiffFrame()
         {
-            Image<Bgr, Byte> temp = new Image<Bgr, Byte>(frame.Size);
-            CvInvoke.cvAbsDiff(prevFrame, frame, temp);
+            Image<Bgr, Byte> temp = new Image<Bgr, Byte>(_frame.Size);
+            CvInvoke.cvAbsDiff(_prevFrame, _frame, temp);
 
             return temp;
         }
 
         //vytvorenie bounding boxov pre pohybujuce sa objekty
-        private void createBoundingBox(bool dayScene, bool firstLane)
+        private void _CreateBoundingBox(bool dayScene, bool firstLane)
         {
 
             if (firstLane)
             {
-                CvInvoke.cvCopy(frame, BBImage, IntPtr.Zero);
+                CvInvoke.cvCopy(_frame, _bbImage, IntPtr.Zero);
             }
 
             //vytvorenie kontur
-            boundingBoxes.Clear();
+            _boundingBoxes.Clear();
             using (MemStorage storage = new MemStorage())
-                for (Contour<Point> contours = foregroundGrayFrame.FindContours(CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE,
+                for (Contour<Point> contours = _foregroundGrayFrame.FindContours(CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE,
                   RETR_TYPE.CV_RETR_EXTERNAL, storage); contours != null; contours = contours.HNext)
                 {
                     Seq<Point> tr = contours.GetConvexHull(ORIENTATION.CV_CLOCKWISE);
-                    boundingBoxes.Add(CvInvoke.cvBoundingRect(tr, true));
-                    BBImage.Draw(boundingBoxes[boundingBoxes.Count - 1], new Bgr(Color.Red), 1);
+                    _boundingBoxes.Add(CvInvoke.cvBoundingRect(tr, true));
+                    _bbImage.Draw(_boundingBoxes[_boundingBoxes.Count - 1], new Bgr(Color.Red), 1);
                 }
 
-            mergeBoundingBoxes();
+            _MergeBoundingBoxes();
 
-            foreach (Rectangle bb in boundingBoxes)
+            foreach (Rectangle bb in _boundingBoxes)
             {
                 if (dayScene)
                 {
-                    if ((bb.Width < minBoundingBoxWidth))
+                    if ((bb.Width < _minBoundingBoxWidth))
                     {
-                        BBImage.Draw(bb, new Bgr(Color.AliceBlue), 1);
+                        _bbImage.Draw(bb, new Bgr(Color.AliceBlue), 1);
                         continue;
                     }
 
                     // spatne porovnanie hran
-                    Image<Gray, Byte> BBMask = new Image<Gray, byte>(frame.Size);
+                    Image<Gray, Byte> BBMask = new Image<Gray, byte>(_frame.Size);
                     Point[] points = { new Point(bb.Left, bb.Top), new Point(bb.Right, bb.Top), new Point(bb.Right, bb.Bottom), new Point(bb.Left, bb.Bottom) };
                     BBMask.FillConvexPoly(points, new Gray(255));
-                    CvInvoke.cvAnd(BBMask, canny, BBMask, IntPtr.Zero);
+                    CvInvoke.cvAnd(BBMask, _canny, BBMask, IntPtr.Zero);
 
                     if (BBMask.CountNonzero()[0] <= 6 * (bb.Width + bb.Height))
                     {
-                        BBImage.Draw(bb, new Bgr(Color.Orange), 1);
+                        _bbImage.Draw(bb, new Bgr(Color.Orange), 1);
                         continue;
                     }
 
-                    if ((bb.Y > minYTracking) && ((bb.Y + bb.Height) < maxYTracking))
+                    if ((bb.Y > _minYTracking) && ((bb.Y + bb.Height) < _maxYTracking))
                     {
-                        tracking.AddCurrentVehicle(bb);
+                        _tracking.AddCurrentVehicle(bb);
                     }
-                    BBImage.Draw(bb, new Bgr(Color.Yellow), 1);
+                    _bbImage.Draw(bb, new Bgr(Color.Yellow), 1);
                 }
                 else
                 {
                     if ((bb.Width * bb.Height) < 7)
                     {
-                        BBImage.Draw(bb, new Bgr(Color.AliceBlue), 1);
+                        _bbImage.Draw(bb, new Bgr(Color.AliceBlue), 1);
                         continue;
                     }
 
-                    if ((bb.Y > minYTracking) && ((bb.Y + bb.Height) < maxYTracking))
+                    if ((bb.Y > _minYTracking) && ((bb.Y + bb.Height) < _maxYTracking))
                     {
-                        pairLights.AddHeadlight(bb);
+                        _pairLights.AddHeadlight(bb);
                     }
-                    BBImage.Draw(bb, new Bgr(Color.Yellow), 1);
+                    _bbImage.Draw(bb, new Bgr(Color.Yellow), 1);
                 }
             }
 
             if (!dayScene)
             {
                 List<Rectangle> vehiclesBB;
-                vehiclesBB = pairLights._CreateVehiclesBB();
+                vehiclesBB = _pairLights._CreateVehiclesBB();
 
                 foreach (Rectangle rect in vehiclesBB)
                 {
-                    tracking.AddCurrentVehicle(rect);
+                    _tracking.AddCurrentVehicle(rect);
                 }
 
-                pairLights._ClearList();
+                _pairLights._ClearList();
             }
-
         }
 
         //spajanie urcitych boundingboxov
-        private void mergeBoundingBoxes()
+        private void _MergeBoundingBoxes()
         {
             //List<Rectangle> BB = new List<Rectangle>();
-            for (int i = boundingBoxes.Count - 1; i >= 0; i--)
+            for (int i = _boundingBoxes.Count - 1; i >= 0; i--)
             {
-                for (int j = 0; j < boundingBoxes.Count; j++)
+                for (int j = 0; j < _boundingBoxes.Count; j++)
                 {
                     if (i == j)
                     {
@@ -743,46 +736,45 @@ namespace IDS
                     }
 
                     //ak sa horizontalne prekryvaju
-                    if (boundingBoxes[i].Left < boundingBoxes[j].Right && boundingBoxes[j].Left < boundingBoxes[i].Right)
+                    if (_boundingBoxes[i].Left < _boundingBoxes[j].Right && _boundingBoxes[j].Left < _boundingBoxes[i].Right)
                     {
                         //ak sa aj vertikalne prekryvaju
-                        if (boundingBoxes[i].Top < boundingBoxes[j].Bottom && boundingBoxes[j].Top < boundingBoxes[i].Bottom)
+                        if (_boundingBoxes[i].Top < _boundingBoxes[j].Bottom && _boundingBoxes[j].Top < _boundingBoxes[i].Bottom)
                         {
-                            Point p1 = new Point(Math.Min(boundingBoxes[i].Left, boundingBoxes[j].Left), Math.Min(boundingBoxes[i].Top, boundingBoxes[j].Top));
-                            Point p2 = new Point(Math.Max(boundingBoxes[i].Right, boundingBoxes[j].Right), Math.Max(boundingBoxes[i].Bottom, boundingBoxes[j].Bottom));
+                            Point p1 = new Point(Math.Min(_boundingBoxes[i].Left, _boundingBoxes[j].Left), Math.Min(_boundingBoxes[i].Top, _boundingBoxes[j].Top));
+                            Point p2 = new Point(Math.Max(_boundingBoxes[i].Right, _boundingBoxes[j].Right), Math.Max(_boundingBoxes[i].Bottom, _boundingBoxes[j].Bottom));
                             int height = p2.Y - p1.Y;
                             int width = p2.X - p1.X;
                             Rectangle newBB = new Rectangle(p1.X, p1.Y, width, height);
-                            boundingBoxes[j] = newBB;
-                            boundingBoxes.RemoveAt(i);
+                            _boundingBoxes[j] = newBB;
+                            _boundingBoxes.RemoveAt(i);
                             break;
                         }
 
-                        int minDist = Math.Min(Math.Abs(boundingBoxes[i].Top - boundingBoxes[j].Bottom),
-                                                Math.Abs(boundingBoxes[i].Bottom - boundingBoxes[j].Top));
+                        int minDist = Math.Min(Math.Abs(_boundingBoxes[i].Top - _boundingBoxes[j].Bottom),
+                                                Math.Abs(_boundingBoxes[i].Bottom - _boundingBoxes[j].Top));
 
                         //ak su blizko seba
-                        if (minDist < mergeDistance)
+                        if (minDist < _mergeDistance)
                         {
-                            Point p1 = new Point(Math.Min(boundingBoxes[i].Left, boundingBoxes[j].Left), Math.Min(boundingBoxes[i].Top, boundingBoxes[j].Top));
-                            Point p2 = new Point(Math.Max(boundingBoxes[i].Right, boundingBoxes[j].Right), Math.Max(boundingBoxes[i].Bottom, boundingBoxes[j].Bottom));
+                            Point p1 = new Point(Math.Min(_boundingBoxes[i].Left, _boundingBoxes[j].Left), Math.Min(_boundingBoxes[i].Top, _boundingBoxes[j].Top));
+                            Point p2 = new Point(Math.Max(_boundingBoxes[i].Right, _boundingBoxes[j].Right), Math.Max(_boundingBoxes[i].Bottom, _boundingBoxes[j].Bottom));
                             int height = p2.Y - p1.Y;
                             int width = p2.X - p1.X;
                             Rectangle newBB = new Rectangle(p1.X, p1.Y, width, height);
-                            boundingBoxes[j] = newBB;
-                            boundingBoxes.RemoveAt(i);
+                            _boundingBoxes[j] = newBB;
+                            _boundingBoxes.RemoveAt(i);
                             break;
                         }
 
                     }
                 }
             }
-
             //return BB;
         }
 
         //otvorenie a nacitanie videa 
-        private void openFileButton_Click(object sender, EventArgs e)
+        private void _OpenFileButton_Click(object sender, EventArgs e)
         {
             openFileDialog1.Filter = "Media Files|*.avi;*.mp4";
             openFileDialog1.FileName = "";
@@ -794,7 +786,7 @@ namespace IDS
                     _capture = null;
                     _capture = new Capture(openFileDialog1.FileName);
                     FPS = (int)_capture.GetCaptureProperty(Emgu.CV.CvEnum.CAP_PROP.CV_CAP_PROP_FPS);
-                    initializedVariables = false;
+                    _initializedVariables = false;
                 }
                 catch (NullReferenceException excpt)
                 {
@@ -809,49 +801,49 @@ namespace IDS
             
             if (daySceneRadioButton.Checked)
             {
-                isDayScene = true;
+                _isDayScene = true;
             }
             else
             {
-                isDayScene = false;
+                _isDayScene = false;
             }
 
             if (showTmpImageCheckBox.Checked)
             {
-                showTmpImages = true;
+                _showTmpImages = true;
             }
             else
             {
-                showTmpImages = false;
+                _showTmpImages = false;
             }
 
             if (_capture != null)
             {
-                frame = _capture.QueryFrame();
+                _frame = _capture.QueryFrame();
                 
 
                 string onlyfilename = openFileDialog1.SafeFileName;
-                RoadParamForm roadParam = new RoadParamForm(frame, onlyfilename);
+                RoadParamForm roadParam = new RoadParamForm(_frame, onlyfilename);
 
                 roadParam.ShowDialog();
 
                 if (roadParam.IsSetAllRoadParam)
                 {
                     openFileButton.Enabled = false;
-                    roadPoints = roadParam.getRoadPoints();
-                    roadDistancePoints = roadParam.getRoadDistancePoints();
-                    realDistance = roadParam.getRealDistance();
-                    roadLanes = roadParam.createRoadLanes();
+                    _roadPoints = roadParam.getRoadPoints();
+                    _roadDistancePoints = roadParam.getRoadDistancePoints();
+                    RealDistance = roadParam.getRealDistance();
+                    _roadLanes = roadParam.createRoadLanes();
 
-                    setStartInitVariables();
-                    createStatisticLabels();
+                    _SetStartInitVariables();
+                    _CreateStatisticLabels();
 
                 }
             }
         }
 
         //vytvorenie GUI pre statisticke informacie
-        private void createStatisticLabels()
+        private void _CreateStatisticLabels()
         {
 
             int x = 512;
@@ -859,7 +851,7 @@ namespace IDS
             int dy = 24;
 
 
-            for (int i = 1; i <= roadLanes.Count; i++)
+            for (int i = 1; i <= _roadLanes.Count; i++)
             {
                 Label laneText = new Label();
                 laneText.Location = new Point(x, y);
@@ -885,10 +877,10 @@ namespace IDS
                 laneSum.Name = "lane" + i.ToString() + "Sum";
                 laneSum.AutoSize = true;
 
-                this.Controls.Add(laneText);
-                this.Controls.Add(laneCars);
-                this.Controls.Add(laneTrucks);
-                this.Controls.Add(laneSum);
+                Controls.Add(laneText);
+                Controls.Add(laneCars);
+                Controls.Add(laneTrucks);
+                Controls.Add(laneSum);
                 y += dy;
             }
 
@@ -916,29 +908,29 @@ namespace IDS
             totalSum.Name = "totalSum";
             totalSum.AutoSize = true;
 
-            this.Controls.Add(sumText);
-            this.Controls.Add(sumCars);
-            this.Controls.Add(sumTrucks);
-            this.Controls.Add(totalSum);
+            Controls.Add(sumText);
+            Controls.Add(sumCars);
+            Controls.Add(sumTrucks);
+            Controls.Add(totalSum);
 
 
         }
 
         
-        private void stopButton_Click(object sender, EventArgs e)
+        private void _StopButton_Click(object sender, EventArgs e)
         {
-            if (paused)
+            if (_paused)
             {
                 stopButton.Text = "Stop";
-                paused = false;
-                My_Timer.Start();
+                _paused = false;
+                _myTimer.Start();
                 openFileButton.Enabled = false;
             }
             else
             {
                 stopButton.Text = "Spustiť";
-                paused = true;
-                My_Timer.Stop();
+                _paused = true;
+                _myTimer.Stop();
                 openFileButton.Enabled = true;
             }
         }
@@ -947,7 +939,7 @@ namespace IDS
         {
             if (e.KeyCode == Keys.N)
             {
-                stopButton_Click(sender, new EventArgs());
+                _StopButton_Click(sender, new EventArgs());
             }
         }
     }
