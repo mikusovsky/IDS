@@ -67,38 +67,38 @@
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" Type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" Type="xsd:string" />
-              <xsd:attribute name="Type" Type="xsd:string" />
-              <xsd:attribute name="mimeType" Type="xsd:string" />
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
               <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" Type="xsd:string" />
-              <xsd:attribute name="name" Type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" Type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" Type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
               </xsd:sequence>
-              <xsd:attribute name="name" Type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="Type" Type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimeType" Type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
               <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" Type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
               </xsd:sequence>
-              <xsd:attribute name="name" Type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required" />
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -117,7 +117,40 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="openFileDialog1.TrayLocation" Type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
+  <data name="ButtonStop_Start" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="ButtonStop_Stop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="DayScene" xml:space="preserve">
+    <value>Day Scene</value>
+  </data>
+  <data name="LoadVideo" xml:space="preserve">
+    <value>Load video</value>
+  </data>
+  <data name="Lorries" xml:space="preserve">
+    <value>Lorries</value>
+  </data>
+  <data name="MainFrameName" xml:space="preserve">
+    <value>IDS</value>
+  </data>
+  <data name="NightScene" xml:space="preserve">
+    <value>Night Scene</value>
+  </data>
+  <data name="PersonalVehicles" xml:space="preserve">
+    <value>Personal</value>
+  </data>
+  <data name="ShowDetails" xml:space="preserve">
+    <value>Show details</value>
+  </data>
+  <data name="Together" xml:space="preserve">
+    <value>Together</value>
+  </data>
+  <data name="TypeOfScene" xml:space="preserve">
+    <value>Type of scene</value>
+  </data>
+  <data name="ZeroFPS" xml:space="preserve">
+    <value>0 fps</value>
+  </data>
 </root>
