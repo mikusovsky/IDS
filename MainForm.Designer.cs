@@ -30,158 +30,158 @@ namespace IDS
       /// </summary>
       private void InitializeComponent()
       {
-         openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-         openFileButton = new System.Windows.Forms.Button();
-         consoleText = new System.Windows.Forms.TextBox();
-         label1 = new System.Windows.Forms.Label();
-         daySceneRadioButton = new System.Windows.Forms.RadioButton();
-         nightSceneRadioButton = new System.Windows.Forms.RadioButton();
-         showTmpImageCheckBox = new System.Windows.Forms.CheckBox();
-         stopButton = new System.Windows.Forms.Button();
-         label3 = new System.Windows.Forms.Label();
-         label4 = new System.Windows.Forms.Label();
-         label5 = new System.Windows.Forms.Label();
-         fpsLabel = new System.Windows.Forms.Label();
+         OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+         OpenFileButton = new System.Windows.Forms.Button();
+         ConsoleText = new System.Windows.Forms.TextBox();
+         TypeOfSceneLabel = new System.Windows.Forms.Label();
+         DaySceneRadioButton = new System.Windows.Forms.RadioButton();
+         NightSceneRadioButton = new System.Windows.Forms.RadioButton();
+         ShowTmpImageCheckBox = new System.Windows.Forms.CheckBox();
+         StopButton = new System.Windows.Forms.Button();
+         PersonalLabel = new System.Windows.Forms.Label();
+         LoriesLabel = new System.Windows.Forms.Label();
+         TogetherLabel = new System.Windows.Forms.Label();
+         FpsLabel = new System.Windows.Forms.Label();
          SuspendLayout();
          // 
-         // openFileDialog1
+         // OpenFileDialog
          // 
-         openFileDialog1.FileName = "openFileDialog1";
+         OpenFileDialog.FileName = "OpenFileDialog";
          // 
-         // openFileButton
+         // OpenFileButton
          // 
-         openFileButton.Location = new System.Drawing.Point(20, 375);
-         openFileButton.Margin = new System.Windows.Forms.Padding(4);
-         openFileButton.Name = "loadVideoButton";
-         openFileButton.Size = new System.Drawing.Size(125, 34);
-         openFileButton.TabIndex = 0;
-         openFileButton.Text = Resources.LoadVideo;
-         openFileButton.UseVisualStyleBackColor = true;
-         openFileButton.Click += new System.EventHandler(_LoadVideoButton_Click);
+         OpenFileButton.Location = new System.Drawing.Point(20, 375);
+         OpenFileButton.Margin = new System.Windows.Forms.Padding(4);
+         OpenFileButton.Name = "loadVideoButton";
+         OpenFileButton.Size = new System.Drawing.Size(125, 34);
+         OpenFileButton.TabIndex = 0;
+         OpenFileButton.Text = Resources.LoadVideo;
+         OpenFileButton.UseVisualStyleBackColor = true;
+         OpenFileButton.Click += new System.EventHandler(_LoadVideoButton_Click);
          // 
-         // consoleText
+         // ConsoleText
          // 
-         consoleText.Location = new System.Drawing.Point(180, 38);
-         consoleText.Margin = new System.Windows.Forms.Padding(4);
-         consoleText.Multiline = true;
-         consoleText.Name = "consoleText";
-         consoleText.ReadOnly = true;
-         consoleText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-         consoleText.Size = new System.Drawing.Size(539, 422);
-         consoleText.TabIndex = 1;
+         ConsoleText.Location = new System.Drawing.Point(180, 38);
+         ConsoleText.Margin = new System.Windows.Forms.Padding(4);
+         ConsoleText.Multiline = true;
+         ConsoleText.Name = "ConsoleText";
+         ConsoleText.ReadOnly = true;
+         ConsoleText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+         ConsoleText.Size = new System.Drawing.Size(539, 422);
+         ConsoleText.TabIndex = 1;
          // 
-         // label1
+         // TypeOfSceneLabel
          // 
-         label1.AutoSize = true;
-         label1.Location = new System.Drawing.Point(16, 42);
-         label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-         label1.Name = "label1";
-         label1.Size = new System.Drawing.Size(98, 17);
-         label1.TabIndex = 2;
-         label1.Text = "Type of scene";
+         TypeOfSceneLabel.AutoSize = true;
+         TypeOfSceneLabel.Location = new System.Drawing.Point(16, 42);
+         TypeOfSceneLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+         TypeOfSceneLabel.Name = "TypeOfSceneLabel";
+         TypeOfSceneLabel.Size = new System.Drawing.Size(98, 17);
+         TypeOfSceneLabel.TabIndex = 2;
+         TypeOfSceneLabel.Text = "Type of scene";
          // 
-         // daySceneRadioButton
+         // DaySceneRadioButton
          // 
-         daySceneRadioButton.AutoSize = true;
-         daySceneRadioButton.Checked = true;
-         daySceneRadioButton.Location = new System.Drawing.Point(20, 62);
-         daySceneRadioButton.Margin = new System.Windows.Forms.Padding(4);
-         daySceneRadioButton.Name = "daySceneRadioButton";
-         daySceneRadioButton.Size = new System.Drawing.Size(98, 21);
-         daySceneRadioButton.TabIndex = 3;
-         daySceneRadioButton.TabStop = true;
-         daySceneRadioButton.Text = Resources.DayScene;
-         daySceneRadioButton.UseVisualStyleBackColor = true;
+         DaySceneRadioButton.AutoSize = true;
+         DaySceneRadioButton.Checked = true;
+         DaySceneRadioButton.Location = new System.Drawing.Point(20, 62);
+         DaySceneRadioButton.Margin = new System.Windows.Forms.Padding(4);
+         DaySceneRadioButton.Name = "DaySceneRadioButton";
+         DaySceneRadioButton.Size = new System.Drawing.Size(98, 21);
+         DaySceneRadioButton.TabIndex = 3;
+         DaySceneRadioButton.TabStop = true;
+         DaySceneRadioButton.Text = Resources.DayScene;
+         DaySceneRadioButton.UseVisualStyleBackColor = true;
          // 
-         // nightSceneRadioButton
+         // NightSceneRadioButton
          // 
-         nightSceneRadioButton.AutoSize = true;
-         nightSceneRadioButton.Location = new System.Drawing.Point(20, 90);
-         nightSceneRadioButton.Margin = new System.Windows.Forms.Padding(4);
-         nightSceneRadioButton.Name = "nightSceneRadioButton";
-         nightSceneRadioButton.Size = new System.Drawing.Size(106, 21);
-         nightSceneRadioButton.TabIndex = 4;
-         nightSceneRadioButton.Text = Resources.NightScene;
-         nightSceneRadioButton.UseVisualStyleBackColor = true;
+         NightSceneRadioButton.AutoSize = true;
+         NightSceneRadioButton.Location = new System.Drawing.Point(20, 90);
+         NightSceneRadioButton.Margin = new System.Windows.Forms.Padding(4);
+         NightSceneRadioButton.Name = "NightSceneRadioButton";
+         NightSceneRadioButton.Size = new System.Drawing.Size(106, 21);
+         NightSceneRadioButton.TabIndex = 4;
+         NightSceneRadioButton.Text = Resources.NightScene;
+         NightSceneRadioButton.UseVisualStyleBackColor = true;
          // 
-         // showTmpImageCheckBox
+         // ShowTmpImageCheckBox
          // 
-         showTmpImageCheckBox.AutoSize = true;
-         showTmpImageCheckBox.Location = new System.Drawing.Point(16, 149);
-         showTmpImageCheckBox.Margin = new System.Windows.Forms.Padding(4);
-         showTmpImageCheckBox.Name = "showTmpImageCheckBox";
-         showTmpImageCheckBox.Size = new System.Drawing.Size(109, 21);
-         showTmpImageCheckBox.TabIndex = 6;
-         showTmpImageCheckBox.Text = Resources.ShowDetails;
-         showTmpImageCheckBox.UseVisualStyleBackColor = true;
+         ShowTmpImageCheckBox.AutoSize = true;
+         ShowTmpImageCheckBox.Location = new System.Drawing.Point(16, 149);
+         ShowTmpImageCheckBox.Margin = new System.Windows.Forms.Padding(4);
+         ShowTmpImageCheckBox.Name = "ShowTmpImageCheckBox";
+         ShowTmpImageCheckBox.Size = new System.Drawing.Size(109, 21);
+         ShowTmpImageCheckBox.TabIndex = 6;
+         ShowTmpImageCheckBox.Text = Resources.ShowDetails;
+         ShowTmpImageCheckBox.UseVisualStyleBackColor = true;
          // 
-         // stopButton
+         // StopButton
          // 
-         stopButton.Location = new System.Drawing.Point(20, 426);
-         stopButton.Margin = new System.Windows.Forms.Padding(4);
-         stopButton.Name = "stopButton";
-         stopButton.Size = new System.Drawing.Size(125, 34);
-         stopButton.TabIndex = 7;
-         stopButton.Text = Resources.ButtonStop_Stop;
-         stopButton.UseVisualStyleBackColor = true;
-         stopButton.Click += new System.EventHandler(this._StopButton_Click);
+         StopButton.Location = new System.Drawing.Point(20, 426);
+         StopButton.Margin = new System.Windows.Forms.Padding(4);
+         StopButton.Name = "StopButton";
+         StopButton.Size = new System.Drawing.Size(125, 34);
+         StopButton.TabIndex = 7;
+         StopButton.Text = Resources.ButtonStop_Stop;
+         StopButton.UseVisualStyleBackColor = true;
+         StopButton.Click += new System.EventHandler(this._StopButton_Click);
          // 
-         // label3
+         // PersonalLabel
          // 
-         label3.AutoSize = true;
-         label3.Location = new System.Drawing.Point(761, 42);
-         label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-         label3.Name = "label3";
-         label3.Size = new System.Drawing.Size(64, 17);
-         label3.TabIndex = 9;
-         label3.Text = "Personal";
+         PersonalLabel.AutoSize = true;
+         PersonalLabel.Location = new System.Drawing.Point(761, 42);
+         PersonalLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+         PersonalLabel.Name = "PersonalLabel";
+         PersonalLabel.Size = new System.Drawing.Size(64, 17);
+         PersonalLabel.TabIndex = 9;
+         PersonalLabel.Text = Resources.PersonalVehicles;
          // 
          // label4
          // 
-         label4.AutoSize = true;
-         label4.Location = new System.Drawing.Point(832, 42);
-         label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-         label4.Name = "label4";
-         label4.Size = new System.Drawing.Size(52, 17);
-         label4.TabIndex = 10;
-         label4.Text = "Lorries";
+         LoriesLabel.AutoSize = true;
+         LoriesLabel.Location = new System.Drawing.Point(832, 42);
+         LoriesLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+         LoriesLabel.Name = "label4";
+         LoriesLabel.Size = new System.Drawing.Size(52, 17);
+         LoriesLabel.TabIndex = 10;
+         LoriesLabel.Text = Resources.Lorries;
          // 
          // label5
          // 
-         label5.AutoSize = true;
-         label5.Location = new System.Drawing.Point(912, 42);
-         label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-         label5.Name = "label5";
-         label5.Size = new System.Drawing.Size(66, 17);
-         label5.TabIndex = 11;
-         label5.Text = "Together";
+         TogetherLabel.AutoSize = true;
+         TogetherLabel.Location = new System.Drawing.Point(912, 42);
+         TogetherLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+         TogetherLabel.Name = "TogetherLabel";
+         TogetherLabel.Size = new System.Drawing.Size(66, 17);
+         TogetherLabel.TabIndex = 11;
+         TogetherLabel.Text = Resources.Together;
          // 
          // fpsLabel
          // 
-         fpsLabel.AutoSize = true;
-         fpsLabel.Location = new System.Drawing.Point(1031, 11);
-         fpsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-         fpsLabel.Name = "fpsLabel";
-         fpsLabel.Size = new System.Drawing.Size(39, 17);
-         fpsLabel.TabIndex = 12;
-         fpsLabel.Text = "0 fps";
+         FpsLabel.AutoSize = true;
+         FpsLabel.Location = new System.Drawing.Point(1031, 11);
+         FpsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+         FpsLabel.Name = "FpsLabel";
+         FpsLabel.Size = new System.Drawing.Size(39, 17);
+         FpsLabel.TabIndex = 12;
+         FpsLabel.Text = "0 fps";
          // 
          // MainForm
          // 
          AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
          AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
          ClientSize = new System.Drawing.Size(1093, 482);
-         Controls.Add(fpsLabel);
-         Controls.Add(label5);
-         Controls.Add(label4);
-         Controls.Add(label3);
-         Controls.Add(stopButton);
-         Controls.Add(showTmpImageCheckBox);
-         Controls.Add(nightSceneRadioButton);
-         Controls.Add(daySceneRadioButton);
-         Controls.Add(label1);
-         Controls.Add(consoleText);
-         Controls.Add(openFileButton);
+         Controls.Add(FpsLabel);
+         Controls.Add(TogetherLabel);
+         Controls.Add(LoriesLabel);
+         Controls.Add(PersonalLabel);
+         Controls.Add(StopButton);
+         Controls.Add(ShowTmpImageCheckBox);
+         Controls.Add(NightSceneRadioButton);
+         Controls.Add(DaySceneRadioButton);
+         Controls.Add(TypeOfSceneLabel);
+         Controls.Add(ConsoleText);
+         Controls.Add(OpenFileButton);
          Margin = new System.Windows.Forms.Padding(4);
          Name = "MainForm";
          Text = "IDS";
@@ -191,18 +191,18 @@ namespace IDS
       }
 
       #endregion
-      private System.Windows.Forms.OpenFileDialog openFileDialog1;
-      private System.Windows.Forms.Button openFileButton;
-      private System.Windows.Forms.TextBox consoleText;
-      private System.Windows.Forms.Label label1;
-      private System.Windows.Forms.RadioButton daySceneRadioButton;
-      private System.Windows.Forms.RadioButton nightSceneRadioButton;
-      private System.Windows.Forms.CheckBox showTmpImageCheckBox;
-      private System.Windows.Forms.Button stopButton;
-      private System.Windows.Forms.Label label3;
-      private System.Windows.Forms.Label label4;
-      private System.Windows.Forms.Label label5;
-      private System.Windows.Forms.Label fpsLabel;
+      private System.Windows.Forms.OpenFileDialog OpenFileDialog;
+      private System.Windows.Forms.Button OpenFileButton;
+      private System.Windows.Forms.TextBox ConsoleText;
+      private System.Windows.Forms.Label TypeOfSceneLabel;
+      private System.Windows.Forms.RadioButton DaySceneRadioButton;
+      private System.Windows.Forms.RadioButton NightSceneRadioButton;
+      private System.Windows.Forms.CheckBox ShowTmpImageCheckBox;
+      private System.Windows.Forms.Button StopButton;
+      private System.Windows.Forms.Label PersonalLabel;
+      private System.Windows.Forms.Label LoriesLabel;
+      private System.Windows.Forms.Label TogetherLabel;
+      private System.Windows.Forms.Label FpsLabel;
    }
 }
 

@@ -100,7 +100,7 @@ namespace IDS
             _initializedVariables = true;
          }
 
-         //consoleText.Text = "sirka pruhu: " + maxWidthOfRoadLane.ToString();
+         //ConsoleText.Text = "sirka pruhu: " + maxWidthOfRoadLane.ToString();
          _myTimer.Interval = 1000 / FPS;
          //My_Timer.Interval = 1;
 
@@ -126,8 +126,8 @@ namespace IDS
 
          _homogMatrix = PerspectiveTransform.FindHomographyMatrix(_roadPoints);
          _SetPerspectiveMeasureDistance(_homogMatrix);
-         consoleText.Text = "";
-         stopButton.Text = Resources.ButtonStop_Stop;
+         ConsoleText.Text = "";
+         StopButton.Text = Resources.ButtonStop_Stop;
 
          _InitImage();
          _InitBool();
@@ -257,7 +257,7 @@ namespace IDS
             _sw.Stop();
 
             int actualFPS = (int)(1000 / _sw.Elapsed.TotalMilliseconds);
-            fpsLabel.Text = actualFPS.ToString() + "fps";
+            FpsLabel.Text = actualFPS.ToString() + "fps";
             //Console.WriteLine(actualFPS+ "fps");
 
             _frameNumber++;
@@ -266,7 +266,7 @@ namespace IDS
          {
             _myTimer.Stop();
             MessageBox.Show("Koniec videa");
-            openFileButton.Enabled = true;
+            OpenFileButton.Enabled = true;
          }
       }
 
@@ -343,7 +343,7 @@ namespace IDS
                      tmpText = _tracking.VehiclesCount.ToString() + "- Nákladné v.,\t r: " + v.Speed.ToString();
                   }
 
-                  consoleText.Text = tmpText + " km/h \r\n" + consoleText.Text;
+                  ConsoleText.Text = tmpText + " km/h \r\n" + ConsoleText.Text;
 
                   break;
                }
@@ -770,15 +770,15 @@ namespace IDS
       //otvorenie a nacitanie videa 
       private void _LoadVideoButton_Click(object sender, EventArgs e)
       {
-         openFileDialog1.Filter = "Media Files|*.avi;*.mp4";
-         openFileDialog1.FileName = "";
+         OpenFileDialog.Filter = "Media Files|*.avi;*.mp4";
+         OpenFileDialog.FileName = "";
          //initializedVariables = false;
-         if (openFileDialog1.ShowDialog() == DialogResult.OK)
+         if (OpenFileDialog.ShowDialog() == DialogResult.OK)
          {
             try
             {
                _capture = null;
-               _capture = new Capture(openFileDialog1.FileName);
+               _capture = new Capture(OpenFileDialog.FileName);
                FPS = (int)_capture.GetCaptureProperty(Emgu.CV.CvEnum.CAP_PROP.CV_CAP_PROP_FPS);
                _initializedVariables = false;
             }
@@ -793,7 +793,7 @@ namespace IDS
          }
 
 
-         if (daySceneRadioButton.Checked)
+         if (DaySceneRadioButton.Checked)
          {
             _isDayScene = true;
          }
@@ -802,7 +802,7 @@ namespace IDS
             _isDayScene = false;
          }
 
-         if (showTmpImageCheckBox.Checked)
+         if (ShowTmpImageCheckBox.Checked)
          {
             _showTmpImages = true;
          }
@@ -816,14 +816,14 @@ namespace IDS
             _frame = _capture.QueryFrame();
 
 
-            string onlyfilename = openFileDialog1.SafeFileName;
+            string onlyfilename = OpenFileDialog.SafeFileName;
             RoadParamForm roadParam = new RoadParamForm(_frame, onlyfilename);
 
             roadParam.ShowDialog();
 
             if (roadParam.IsSetAllRoadParam)
             {
-               openFileButton.Enabled = false;
+               OpenFileButton.Enabled = false;
                _roadPoints = roadParam.getRoadPoints();
                _roadDistancePoints = roadParam.getRoadDistancePoints();
                RealDistance = roadParam.getRealDistance();
@@ -914,17 +914,17 @@ namespace IDS
       {
          if (_paused)
          {
-            stopButton.Text = Resources.ButtonStop_Stop;
+            StopButton.Text = Resources.ButtonStop_Stop;
             _paused = false;
             _myTimer.Start();
-            openFileButton.Enabled = false;
+            OpenFileButton.Enabled = false;
          }
          else
          {
-            stopButton.Text = Resources.ButtonStop_Start;
+            StopButton.Text = Resources.ButtonStop_Start;
             _paused = true;
             _myTimer.Stop();
-            openFileButton.Enabled = true;
+            OpenFileButton.Enabled = true;
          }
       }
 
