@@ -144,6 +144,9 @@
   <data name="ShowDetails" xml:space="preserve">
     <value>Show details</value>
   </data>
+  <data name="SumText" xml:space="preserve">
+    <value>Sum</value>
+  </data>
   <data name="Together" xml:space="preserve">
     <value>Together</value>
   </data>

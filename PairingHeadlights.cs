@@ -83,7 +83,7 @@ namespace IDS
                foundPair = true;
                _headlight[j].Paired = true;
             }
-            
+
             if ((!foundPair) && (_headlight[i].Width <= CW) && (_headlight[i].Height <= CH))
             {
                _AddOnlyHeadlightBB(i);

@@ -7,6 +7,7 @@ using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using Emgu.CV.VideoSurveillance;
 using System.Diagnostics;
+using Emgu.CV.GPU;
 using IDS.IDS;
 
 namespace IDS
@@ -112,7 +113,6 @@ namespace IDS
       private void _InitVariables()
       {
          _myTimer = new System.Windows.Forms.Timer();
-
          _mogDetector = new BackgroundSubstractorMOG2(30, 50, false);
          _tracking = new TrackingVehicles(_roadLanes[0].MaxWidth);
          _pairLights = new PairingHeadlights(_roadLanes[0].MaxWidth);
@@ -127,7 +127,7 @@ namespace IDS
          _homogMatrix = PerspectiveTransform.FindHomographyMatrix(_roadPoints);
          _SetPerspectiveMeasureDistance(_homogMatrix);
          consoleText.Text = "";
-         stopButton.Text = Resource.ButtonStop_Stop;
+         stopButton.Text = Resources.ButtonStop_Stop;
 
          _InitImage();
          _InitBool();
@@ -280,15 +280,15 @@ namespace IDS
 
          for (int i = 0; i < _roadLanes.Count; i++)
          {
-            name = "lane" + (i + 1).ToString() + "Cars";
+            name = "lane" + (i + 1) + Resources.PersonalVehicles;
             lb = (Label)Controls[name];
             lb.Text = _roadLanes[i].NumberOfPrivateCars.ToString();
 
-            name = "lane" + (i + 1).ToString() + "Trucks";
+            name = "lane" + (i + 1) + Resources.Lorries;
             lb = (Label)Controls[name];
             lb.Text = _roadLanes[i].NumberOfTrucks.ToString();
 
-            name = "lane" + (i + 1).ToString() + "Sum";
+            name = "lane" + (i + 1) + Resources.SumText;
             lb = (Label)Controls[name];
             lb.Text = _roadLanes[i].NumberOfCars.ToString();
 
@@ -297,13 +297,13 @@ namespace IDS
 
          }
 
-         lb = (Label)Controls["sumCars"];
+         lb = (Label)Controls[Deffinitions.SumCars];
          lb.Text = sumCars.ToString();
 
-         lb = (Label)Controls["sumTrucks"];
+         lb = (Label)Controls[Deffinitions.SumTrucks];
          lb.Text = sumTrucks.ToString();
 
-         lb = (Label)Controls["totalSum"];
+         lb = (Label)Controls[Deffinitions.TotalSum];
          lb.Text = (sumCars + sumTrucks).ToString();
       }
 
@@ -504,8 +504,8 @@ namespace IDS
       private Image<Gray, Byte> _CannyMask()
       {
          Image<Gray, Byte> gray = _foregroundGrayFrame.PyrDown().PyrUp();
-         //Image<Gray, Byte> cannyGray1 = gray.Canny(new Gray(50), new Gray(50));
-         Image<Gray, Byte> cannyGray1 = gray.Canny(50, 50);
+         Image<Gray, Byte> cannyGray1 = gray.Canny(new Gray(50), new Gray(50));
+         //Image<Gray, Byte> cannyGray1 = gray.Canny(50, 50);
          Image<Gray, Byte> cannyGray2 = cannyGray1.Clone();
          Image<Gray, Byte> cannyGray = cannyGray1 + cannyGray2;
 
@@ -761,7 +761,6 @@ namespace IDS
                      _boundingBoxes.RemoveAt(i);
                      break;
                   }
-
                }
             }
          }
@@ -769,7 +768,7 @@ namespace IDS
       }
 
       //otvorenie a nacitanie videa 
-      private void _OpenFileButton_Click(object sender, EventArgs e)
+      private void _LoadVideoButton_Click(object sender, EventArgs e)
       {
          openFileDialog1.Filter = "Media Files|*.avi;*.mp4";
          openFileDialog1.FileName = "";
@@ -849,26 +848,26 @@ namespace IDS
          {
             Label laneText = new Label();
             laneText.Location = new Point(x, y);
-            laneText.Text = "Pruh č." + i.ToString();
+            laneText.Text = "Pruh č." + i;
             laneText.AutoSize = true;
 
 
             Label laneCars = new Label();
             laneCars.Location = new Point(x + 72, y);
             laneCars.Text = "0";
-            laneCars.Name = "lane" + i.ToString() + "Cars";
+            laneCars.Name = "lane" + i + Resources.PersonalVehicles;
             laneCars.AutoSize = true;
 
             Label laneTrucks = new Label();
             laneTrucks.Location = new Point(x + 128, y);
             laneTrucks.Text = "0";
-            laneTrucks.Name = "lane" + i.ToString() + "Trucks";
+            laneTrucks.Name = "lane" + i + Resources.Lorries;
             laneTrucks.AutoSize = true;
 
             Label laneSum = new Label();
             laneSum.Location = new Point(x + 188, y);
             laneSum.Text = "0";
-            laneSum.Name = "lane" + i.ToString() + "Sum";
+            laneSum.Name = "lane" + i + Resources.SumText;
             laneSum.AutoSize = true;
 
             Controls.Add(laneText);
@@ -880,26 +879,26 @@ namespace IDS
 
          Label sumText = new Label();
          sumText.Location = new Point(x, y);
-         sumText.Text = "SPOLU";
+         sumText.Text = Resources.Together;
          sumText.AutoSize = true;
 
 
          Label sumCars = new Label();
          sumCars.Location = new Point(x + 72, y);
          sumCars.Text = "0";
-         sumCars.Name = "sumCars";
+         sumCars.Name = Deffinitions.SumCars;
          sumCars.AutoSize = true;
 
          Label sumTrucks = new Label();
          sumTrucks.Location = new Point(x + 128, y);
          sumTrucks.Text = "0";
-         sumTrucks.Name = "sumTrucks";
+         sumTrucks.Name = Deffinitions.SumTrucks;
          sumTrucks.AutoSize = true;
 
          Label totalSum = new Label();
          totalSum.Location = new Point(x + 188, y);
          totalSum.Text = "0";
-         totalSum.Name = "totalSum";
+         totalSum.Name = Deffinitions.TotalSum;
          totalSum.AutoSize = true;
 
          Controls.Add(sumText);
@@ -915,14 +914,14 @@ namespace IDS
       {
          if (_paused)
          {
-            stopButton.Text = Resource.ButtonStop_Stop;
+            stopButton.Text = Resources.ButtonStop_Stop;
             _paused = false;
             _myTimer.Start();
             openFileButton.Enabled = false;
          }
          else
          {
-            stopButton.Text = Resource.ButtonStop_Start;
+            stopButton.Text = Resources.ButtonStop_Start;
             _paused = true;
             _myTimer.Stop();
             openFileButton.Enabled = true;
