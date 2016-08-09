@@ -1,0 +1,11 @@
+-- Rozbehnutie projektu po predchodcovi --- DONE
+
+-- Analyza projektu  --- TODO  -- Started
+
+-- Add support for extraction front side of car, or for extraction each car separarly  --- TODO
+
+-- Add support for Neural (Convolution) Netvork  --- TODO
+			-- create Database of car images  --- TODO
+			-- learn neural network on this Database  --- TODO
+			-- try to clasify on extracted  --- TODO
+			
