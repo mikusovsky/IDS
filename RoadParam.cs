@@ -40,28 +40,28 @@ namespace IDS
             InitializeComponent();
             Width = Math.Max(frame.Width + 200, 520);
             Height = Math.Max(frame.Height + 50, 300);
-            framePictureBox.Width = frame.Width;
-            framePictureBox.Height = frame.Height;
-            framePictureBox.Top = 5;
-            framePictureBox.Left = 5;
-            framePictureBox.Image = frame.ToBitmap();
+            _framePictureBox.Width = frame.Width;
+            _framePictureBox.Height = frame.Height;
+            _framePictureBox.Top = 5;
+            _framePictureBox.Left = 5;
+            _framePictureBox.Image = frame.ToBitmap();
             _image = frame;
             _fileName = fileName;
 
             _isSetAllRoadParam = false;
             _setRoadPoints = false;
 
-            saveRoadPointsButton.Enabled = true;
-            saveRoadDistancePointsButton.Enabled = false;
-            realDistanceTextBox.Enabled = false;
+            _saveRoadPointsButton.Enabled = true;
+            _saveRoadDistancePointsButton.Enabled = false;
+            _realDistanceTextBox.Enabled = false;
 
-            checkFilename(fileName);
+            _CheckFilename(fileName);
 
-            initPoints();
+            _InitPoints();
         }
 
         //kontrola na meno suboru, ci je to vlastne video alebo nejake nezname
-        private void checkFilename(string fileName)
+        private void _CheckFilename(string fileName)
         {
             string text;
 
@@ -78,14 +78,14 @@ namespace IDS
         }
 
         //inicializacia bodov
-        private void initPoints()
+        private void _InitPoints()
         {
-            initRoadPoints();
-            initRoadDistancePoints();
+            _InitRoadPoints();
+            _InitRoadDistancePoints();
         }
 
         //inicializacia bodov vozovky
-        private void initRoadPoints()
+        private void _InitRoadPoints()
         {
             Point newPoint;
 
@@ -257,7 +257,7 @@ namespace IDS
                
                 case 90:
                     {
-                        numberOfLanesTextBox.Text = "1";
+                        _numberOfLanesTextBox.Text = "1";
                         newPoint = new Point(159, 16);
                         _roadPoints.Add(newPoint);
 
@@ -273,7 +273,7 @@ namespace IDS
                     }
                 case 91:
                     {
-                        numberOfLanesTextBox.Text = "1";
+                        _numberOfLanesTextBox.Text = "1";
                         newPoint = new Point(159, 16);
                         _roadPoints.Add(newPoint);
 
@@ -289,7 +289,7 @@ namespace IDS
                     }
                 case 92:
                     {
-                        numberOfLanesTextBox.Text = "1";
+                        _numberOfLanesTextBox.Text = "1";
                         newPoint = new Point(178, 25);
                         _roadPoints.Add(newPoint);
 
@@ -305,7 +305,7 @@ namespace IDS
                     }
                 case 93:
                     {
-                        numberOfLanesTextBox.Text = "1";
+                        _numberOfLanesTextBox.Text = "1";
                         newPoint = new Point(163, 16);
                         _roadPoints.Add(newPoint);
 
@@ -321,7 +321,7 @@ namespace IDS
                     }
                 case 94:
                     {
-                        numberOfLanesTextBox.Text = "1";
+                        _numberOfLanesTextBox.Text = "1";
                         newPoint = new Point(159, 16);
                         _roadPoints.Add(newPoint);
 
@@ -386,7 +386,7 @@ namespace IDS
         }
 
         //inicializacia bodov referencnej dlzky
-        private void initRoadDistancePoints()
+        private void _InitRoadDistancePoints()
         {
             Point newPoint;
 
@@ -400,7 +400,7 @@ namespace IDS
                         newPoint = new Point((int)(173 * _rate), (int)(158 * _rate));
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "7";
+                        _realDistanceTextBox.Text = "7";
 
                         break;
                     }
@@ -413,7 +413,7 @@ namespace IDS
                         newPoint = new Point((int)(161 * _rate), (int)(165 * _rate));
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "10";
+                        _realDistanceTextBox.Text = "10";
                         break;
                     }
                 case 102:
@@ -424,7 +424,7 @@ namespace IDS
                         newPoint = new Point((int)(166 * _rate), (int)(105 * _rate));
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "10";
+                        _realDistanceTextBox.Text = "10";
                         break;
                     }
 
@@ -439,7 +439,7 @@ namespace IDS
                         newPoint = new Point((int)(170 * _rate), (int)(154 * _rate));
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "10";
+                        _realDistanceTextBox.Text = "10";
                         break;
                     }
 
@@ -451,7 +451,7 @@ namespace IDS
                         newPoint = new Point((int)(161 * _rate), (int)(166 * _rate));
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "10";
+                        _realDistanceTextBox.Text = "10";
                         break;
 
                     }
@@ -464,7 +464,7 @@ namespace IDS
                         newPoint = new Point((int)(169 * _rate), (int)(142 * _rate));
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "10";
+                        _realDistanceTextBox.Text = "10";
                         break;
                     }
 
@@ -476,7 +476,7 @@ namespace IDS
                         newPoint = new Point((int)(164 * _rate), (int)(67 * _rate));
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "10";
+                        _realDistanceTextBox.Text = "10";
                         break;
                     }
 
@@ -489,7 +489,7 @@ namespace IDS
                         newPoint = new Point(69, 194);
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "6";
+                        _realDistanceTextBox.Text = "6";
                         break;
                     }
 
@@ -501,7 +501,7 @@ namespace IDS
                         newPoint = new Point(132, 168);
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "7";
+                        _realDistanceTextBox.Text = "7";
 
                         break;
                     }
@@ -513,7 +513,7 @@ namespace IDS
                         newPoint = new Point(171, 182);
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "4,5";
+                        _realDistanceTextBox.Text = "4,5";
 
                         break;
                     }
@@ -526,7 +526,7 @@ namespace IDS
                         newPoint = new Point(180, 138);
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "6,3";
+                        _realDistanceTextBox.Text = "6,3";
                         break;
                     }
                 case 91:
@@ -537,7 +537,7 @@ namespace IDS
                         newPoint = new Point(183, 137);
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "6,3";
+                        _realDistanceTextBox.Text = "6,3";
                         break;
                     }
                 case 92:
@@ -548,7 +548,7 @@ namespace IDS
                         newPoint = new Point(205, 185);
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "6,3";
+                        _realDistanceTextBox.Text = "6,3";
                         break;
                     }
                 case 93:
@@ -559,7 +559,7 @@ namespace IDS
                         newPoint = new Point(187, 140);
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "6,3";
+                        _realDistanceTextBox.Text = "6,3";
                         break;
                     }
                 case 94:
@@ -570,7 +570,7 @@ namespace IDS
                         newPoint = new Point(183, 137);
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "6,3";
+                        _realDistanceTextBox.Text = "6,3";
                         break;
                     }
 
@@ -582,7 +582,7 @@ namespace IDS
                         newPoint = new Point((int)(161 * _rate), (int)(165 * _rate));
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "10";
+                        _realDistanceTextBox.Text = "10";
                         break;
                     }
 
@@ -594,7 +594,7 @@ namespace IDS
                         newPoint = new Point(69, 194);
                         _roadDistancePoints.Add(newPoint);
 
-                        realDistanceTextBox.Text = "6";
+                        _realDistanceTextBox.Text = "6";
                         break;
                     }
                 default:
@@ -611,7 +611,7 @@ namespace IDS
         }
 
         //vypocet vzdialenosti 2 bodov
-        private int FindDistanceToPointSquared(Point pt1, Point pt2)
+        private int _FindDistanceToPointSquared(Point pt1, Point pt2)
         {
             int dx = pt1.X - pt2.X;
             int dy = pt1.Y - pt2.Y;
@@ -619,32 +619,32 @@ namespace IDS
         }
 
         //kreslenie
-        private void framePictureBox_Paint(object sender, PaintEventArgs e)
+        private void _FramePictureBox_Paint(object sender, PaintEventArgs e)
         {
             if (!_setRoadPoints)
             {
-                drawRoadPoints(e);
+                _DrawRoadPoints(e);
             }
             else
             {
-                drawRoadDistancePoints(e);
+                _DrawRoadDistancePoints(e);
             }
         }
 
         //kreslenie bodov vozovky
-        private void drawRoadPoints(PaintEventArgs e)
+        private void _DrawRoadPoints(PaintEventArgs e)
         {
             Pen myPen = new Pen(Color.Yellow, 2);
             e.Graphics.DrawPolygon(myPen, _roadPoints.ToArray());
 
             foreach (Point corner in _roadPoints)
             {
-                drawCorner(e, corner);
+                _DrawCorner(e, corner);
             }
         }
 
         //kreslenie rohov
-        private void drawCorner(PaintEventArgs e, Point corner)
+        private void _DrawCorner(PaintEventArgs e, Point corner)
         {
             Rectangle rect = new Rectangle(
                 corner.X - _objectRadius, corner.Y - _objectRadius,
@@ -654,23 +654,23 @@ namespace IDS
         }
 
         //kreslenie bodov referencnej dlzky
-        private void drawRoadDistancePoints(PaintEventArgs e)
+        private void _DrawRoadDistancePoints(PaintEventArgs e)
         {
             Pen myPen = new Pen(Color.Yellow, 2);
             e.Graphics.DrawLine(myPen, _roadDistancePoints[0], _roadDistancePoints[1]);
 
             foreach (Point corner in _roadDistancePoints)
             {
-                drawCorner(e, corner);
+                _DrawCorner(e, corner);
             }
         }
 
         //najdenie oznaceneho bodu
-        private int findSelectPoint(List<Point> points, Point mousePoint)
+        private int _FindSelectPoint(List<Point> points, Point mousePoint)
         {
             for (int i = 0; i < points.Count; i++)
             {
-                if (FindDistanceToPointSquared(points[i], mousePoint) < 15)
+                if (_FindDistanceToPointSquared(points[i], mousePoint) < 15)
                 {
                     return i;
                 }
@@ -679,7 +679,7 @@ namespace IDS
             return -1;
         }
 
-        private void framePictureBox_MouseMove(object sender, MouseEventArgs e)
+        private void _FramePictureBox_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left && _index != -1)
             {
@@ -696,10 +696,10 @@ namespace IDS
                     _roadDistancePoints[_index] = tmp;
                 }
             }
-            framePictureBox.Invalidate();
+            _framePictureBox.Invalidate();
         }
 
-        private void framePictureBox_MouseDown(object sender, MouseEventArgs e)
+        private void FramePictureBox_MouseDown(object sender, MouseEventArgs e)
         {
             List<Point> points;
             if (!_setRoadPoints)
@@ -711,7 +711,7 @@ namespace IDS
                 points = _roadDistancePoints;
             }
 
-            _index = findSelectPoint(points, e.Location);
+            _index = _FindSelectPoint(points, e.Location);
             if (_index != -1)
             {
                 _oldX = points[_index].X;
@@ -719,32 +719,32 @@ namespace IDS
             }
         }
 
-        private void framePictureBox_MouseUp(object sender, MouseEventArgs e)
+        private void FramePictureBox_MouseUp(object sender, MouseEventArgs e)
         {
             _index = -1;
         }
 
-        private void saveRoadPointsButton_Click(object sender, EventArgs e)
+        private void SaveRoadPointsButton_Click(object sender, EventArgs e)
         {
-            if (int.TryParse(numberOfLanesTextBox.Text, out _numberOfRoadLanes))
+            if (int.TryParse(_numberOfLanesTextBox.Text, out _numberOfRoadLanes))
             {
                 _setRoadPoints = true;
-                saveRoadPointsButton.Enabled = false;
-                numberOfLanesTextBox.Enabled = false;
-                saveRoadDistancePointsButton.Enabled = true;
-                realDistanceTextBox.Enabled = true;
-                framePictureBox.Invalidate();
+                _saveRoadPointsButton.Enabled = false;
+                _numberOfLanesTextBox.Enabled = false;
+                _saveRoadDistancePointsButton.Enabled = true;
+                _realDistanceTextBox.Enabled = true;
+                _framePictureBox.Invalidate();
             }
             else
             {
                 MessageBox.Show(Resources.WrongInputNumerForCountOfRoudLines);
-                numberOfLanesTextBox.Text = "";
+                _numberOfLanesTextBox.Text = "";
             }
         }
 
-        private void saveRoadDistancePointsButton_Click(object sender, EventArgs e)
+        private void SaveRoadDistancePointsButton_Click(object sender, EventArgs e)
         {
-            if (double.TryParse(realDistanceTextBox.Text, out _realDistance))
+            if (double.TryParse(_realDistanceTextBox.Text, out _realDistance))
             {
                 _isSetAllRoadParam = true;
                 this.Close();
@@ -754,12 +754,12 @@ namespace IDS
             else
             {
                 MessageBox.Show("Zle zadané číslo vzdialenosti");
-                realDistanceTextBox.Text = "";
+                _realDistanceTextBox.Text = "";
             }
         }
 
         //vytvorenie jednotlivych jazdnych pruhov
-        public List<RoadLane> createRoadLanes()
+        public List<RoadLane> CreateRoadLanes()
         {
             int topRoadLaneWidth = (_roadPoints[1].X - _roadPoints[0].X) / _numberOfRoadLanes;
             int bottomRoadLaneWidth = (_roadPoints[2].X - _roadPoints[3].X) / _numberOfRoadLanes;
@@ -778,7 +778,7 @@ namespace IDS
         }
 
         //usporiadanie bodov, aby sa s nimi dalo pracovat ako s polygonom
-        private List<Point> sortRoadPoints()
+        private List<Point> SortRoadPoints()
         {
             List<Point> newList = new List<Point>();
             newList.Add(_roadPoints[0]);
@@ -800,17 +800,17 @@ namespace IDS
             set { this._numberOfRoadLanes = value; }
         }
 
-        public List<Point> getRoadPoints()
+        public List<Point> GetRoadPoints()
         {
-            return sortRoadPoints();
+            return SortRoadPoints();
         }
 
-        public List<Point> getRoadDistancePoints()
+        public List<Point> GetRoadDistancePoints()
         {
             return _roadDistancePoints;
         }
 
-        public double getRealDistance()
+        public double GetRealDistance()
         {
             return _realDistance;
         }

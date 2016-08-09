@@ -823,10 +823,10 @@ namespace IDS
             if (roadParam.IsSetAllRoadParam)
             {
                OpenFileButton.Enabled = false;
-               _roadPoints = roadParam.getRoadPoints();
-               _roadDistancePoints = roadParam.getRoadDistancePoints();
-               RealDistance = roadParam.getRealDistance();
-               _roadLanes = roadParam.createRoadLanes();
+               _roadPoints = roadParam.GetRoadPoints();
+               _roadDistancePoints = roadParam.GetRoadDistancePoints();
+               RealDistance = roadParam.GetRealDistance();
+               _roadLanes = roadParam.CreateRoadLanes();
 
                _SetStartInitVariables();
                _CreateStatisticLabels();

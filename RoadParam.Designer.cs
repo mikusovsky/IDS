@@ -5,7 +5,7 @@
       /// <summary>
       /// Required designer variable.
       /// </summary>
-      private System.ComponentModel.IContainer components = null;
+      private System.ComponentModel.IContainer _components = null;
 
       /// <summary>
       /// Clean up any resources being used.
@@ -13,9 +13,9 @@
       /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
       protected override void Dispose(bool disposing)
       {
-         if (disposing && (components != null))
+         if (disposing && (_components != null))
          {
-            components.Dispose();
+            _components.Dispose();
          }
          base.Dispose(disposing);
       }
@@ -28,102 +28,102 @@
       /// </summary>
       private void InitializeComponent()
       {
-         this.framePictureBox = new System.Windows.Forms.PictureBox();
-         this.saveRoadPointsButton = new System.Windows.Forms.Button();
-         this.saveRoadDistancePointsButton = new System.Windows.Forms.Button();
-         this.realDistanceTextBox = new System.Windows.Forms.TextBox();
-         this.label1 = new System.Windows.Forms.Label();
-         this.label2 = new System.Windows.Forms.Label();
-         this.numberOfLanesTextBox = new System.Windows.Forms.TextBox();
-         ((System.ComponentModel.ISupportInitialize)(this.framePictureBox)).BeginInit();
+         this._framePictureBox = new System.Windows.Forms.PictureBox();
+         this._saveRoadPointsButton = new System.Windows.Forms.Button();
+         this._saveRoadDistancePointsButton = new System.Windows.Forms.Button();
+         this._realDistanceTextBox = new System.Windows.Forms.TextBox();
+         this._realDistinctLabel = new System.Windows.Forms.Label();
+         this._countRoutsLabel = new System.Windows.Forms.Label();
+         this._numberOfLanesTextBox = new System.Windows.Forms.TextBox();
+         ((System.ComponentModel.ISupportInitialize)(this._framePictureBox)).BeginInit();
          this.SuspendLayout();
          // 
          // framePictureBox
          // 
-         this.framePictureBox.Location = new System.Drawing.Point(38, 12);
-         this.framePictureBox.Name = "framePictureBox";
-         this.framePictureBox.Size = new System.Drawing.Size(425, 271);
-         this.framePictureBox.TabIndex = 0;
-         this.framePictureBox.TabStop = false;
-         this.framePictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.framePictureBox_Paint);
-         this.framePictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.framePictureBox_MouseDown);
-         this.framePictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.framePictureBox_MouseMove);
-         this.framePictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.framePictureBox_MouseUp);
+         this._framePictureBox.Location = new System.Drawing.Point(38, 12);
+         this._framePictureBox.Name = "_framePictureBox";
+         this._framePictureBox.Size = new System.Drawing.Size(425, 271);
+         this._framePictureBox.TabIndex = 0;
+         this._framePictureBox.TabStop = false;
+         this._framePictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this._FramePictureBox_Paint);
+         this._framePictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.FramePictureBox_MouseDown);
+         this._framePictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this._FramePictureBox_MouseMove);
+         this._framePictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.FramePictureBox_MouseUp);
          // 
          // saveRoadPointsButton
          // 
-         this.saveRoadPointsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-         this.saveRoadPointsButton.Location = new System.Drawing.Point(528, 82);
-         this.saveRoadPointsButton.Name = "saveRoadPointsButton";
-         this.saveRoadPointsButton.Size = new System.Drawing.Size(100, 38);
-         this.saveRoadPointsButton.TabIndex = 1;
-         this.saveRoadPointsButton.Text = "Uložiť nastavenia cesty";
-         this.saveRoadPointsButton.UseVisualStyleBackColor = true;
-         this.saveRoadPointsButton.Click += new System.EventHandler(this.saveRoadPointsButton_Click);
+         this._saveRoadPointsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+         this._saveRoadPointsButton.Location = new System.Drawing.Point(528, 82);
+         this._saveRoadPointsButton.Name = "_saveRoadPointsButton";
+         this._saveRoadPointsButton.Size = new System.Drawing.Size(100, 38);
+         this._saveRoadPointsButton.TabIndex = 1;
+         this._saveRoadPointsButton.Text = "Uložiť nastavenia cesty";
+         this._saveRoadPointsButton.UseVisualStyleBackColor = true;
+         this._saveRoadPointsButton.Click += new System.EventHandler(this.SaveRoadPointsButton_Click);
          // 
          // saveRoadDistancePointsButton
          // 
-         this.saveRoadDistancePointsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-         this.saveRoadDistancePointsButton.Location = new System.Drawing.Point(528, 196);
-         this.saveRoadDistancePointsButton.Name = "saveRoadDistancePointsButton";
-         this.saveRoadDistancePointsButton.Size = new System.Drawing.Size(100, 39);
-         this.saveRoadDistancePointsButton.TabIndex = 2;
-         this.saveRoadDistancePointsButton.Text = "Uložiť referenčnú vzdialenosť";
-         this.saveRoadDistancePointsButton.UseVisualStyleBackColor = true;
-         this.saveRoadDistancePointsButton.Click += new System.EventHandler(this.saveRoadDistancePointsButton_Click);
+         this._saveRoadDistancePointsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+         this._saveRoadDistancePointsButton.Location = new System.Drawing.Point(528, 196);
+         this._saveRoadDistancePointsButton.Name = "_saveRoadDistancePointsButton";
+         this._saveRoadDistancePointsButton.Size = new System.Drawing.Size(100, 39);
+         this._saveRoadDistancePointsButton.TabIndex = 2;
+         this._saveRoadDistancePointsButton.Text = "Uložiť referenčnú vzdialenosť";
+         this._saveRoadDistancePointsButton.UseVisualStyleBackColor = true;
+         this._saveRoadDistancePointsButton.Click += new System.EventHandler(this.SaveRoadDistancePointsButton_Click);
          // 
          // realDistanceTextBox
          // 
-         this.realDistanceTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-         this.realDistanceTextBox.Location = new System.Drawing.Point(528, 170);
-         this.realDistanceTextBox.Name = "realDistanceTextBox";
-         this.realDistanceTextBox.Size = new System.Drawing.Size(55, 20);
-         this.realDistanceTextBox.TabIndex = 3;
+         this._realDistanceTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+         this._realDistanceTextBox.Location = new System.Drawing.Point(528, 170);
+         this._realDistanceTextBox.Name = "_realDistanceTextBox";
+         this._realDistanceTextBox.Size = new System.Drawing.Size(55, 20);
+         this._realDistanceTextBox.TabIndex = 3;
          // 
          // label1
          // 
-         this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-         this.label1.AutoSize = true;
-         this.label1.Location = new System.Drawing.Point(525, 154);
-         this.label1.Name = "label1";
-         this.label1.Size = new System.Drawing.Size(101, 13);
-         this.label1.TabIndex = 4;
-         this.label1.Text = "Reálna vzdialenosť:";
+         this._realDistinctLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+         this._realDistinctLabel.AutoSize = true;
+         this._realDistinctLabel.Location = new System.Drawing.Point(525, 154);
+         this._realDistinctLabel.Name = "_realDistinctLabel";
+         this._realDistinctLabel.Size = new System.Drawing.Size(101, 13);
+         this._realDistinctLabel.TabIndex = 4;
+         this._realDistinctLabel.Text = "Reálna vzdialenosť:";
          // 
          // label2
          // 
-         this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-         this.label2.AutoSize = true;
-         this.label2.Location = new System.Drawing.Point(525, 24);
-         this.label2.Name = "label2";
-         this.label2.Size = new System.Drawing.Size(71, 13);
-         this.label2.TabIndex = 5;
-         this.label2.Text = "Počet pruhov";
+         this._countRoutsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+         this._countRoutsLabel.AutoSize = true;
+         this._countRoutsLabel.Location = new System.Drawing.Point(525, 24);
+         this._countRoutsLabel.Name = "_countRoutsLabel";
+         this._countRoutsLabel.Size = new System.Drawing.Size(71, 13);
+         this._countRoutsLabel.TabIndex = 5;
+         this._countRoutsLabel.Text = "Počet pruhov";
          // 
          // numberOfLanesTextBox
          // 
-         this.numberOfLanesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-         this.numberOfLanesTextBox.Location = new System.Drawing.Point(530, 42);
-         this.numberOfLanesTextBox.Name = "numberOfLanesTextBox";
-         this.numberOfLanesTextBox.Size = new System.Drawing.Size(53, 20);
-         this.numberOfLanesTextBox.TabIndex = 6;
-         this.numberOfLanesTextBox.Text = "2";
+         this._numberOfLanesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+         this._numberOfLanesTextBox.Location = new System.Drawing.Point(530, 42);
+         this._numberOfLanesTextBox.Name = "_numberOfLanesTextBox";
+         this._numberOfLanesTextBox.Size = new System.Drawing.Size(53, 20);
+         this._numberOfLanesTextBox.TabIndex = 6;
+         this._numberOfLanesTextBox.Text = "2";
          // 
          // RoadParamForm
          // 
          this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
          this.ClientSize = new System.Drawing.Size(645, 321);
-         this.Controls.Add(this.numberOfLanesTextBox);
-         this.Controls.Add(this.label2);
-         this.Controls.Add(this.label1);
-         this.Controls.Add(this.realDistanceTextBox);
-         this.Controls.Add(this.saveRoadDistancePointsButton);
-         this.Controls.Add(this.saveRoadPointsButton);
-         this.Controls.Add(this.framePictureBox);
+         this.Controls.Add(this._numberOfLanesTextBox);
+         this.Controls.Add(this._countRoutsLabel);
+         this.Controls.Add(this._realDistinctLabel);
+         this.Controls.Add(this._realDistanceTextBox);
+         this.Controls.Add(this._saveRoadDistancePointsButton);
+         this.Controls.Add(this._saveRoadPointsButton);
+         this.Controls.Add(this._framePictureBox);
          this.Name = "RoadParamForm";
          this.Text = "Nastavenie vlastnosti cesty";
-         ((System.ComponentModel.ISupportInitialize)(this.framePictureBox)).EndInit();
+         ((System.ComponentModel.ISupportInitialize)(this._framePictureBox)).EndInit();
          this.ResumeLayout(false);
          this.PerformLayout();
 
@@ -131,12 +131,12 @@
 
       #endregion
 
-      private System.Windows.Forms.PictureBox framePictureBox;
-      private System.Windows.Forms.Button saveRoadPointsButton;
-      private System.Windows.Forms.Button saveRoadDistancePointsButton;
-      private System.Windows.Forms.TextBox realDistanceTextBox;
-      private System.Windows.Forms.Label label1;
-      private System.Windows.Forms.Label label2;
-      private System.Windows.Forms.TextBox numberOfLanesTextBox;
+      private System.Windows.Forms.PictureBox _framePictureBox;
+      private System.Windows.Forms.Button _saveRoadPointsButton;
+      private System.Windows.Forms.Button _saveRoadDistancePointsButton;
+      private System.Windows.Forms.TextBox _realDistanceTextBox;
+      private System.Windows.Forms.Label _realDistinctLabel;
+      private System.Windows.Forms.Label _countRoutsLabel;
+      private System.Windows.Forms.TextBox _numberOfLanesTextBox;
    }
 }
