@@ -814,8 +814,7 @@ namespace IDS
          if (_capture != null)
          {
             _frame = _capture.QueryFrame();
-
-
+            
             string onlyfilename = OpenFileDialog.SafeFileName;
             RoadParamForm roadParam = new RoadParamForm(_frame, onlyfilename);
 

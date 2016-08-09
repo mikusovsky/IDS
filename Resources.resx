@@ -153,6 +153,9 @@
   <data name="TypeOfScene" xml:space="preserve">
     <value>Type of scene</value>
   </data>
+  <data name="WrongInputNumerForCountOfRoudLines" xml:space="preserve">
+    <value>Wrong input numer  for count of roud lines</value>
+  </data>
   <data name="ZeroFPS" xml:space="preserve">
     <value>0 fps</value>
   </data>

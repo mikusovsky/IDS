@@ -169,6 +169,15 @@ namespace IDS.IDS {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wrong input numer  for count of roud lines.
+        /// </summary>
+        internal static string WrongInputNumerForCountOfRoudLines {
+            get {
+                return ResourceManager.GetString("WrongInputNumerForCountOfRoudLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 0 fps.
         /// </summary>
         internal static string ZeroFPS {
