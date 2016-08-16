@@ -83,12 +83,12 @@ namespace IDS
       static public int FRAME_WIDTH;
       static public int START_COUNTED_AREA;
       static public int END_COUNTED_AREA;
-      static public int MAX_SIZE_OF_PRIVATE_CAR;
+      static public int MAX_SIZE_OF_PERSONAL_CAR;
 
       public MainForm()
       {
          InitializeComponent();
-         this.KeyPreview = true;
+         KeyPreview = true;
       }
 
       //inicializacia premennych
@@ -118,13 +118,14 @@ namespace IDS
          _pairLights = new PairingHeadlights(_roadLanes[0].MaxWidth);
 
          _measurePoint1 = new Point();
-         _measurePoint2 = new Point(); ;
+         _measurePoint2 = new Point();
          _perspectiveMeasurePoint1 = new Point();
          _perspectiveMeasurePoint2 = new Point();
 
          _boundingBoxes = new List<Rectangle>();
 
          _homogMatrix = PerspectiveTransform.FindHomographyMatrix(_roadPoints);
+         //TODO create matrix rectangular to car
          _SetPerspectiveMeasureDistance(_homogMatrix);
          ConsoleText.Text = "";
          StopButton.Text = Resources.ButtonStop_Stop;
@@ -168,7 +169,7 @@ namespace IDS
          int laneHeight = _roadLanes[0].LanePoints[3].Y - _roadLanes[0].LanePoints[0].Y;
          START_COUNTED_AREA = (int)(_roadLanes[0].LanePoints[0].Y + (0.6 * laneHeight));
          END_COUNTED_AREA = (int)(_roadLanes[0].LanePoints[0].Y + (0.85 * laneHeight));
-         MAX_SIZE_OF_PRIVATE_CAR = 8;
+         MAX_SIZE_OF_PERSONAL_CAR = 8;
       }
 
       private void _InitMogParams()
@@ -282,7 +283,7 @@ namespace IDS
          {
             name = "lane" + (i + 1) + Resources.PersonalVehicles;
             lb = (Label)Controls[name];
-            lb.Text = _roadLanes[i].NumberOfPrivateCars.ToString();
+            lb.Text = _roadLanes[i].NumberOfPersonalCars.ToString();
 
             name = "lane" + (i + 1) + Resources.Lorries;
             lb = (Label)Controls[name];
@@ -292,7 +293,7 @@ namespace IDS
             lb = (Label)Controls[name];
             lb.Text = _roadLanes[i].NumberOfCars.ToString();
 
-            sumCars += _roadLanes[i].NumberOfPrivateCars;
+            sumCars += _roadLanes[i].NumberOfPersonalCars;
             sumTrucks += _roadLanes[i].NumberOfTrucks;
 
          }
@@ -332,9 +333,9 @@ namespace IDS
             {
                if (centerPoint < lane.LanePoints[2].X)
                {
-                  if (v.Size < MAX_SIZE_OF_PRIVATE_CAR)
+                  if (v.Size < MAX_SIZE_OF_PERSONAL_CAR)
                   {
-                     lane.NumberOfPrivateCars++;
+                     lane.NumberOfPersonalCars++;
                      tmpText = _tracking.VehiclesCount.ToString() + "- Osobné v., \t r: " + v.Speed.ToString();
                   }
                   else
@@ -683,7 +684,7 @@ namespace IDS
 
                if ((bb.Y > _minYTracking) && ((bb.Y + bb.Height) < _maxYTracking))
                {
-                  _tracking.AddCurrentVehicle(bb);
+                  _tracking.AddCurrentVehicle(bb, _frame);
                }
                _bbImage.Draw(bb, new Bgr(Color.Yellow), 1);
             }
@@ -710,7 +711,7 @@ namespace IDS
 
             foreach (Rectangle rect in vehiclesBB)
             {
-               _tracking.AddCurrentVehicle(rect);
+               _tracking.AddCurrentVehicle(rect, _frame);
             }
 
             _pairLights._ClearList();

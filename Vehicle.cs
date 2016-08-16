@@ -1,6 +1,7 @@
 ﻿using System;
 using Emgu.CV;
 using System.Drawing;
+using Emgu.CV.Structure;
 
 namespace IDS
 {
@@ -27,9 +28,10 @@ namespace IDS
       private int _numberOfMissingFrames;
       private bool _used;
       private int _numberOfFrameStartCountedArea;
+      private Image<Bgr, Byte> _carPhoto;
 
 
-      public Vehicle(Point p1, Point p2)
+      public Vehicle(Point p1, Point p2, Image<Bgr, Byte> frame)
       {
          P1 = p1;
          P2 = p2;
@@ -47,6 +49,7 @@ namespace IDS
          _numberOfMissingFrames = 0;
          _used = false;
          _numberOfFrameStartCountedArea = 0;
+         _CreateVehiclePhoto(frame);
       }
 
       public void SetPredictionP(int x, int y)
@@ -146,6 +149,20 @@ namespace IDS
       {
          get { return _positionOnStartCountedArea; }
          set { _positionOnStartCountedArea = value; }
+      }
+
+      public void _CreateVehiclePhoto(Image<Bgr, Byte> frame)
+      {
+         _carPhoto = new Image<Bgr, byte>(frame.Size);
+         CvInvoke.cvCopy(frame, _carPhoto, IntPtr.Zero);
+         Rectangle rect = new Rectangle(P1.X, P1.Y, P2.X - P1.X, P2.Y - P1.Y);
+         _carPhoto.ROI = rect;
+         //CvInvoke.cvShowImage("pozadie", _carPhoto);
+      }
+
+      public Image<Bgr, Byte> GetCarPhoto()
+      {
+         return _carPhoto;
       }
    }
 }

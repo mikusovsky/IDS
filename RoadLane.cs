@@ -7,7 +7,7 @@ namespace IDS
    public class RoadLane
    {
       List<Point> _lanePoints;
-      int _numberOfPrivateCars;
+      int _numberOfPersonalCars;
       int _numberOfTrucks;
       int _numberOfCars;
 
@@ -19,15 +19,15 @@ namespace IDS
          _lanePoints.Add(rb);
          _lanePoints.Add(lb);
 
-         _numberOfPrivateCars = 0;
+         _numberOfPersonalCars = 0;
          _numberOfTrucks = 0;
          _numberOfCars = 0;
       }
 
-      public int NumberOfPrivateCars
+      public int NumberOfPersonalCars
       {
-         get { return _numberOfPrivateCars; }
-         set { _numberOfPrivateCars = value; }
+         get { return _numberOfPersonalCars; }
+         set { _numberOfPersonalCars = value; }
       }
 
       public int NumberOfTrucks
@@ -38,7 +38,7 @@ namespace IDS
 
       public int NumberOfCars
       {
-         get { return _numberOfPrivateCars + _numberOfTrucks; }
+         get { return _numberOfPersonalCars + _numberOfTrucks; }
       }
 
       public List<Point> LanePoints

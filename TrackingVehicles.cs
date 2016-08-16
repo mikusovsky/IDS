@@ -27,7 +27,7 @@ namespace IDS
       }
 
       //pridanie noveho vozidla do zoznamu
-      public void AddCurrentVehicle(Rectangle bb)
+      public void AddCurrentVehicle(Rectangle bb, Image<Bgr, Byte> frame)
       {
          Point p1 = new Point();
          Point p2 = new Point();
@@ -35,8 +35,8 @@ namespace IDS
          p1.Y = bb.Y;
          p2.X = bb.X + bb.Width;
          p2.Y = bb.Y + bb.Height;
-         Vehicle tmp = new Vehicle(p1, p2);
-         CurrentVehicles.Add(tmp);
+         Vehicle v = new Vehicle(p1, p2, frame);
+         CurrentVehicles.Add(v);
       }
 
       //najdenie vozidiel na predchadzajucich snimkach 
