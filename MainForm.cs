@@ -7,6 +7,7 @@ using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using Emgu.CV.VideoSurveillance;
 using System.Diagnostics;
+using System.IO;
 using Emgu.CV.GPU;
 using IDS.IDS;
 
@@ -127,7 +128,6 @@ namespace IDS
          _homogMatrix = PerspectiveTransform.FindHomographyMatrix(_roadPoints);
          //TODO create matrix rectangular to car
          _SetPerspectiveMeasureDistance(_homogMatrix);
-         ConsoleText.Text = "";
          StopButton.Text = Resources.ButtonStop_Stop;
 
          _InitImage();
@@ -325,32 +325,7 @@ namespace IDS
             _frame.DrawPolyline(lane.LanePoints.ToArray(), true, new Bgr(Color.Yellow), 2);
          }
 
-         foreach (Vehicle v in newCountedVehicles)
-         {
-            int centerPoint = (int)((v.P1.X + v.P2.X) / 2);
-            string tmpText;
-            foreach (RoadLane lane in _roadLanes)
-            {
-               if (centerPoint < lane.LanePoints[2].X)
-               {
-                  if (v.Size < MAX_SIZE_OF_PERSONAL_CAR)
-                  {
-                     lane.NumberOfPersonalCars++;
-                     tmpText = _tracking.VehiclesCount.ToString() + "- Osobné v., \t r: " + v.Speed.ToString();
-                  }
-                  else
-                  {
-                     lane.NumberOfTrucks++;
-                     tmpText = _tracking.VehiclesCount.ToString() + "- Nákladné v.,\t r: " + v.Speed.ToString();
-                  }
-
-                  ConsoleText.Text = tmpText + " km/h \r\n" + ConsoleText.Text;
-
-                  break;
-               }
-            }
-
-         }
+         _ShowInfoAboutVehicles(newCountedVehicles);
 
          foreach (Vehicle v in _tracking.CurrentVehicles)
          {
@@ -377,6 +352,45 @@ namespace IDS
          }
 
          CvInvoke.cvShowImage("Monitoring", _frame);
+      }
+
+      private void _ShowInfoAboutVehicles(List<Vehicle> vehicles)
+      {
+         List<string> infoVehicleList = new List<string>();
+         foreach (Vehicle v in vehicles)
+         {
+            int centerPoint = (int) ((v.P1.X + v.P2.X)/2);
+            foreach (RoadLane lane in _roadLanes)
+            {
+               if (centerPoint < lane.LanePoints[2].X)
+               {
+                  infoVehicleList.Add("---");
+                  infoVehicleList.Add("---");
+                  infoVehicleList.Add("---");
+                  infoVehicleList.Add("---");
+                  infoVehicleList.Add(v.Speed.ToString());
+                  infoVehicleList.Add(string.Empty);
+                  /*
+                  if (v.Size < MAX_SIZE_OF_PERSONAL_CAR)
+                  {
+                     lane.NumberOfPersonalCars++;
+                     tmpText = _tracking.VehiclesCount.ToString() + "- Osobné v., \t r: " + v.Speed.ToString();
+                  }
+                  else
+                  {
+                     lane.NumberOfTrucks++;
+                     tmpText = _tracking.VehiclesCount.ToString() + "- Nákladné v.,\t r: " + v.Speed.ToString();
+                  }
+                  ConsoleText.Text = tmpText + " km/h \r\n" + ConsoleText.Text;
+                  */
+                  //CarInfoView.Items.Add( new ListViewItem(infoVehicleList.ToArray()));
+                  CarInfoViewImageList.Images.Add(v.GetCarPhoto().Bitmap);
+                  CarInfoView.Items.Add(new ListViewItem(infoVehicleList.ToArray(), CarInfoViewImageList.Images.Count - 1));
+                  CarInfoView.Items[CarInfoView.Items.Count - 1].EnsureVisible();
+               }
+            }
+            //TODO
+         }
       }
 
       //metoda na identifikaciu objektu pocas dna

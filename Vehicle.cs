@@ -30,7 +30,6 @@ namespace IDS
       private int _numberOfFrameStartCountedArea;
       private Image<Bgr, Byte> _carPhoto;
 
-
       public Vehicle(Point p1, Point p2, Image<Bgr, Byte> frame)
       {
          P1 = p1;

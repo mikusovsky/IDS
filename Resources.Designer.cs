@@ -79,6 +79,33 @@ namespace IDS.IDS {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Brand.
+        /// </summary>
+        internal static string CarBrand {
+            get {
+                return ResourceManager.GetString("CarBrand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Car id.
+        /// </summary>
+        internal static string CarId {
+            get {
+                return ResourceManager.GetString("CarId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Car type.
+        /// </summary>
+        internal static string CarType {
+            get {
+                return ResourceManager.GetString("CarType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Day Scene.
         /// </summary>
         internal static string DayScene {
@@ -133,11 +160,29 @@ namespace IDS.IDS {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Photo.
+        /// </summary>
+        internal static string Photo {
+            get {
+                return ResourceManager.GetString("Photo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show details.
         /// </summary>
         internal static string ShowDetails {
             get {
                 return ResourceManager.GetString("ShowDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Speed.
+        /// </summary>
+        internal static string Speed {
+            get {
+                return ResourceManager.GetString("Speed", resourceCulture);
             }
         }
         
@@ -156,6 +201,15 @@ namespace IDS.IDS {
         internal static string Together {
             get {
                 return ResourceManager.GetString("Together", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type of.
+        /// </summary>
+        internal static string TypeOf {
+            get {
+                return ResourceManager.GetString("TypeOf", resourceCulture);
             }
         }
         

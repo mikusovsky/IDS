@@ -123,6 +123,15 @@
   <data name="ButtonStop_Stop" xml:space="preserve">
     <value>Stop</value>
   </data>
+  <data name="CarBrand" xml:space="preserve">
+    <value>Brand</value>
+  </data>
+  <data name="CarId" xml:space="preserve">
+    <value>Car id</value>
+  </data>
+  <data name="CarType" xml:space="preserve">
+    <value>Car type</value>
+  </data>
   <data name="DayScene" xml:space="preserve">
     <value>Day Scene</value>
   </data>
@@ -141,14 +150,23 @@
   <data name="PersonalVehicles" xml:space="preserve">
     <value>Personal</value>
   </data>
+  <data name="Photo" xml:space="preserve">
+    <value>Photo</value>
+  </data>
   <data name="ShowDetails" xml:space="preserve">
     <value>Show details</value>
+  </data>
+  <data name="Speed" xml:space="preserve">
+    <value>Speed</value>
   </data>
   <data name="SumText" xml:space="preserve">
     <value>Sum</value>
   </data>
   <data name="Together" xml:space="preserve">
     <value>Together</value>
+  </data>
+  <data name="TypeOf" xml:space="preserve">
+    <value>Type of</value>
   </data>
   <data name="TypeOfScene" xml:space="preserve">
     <value>Type of scene</value>
