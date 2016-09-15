@@ -51,6 +51,8 @@ namespace IDS
          this.SpeedOfVehicleHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
          this.CarImageOfVehicleHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
          this.CarInfoViewImageList = new System.Windows.Forms.ImageList(this.components);
+         this.mainFrameViewer = new System.Windows.Forms.PictureBox();
+         ((System.ComponentModel.ISupportInitialize)(this.mainFrameViewer)).BeginInit();
          this.SuspendLayout();
          // 
          // OpenFileDialog
@@ -223,11 +225,20 @@ namespace IDS
          this.CarInfoViewImageList.ImageSize = new System.Drawing.Size(128, 128);
          this.CarInfoViewImageList.TransparentColor = System.Drawing.Color.Transparent;
          // 
+         // pictureBox1
+         // 
+         this.mainFrameViewer.Location = new System.Drawing.Point(806, 72);
+         this.mainFrameViewer.Name = "mainFrameViewer";
+         this.mainFrameViewer.Size = new System.Drawing.Size(358, 227);
+         this.mainFrameViewer.TabIndex = 13;
+         this.mainFrameViewer.TabStop = false;
+         // 
          // MainForm
          // 
          this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-         this.ClientSize = new System.Drawing.Size(1109, 613);
+         this.ClientSize = new System.Drawing.Size(1176, 613);
+         this.Controls.Add(this.mainFrameViewer);
          this.Controls.Add(this.CarInfoView);
          this.Controls.Add(this.FpsLabel);
          this.Controls.Add(this.TogetherLabel);
@@ -243,6 +254,7 @@ namespace IDS
          this.Name = "MainForm";
          this.Text = "IDS";
          this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
+         ((System.ComponentModel.ISupportInitialize)(this.mainFrameViewer)).EndInit();
          this.ResumeLayout(false);
          this.PerformLayout();
 
@@ -268,6 +280,7 @@ namespace IDS
       private System.Windows.Forms.ColumnHeader TypeOfVehicleHeader;
       private System.Windows.Forms.ColumnHeader SpeedOfVehicleHeader;
       private System.Windows.Forms.ColumnHeader CarImageOfVehicleHeader;
+      private System.Windows.Forms.PictureBox mainFrameViewer;
    }
 }
 

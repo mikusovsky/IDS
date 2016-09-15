@@ -30,6 +30,8 @@ namespace IDS
       private int _numberOfFrameStartCountedArea;
       private Image<Bgr, Byte> _carPhoto;
 
+      public bool WasHandled { get; set; }
+
       public Vehicle(Point p1, Point p2, Image<Bgr, Byte> frame)
       {
          P1 = p1;
@@ -49,6 +51,7 @@ namespace IDS
          _used = false;
          _numberOfFrameStartCountedArea = 0;
          _CreateVehiclePhoto(frame);
+         WasHandled = false;
       }
 
       public void SetPredictionP(int x, int y)

@@ -308,7 +308,7 @@ namespace IDS
          lb.Text = (sumCars + sumTrucks).ToString();
       }
 
-      //metoda sa trackovanie pohybujucich sa objektov
+      //metoda na trackovanie pohybujucich sa objektov
       private void _TrackingVehicles()
       {
          _tracking.FindPrevBb();
@@ -350,8 +350,8 @@ namespace IDS
             Point p = new Point(15, 15);
             _frame.Draw(s, ref font, p, new Bgr(Color.Yellow));
          }
-
-         CvInvoke.cvShowImage("Monitoring", _frame);
+         mainFrameViewer.Image = _frame.Bitmap;
+         //CvInvoke.cvShowImage("Monitoring", _frame);
       }
 
       private void _ShowInfoAboutVehicles(List<Vehicle> vehicles)
@@ -362,7 +362,7 @@ namespace IDS
             int centerPoint = (int) ((v.P1.X + v.P2.X)/2);
             foreach (RoadLane lane in _roadLanes)
             {
-               if (centerPoint < lane.LanePoints[2].X)
+               if (centerPoint < lane.LanePoints[2].X && !v.WasHandled)
                {
                   infoVehicleList.Add("---");
                   infoVehicleList.Add("---");
@@ -370,26 +370,13 @@ namespace IDS
                   infoVehicleList.Add("---");
                   infoVehicleList.Add(v.Speed.ToString());
                   infoVehicleList.Add(string.Empty);
-                  /*
-                  if (v.Size < MAX_SIZE_OF_PERSONAL_CAR)
-                  {
-                     lane.NumberOfPersonalCars++;
-                     tmpText = _tracking.VehiclesCount.ToString() + "- Osobné v., \t r: " + v.Speed.ToString();
-                  }
-                  else
-                  {
-                     lane.NumberOfTrucks++;
-                     tmpText = _tracking.VehiclesCount.ToString() + "- Nákladné v.,\t r: " + v.Speed.ToString();
-                  }
-                  ConsoleText.Text = tmpText + " km/h \r\n" + ConsoleText.Text;
-                  */
-                  //CarInfoView.Items.Add( new ListViewItem(infoVehicleList.ToArray()));
+
                   CarInfoViewImageList.Images.Add(v.GetCarPhoto().Bitmap);
                   CarInfoView.Items.Add(new ListViewItem(infoVehicleList.ToArray(), CarInfoViewImageList.Images.Count - 1));
                   CarInfoView.Items[CarInfoView.Items.Count - 1].EnsureVisible();
+                  v.WasHandled = true;
                }
             }
-            //TODO
          }
       }
 
@@ -608,7 +595,7 @@ namespace IDS
                _createBackgroundImage = false;
             }
             _backgroundFrame = _floatBackgroundFrame.Convert<Bgr, Byte>();
-            CvInvoke.cvShowImage("pozadie", _backgroundFrame);
+            //CvInvoke.cvShowImage("pozadie", _backgroundFrame);
             CvInvoke.cvAbsDiff(_frame, _backgroundFrame, temp);
          }
          return temp.Convert<Gray, Byte>();
