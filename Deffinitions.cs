@@ -7,8 +7,10 @@ namespace IDS.IDS
 {
    static class Deffinitions
    {
-      public const string SumCars = "sumCars";
-      public const string SumTrucks = "sumTrucks";
-      public const string TotalSum = "totalSum";
+      public const string SUM_CARS = "sumCars";
+      public const string SUM_TRUCKS = "sumTrucks";
+      public const string TOTAL_SUM = "totalSum";
+
+      public const int LOW_FRAME_WIDTH = 320;
    }
 }

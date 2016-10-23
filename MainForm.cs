@@ -7,6 +7,7 @@ using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using Emgu.CV.VideoSurveillance;
 using System.Diagnostics;
+using System.Drawing.Drawing2D;
 using System.IO;
 using Emgu.CV.GPU;
 using IDS.IDS;
@@ -19,6 +20,7 @@ namespace IDS
       Capture _capture;
 
       Image<Bgr, Byte> _frame;
+      Image<Bgr, Byte> _frameHD;
       Image<Bgr, Byte> _prevFrame;
       Image<Bgr, Byte> _contoursImage;
       Image<Bgr, Byte> _bbImage;
@@ -36,6 +38,8 @@ namespace IDS
       Image<Bgr, float> _floatBackgroundFrame;
 
       Matrix<float> _homogMatrix;
+
+      private double _HdRatio;
 
       MCvGaussBGStatModelParams _mogParams;
       BGStatModel<Bgr> _bgModel;
@@ -224,13 +228,48 @@ namespace IDS
          tmp = PerspectiveTransform.PerspectiveTransformPoint(_measurePoint2.X, _measurePoint2.Y, matrix);
          _perspectiveMeasurePoint2 = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
       }
+      
+      private static Bitmap _Resize(Bitmap image, Bitmap newImage)
+      {
+         using (Graphics gr = Graphics.FromImage(newImage))
+         {
+            Rectangle rc = new Rectangle(0, 0, newImage.Width, newImage.Height);
+            gr.SmoothingMode = SmoothingMode.HighQuality;
+            gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            gr.DrawImage(image, rc);
+         }
+         return newImage;
+      }
+
+      private void  _HdToLow(Image<Bgr, Byte> hdFrame, ref Image<Bgr, Byte> lowFrame)
+      {
+         if (hdFrame == null || hdFrame.Width == 0)
+         {
+            return;
+         }
+         double ratio = ((double)hdFrame.Width) / ((double)hdFrame.Height);
+         int lowWidth = Deffinitions.LOW_FRAME_WIDTH;
+         int lowHeight = (int)(Convert.ToDouble(lowWidth) / ratio);
+
+         _HdRatio = lowHeight/(Convert.ToDouble(hdFrame.Height));
+
+         if (lowFrame == null)
+         {
+            Bitmap bitmap = new Bitmap(lowWidth, lowHeight);
+            bitmap.SetResolution(bitmap.HorizontalResolution, bitmap.VerticalResolution);
+            lowFrame = new Image<Bgr, byte>(bitmap);
+         }
+         _Resize(hdFrame.Bitmap, lowFrame.Bitmap);
+      }
 
       //hlavna metoda na spracovanie kazdeho framu
       private void _MyTimerTick(object sender, EventArgs e)
       {
          _sw = Stopwatch.StartNew();
 
-         _frame = _capture.QueryFrame();
+         _frameHD = _capture.QueryFrame();
+         _HdToLow(_frameHD, ref _frame);
 
          if (_frame != null)
          {
@@ -298,13 +337,13 @@ namespace IDS
 
          }
 
-         lb = (Label)Controls[Deffinitions.SumCars];
+         lb = (Label)Controls[Deffinitions.SUM_CARS];
          lb.Text = sumCars.ToString();
 
-         lb = (Label)Controls[Deffinitions.SumTrucks];
+         lb = (Label)Controls[Deffinitions.SUM_TRUCKS];
          lb.Text = sumTrucks.ToString();
 
-         lb = (Label)Controls[Deffinitions.TotalSum];
+         lb = (Label)Controls[Deffinitions.TOTAL_SUM];
          lb.Text = (sumCars + sumTrucks).ToString();
       }
 
@@ -359,7 +398,7 @@ namespace IDS
          List<string> infoVehicleList = new List<string>();
          foreach (Vehicle v in vehicles)
          {
-            int centerPoint = (int) ((v.P1.X + v.P2.X)/2);
+            int centerPoint = (int)((v.P1.X + v.P2.X) / 2);
             foreach (RoadLane lane in _roadLanes)
             {
                if (centerPoint < lane.LanePoints[2].X && !v.WasHandled)
@@ -685,7 +724,7 @@ namespace IDS
 
                if ((bb.Y > _minYTracking) && ((bb.Y + bb.Height) < _maxYTracking))
                {
-                  _tracking.AddCurrentVehicle(bb, _frame);
+                  _tracking.AddCurrentVehicle(bb, _frame, _frameHD, _HdRatio);
                }
                _bbImage.Draw(bb, new Bgr(Color.Yellow), 1);
             }
@@ -712,7 +751,7 @@ namespace IDS
 
             foreach (Rectangle rect in vehiclesBB)
             {
-               _tracking.AddCurrentVehicle(rect, _frame);
+               _tracking.AddCurrentVehicle(rect, _frame, _frameHD, _HdRatio);
             }
 
             _pairLights._ClearList();
@@ -815,8 +854,9 @@ namespace IDS
 
          if (_capture != null)
          {
-            _frame = _capture.QueryFrame();
-            
+            _frameHD = _capture.QueryFrame();
+            _HdToLow(_frameHD, ref _frame);
+
             string onlyfilename = OpenFileDialog.SafeFileName;
             RoadParamForm roadParam = new RoadParamForm(_frame, onlyfilename);
 
@@ -887,19 +927,19 @@ namespace IDS
          Label sumCars = new Label();
          sumCars.Location = new Point(x + 72, y);
          sumCars.Text = "0";
-         sumCars.Name = Deffinitions.SumCars;
+         sumCars.Name = Deffinitions.SUM_CARS;
          sumCars.AutoSize = true;
 
          Label sumTrucks = new Label();
          sumTrucks.Location = new Point(x + 128, y);
          sumTrucks.Text = "0";
-         sumTrucks.Name = Deffinitions.SumTrucks;
+         sumTrucks.Name = Deffinitions.SUM_TRUCKS;
          sumTrucks.AutoSize = true;
 
          Label totalSum = new Label();
          totalSum.Location = new Point(x + 188, y);
          totalSum.Text = "0";
-         totalSum.Name = Deffinitions.TotalSum;
+         totalSum.Name = Deffinitions.TOTAL_SUM;
          totalSum.AutoSize = true;
 
          Controls.Add(sumText);

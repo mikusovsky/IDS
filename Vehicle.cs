@@ -32,7 +32,7 @@ namespace IDS
 
       public bool WasHandled { get; set; }
 
-      public Vehicle(Point p1, Point p2, Image<Bgr, Byte> frame)
+      public Vehicle(Point p1, Point p2, Image<Bgr, Byte> frame, Image<Bgr, Byte> frameHD, double hdRatio)
       {
          P1 = p1;
          P2 = p2;
@@ -50,7 +50,7 @@ namespace IDS
          _numberOfMissingFrames = 0;
          _used = false;
          _numberOfFrameStartCountedArea = 0;
-         _CreateVehiclePhoto(frame);
+         _CreateVehiclePhoto(frameHD, hdRatio);
          WasHandled = false;
       }
 
@@ -153,11 +153,11 @@ namespace IDS
          set { _positionOnStartCountedArea = value; }
       }
 
-      public void _CreateVehiclePhoto(Image<Bgr, Byte> frame)
+      public void _CreateVehiclePhoto(Image<Bgr, Byte> frame, double hdRatio)
       {
          _carPhoto = new Image<Bgr, byte>(frame.Size);
          CvInvoke.cvCopy(frame, _carPhoto, IntPtr.Zero);
-         Rectangle rect = new Rectangle(P1.X, P1.Y, P2.X - P1.X, P2.Y - P1.Y);
+         Rectangle rect = new Rectangle((int) hdRatio * P1.X, (int)hdRatio * P1.Y, (int)hdRatio * (P2.X - P1.X), (int)hdRatio * (P2.Y - P1.Y));
          _carPhoto.ROI = rect;
          //CvInvoke.cvShowImage("pozadie", _carPhoto);
       }
