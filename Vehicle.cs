@@ -32,7 +32,7 @@ namespace IDS
 
       public bool WasHandled { get; set; }
 
-      public Vehicle(Point p1, Point p2, Image<Bgr, Byte> frame, Image<Bgr, Byte> frameHD, double hdRatio)
+      public Vehicle(Point p1, Point p2, Image<Bgr, Byte> frameHD, double hdRatio)
       {
          P1 = p1;
          P2 = p2;
@@ -157,7 +157,11 @@ namespace IDS
       {
          _carPhoto = new Image<Bgr, byte>(frame.Size);
          CvInvoke.cvCopy(frame, _carPhoto, IntPtr.Zero);
-         Rectangle rect = new Rectangle((int) hdRatio * P1.X, (int)hdRatio * P1.Y, (int)hdRatio * (P2.X - P1.X), (int)hdRatio * (P2.Y - P1.Y));
+         int minX = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P1.X)));
+         int minY = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P1.Y)));
+         int width = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P2.X - P1.X)));
+         int height = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P2.Y - P1.Y)));
+         Rectangle rect = new Rectangle(minX, minY, width, height);
          _carPhoto.ROI = rect;
          //CvInvoke.cvShowImage("pozadie", _carPhoto);
       }

@@ -39,7 +39,7 @@ namespace IDS
 
       Matrix<float> _homogMatrix;
 
-      private double _HdRatio;
+      private double _hdRatio = 1;
 
       MCvGaussBGStatModelParams _mogParams;
       BGStatModel<Bgr> _bgModel;
@@ -228,7 +228,7 @@ namespace IDS
          tmp = PerspectiveTransform.PerspectiveTransformPoint(_measurePoint2.X, _measurePoint2.Y, matrix);
          _perspectiveMeasurePoint2 = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
       }
-      
+
       private static Bitmap _Resize(Bitmap image, Bitmap newImage)
       {
          using (Graphics gr = Graphics.FromImage(newImage))
@@ -242,21 +242,23 @@ namespace IDS
          return newImage;
       }
 
-      private void  _HdToLow(Image<Bgr, Byte> hdFrame, ref Image<Bgr, Byte> lowFrame)
+      private void _HdToLow(Image<Bgr, Byte> hdFrame, ref Image<Bgr, Byte> lowFrame)
       {
          if (hdFrame == null || hdFrame.Width == 0)
          {
             return;
          }
-         double ratio = ((double)hdFrame.Width) / ((double)hdFrame.Height);
+         double hdWidth = Convert.ToDouble(hdFrame.Width);
+         double hdHeight = Convert.ToDouble(hdFrame.Height);
+         double ratio = hdWidth / hdHeight;
          int lowWidth = Deffinitions.LOW_FRAME_WIDTH;
-         int lowHeight = (int)(Convert.ToDouble(lowWidth) / ratio);
+         double lowHeight = Convert.ToDouble(lowWidth) / ratio;
 
-         _HdRatio = lowHeight/(Convert.ToDouble(hdFrame.Height));
+         _hdRatio = hdHeight / lowHeight;
 
          if (lowFrame == null)
          {
-            Bitmap bitmap = new Bitmap(lowWidth, lowHeight);
+            Bitmap bitmap = new Bitmap(lowWidth, Convert.ToInt32(Math.Round(lowHeight)));
             bitmap.SetResolution(bitmap.HorizontalResolution, bitmap.VerticalResolution);
             lowFrame = new Image<Bgr, byte>(bitmap);
          }
@@ -269,6 +271,7 @@ namespace IDS
          _sw = Stopwatch.StartNew();
 
          _frameHD = _capture.QueryFrame();
+         //_frame = _frameHD;
          _HdToLow(_frameHD, ref _frame);
 
          if (_frame != null)
@@ -724,7 +727,7 @@ namespace IDS
 
                if ((bb.Y > _minYTracking) && ((bb.Y + bb.Height) < _maxYTracking))
                {
-                  _tracking.AddCurrentVehicle(bb, _frame, _frameHD, _HdRatio);
+                  _tracking.AddCurrentVehicle(bb, _frameHD, _hdRatio);
                }
                _bbImage.Draw(bb, new Bgr(Color.Yellow), 1);
             }
@@ -751,7 +754,7 @@ namespace IDS
 
             foreach (Rectangle rect in vehiclesBB)
             {
-               _tracking.AddCurrentVehicle(rect, _frame, _frameHD, _HdRatio);
+               _tracking.AddCurrentVehicle(rect, _frameHD, _hdRatio);
             }
 
             _pairLights._ClearList();
@@ -855,6 +858,7 @@ namespace IDS
          if (_capture != null)
          {
             _frameHD = _capture.QueryFrame();
+            //_frame = _frameHD;
             _HdToLow(_frameHD, ref _frame);
 
             string onlyfilename = OpenFileDialog.SafeFileName;
