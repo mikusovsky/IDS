@@ -19,8 +19,10 @@ namespace IDS
       System.Windows.Forms.Timer _myTimer;
       Capture _capture;
 
-      Image<Bgr, Byte> _frame;
+      Image<Bgr, Byte> _frameLow;
       Image<Bgr, Byte> _frameHD;
+      Image<Bgr, Byte> _frameRoadLow;
+      Image<Bgr, Byte> _frameRoadHD;
       Image<Bgr, Byte> _prevFrame;
       Image<Bgr, Byte> _contoursImage;
       Image<Bgr, Byte> _bbImage;
@@ -40,6 +42,7 @@ namespace IDS
       Matrix<float> _homogMatrix;
 
       private double _hdRatio = 1;
+      private double _roadHdRatio = 1;
 
       MCvGaussBGStatModelParams _mogParams;
       BGStatModel<Bgr> _bgModel;
@@ -64,6 +67,7 @@ namespace IDS
       PairingHeadlights _pairLights;
 
       List<Point> _roadPoints;
+      Range _roadRange = new Range();
       List<Point> _roadDistancePoints;
       Point _measurePoint1;
       Point _measurePoint2;
@@ -142,22 +146,22 @@ namespace IDS
 
       private void _InitImage()
       {
-         FRAME_HEIGHT = _frame.Height;
-         FRAME_WIDTH = _frame.Width;
-         _prevFrame = new Image<Bgr, Byte>(_frame.Size);
-         _contoursImage = new Image<Bgr, Byte>(_frame.Size);
-         _bbImage = new Image<Bgr, Byte>(_frame.Size);
-         _foregroundFrame = new Image<Bgr, Byte>(_frame.Size);
-         _backgroundFrame = new Image<Bgr, Byte>(_frame.Size);
-         _foregroundGrayFrame = new Image<Gray, Byte>(_frame.Size);
-         _tempBgrFrame = new Image<Bgr, Byte>(_frame.Size);
-         _tempGrayFrame = new Image<Gray, Byte>(_frame.Size);
-         _tempGrayBackgroundFrame = new Image<Gray, Byte>(_frame.Size);
+         FRAME_HEIGHT = _frameLow.Height;
+         FRAME_WIDTH = _frameLow.Width;
+         _prevFrame = new Image<Bgr, Byte>(_frameLow.Size);
+         _contoursImage = new Image<Bgr, Byte>(_frameLow.Size);
+         _bbImage = new Image<Bgr, Byte>(_frameLow.Size);
+         _foregroundFrame = new Image<Bgr, Byte>(_frameLow.Size);
+         _backgroundFrame = new Image<Bgr, Byte>(_frameLow.Size);
+         _foregroundGrayFrame = new Image<Gray, Byte>(_frameLow.Size);
+         _tempBgrFrame = new Image<Bgr, Byte>(_frameLow.Size);
+         _tempGrayFrame = new Image<Gray, Byte>(_frameLow.Size);
+         _tempGrayBackgroundFrame = new Image<Gray, Byte>(_frameLow.Size);
          _birdEye = new Image<Bgr, byte>(BIRD_EYE_WIDTH, BIRD_EYE_HEIGHT);
-         _canny = new Image<Gray, Byte>(_frame.Size);
+         _canny = new Image<Gray, Byte>(_frameLow.Size);
 
-         _floatFrame = new Image<Bgr, float>(_frame.Size);
-         _floatBackgroundFrame = new Image<Bgr, float>(_frame.Size);
+         _floatFrame = new Image<Bgr, float>(_frameLow.Size);
+         _floatBackgroundFrame = new Image<Bgr, float>(_frameLow.Size);
       }
 
       private void _InitInt()
@@ -200,8 +204,8 @@ namespace IDS
       private void _InicializationFirstFrame()
       {
          _startFrameCapture = false;
-         CvInvoke.cvCopy(_frame, _prevFrame, IntPtr.Zero);
-         _bgModel = new BGStatModel<Bgr>(_frame, ref _mogParams);
+         CvInvoke.cvCopy(_frameLow, _prevFrame, IntPtr.Zero);
+         _bgModel = new BGStatModel<Bgr>(_frameLow, ref _mogParams);
       }
 
       //nastavenie referencnej vzdialenosti vo vtacom pohlade
@@ -242,7 +246,7 @@ namespace IDS
          return newImage;
       }
 
-      private void _HdToLow(Image<Bgr, Byte> hdFrame, ref Image<Bgr, Byte> lowFrame)
+      private void _HdToLow(Image<Bgr, Byte> hdFrame, ref Image<Bgr, Byte> lowFrame, Enums.TypeOfRatio typeOfRatio)
       {
          if (hdFrame == null || hdFrame.Width == 0)
          {
@@ -253,8 +257,15 @@ namespace IDS
          double ratio = hdWidth / hdHeight;
          int lowWidth = Deffinitions.LOW_FRAME_WIDTH;
          double lowHeight = Convert.ToDouble(lowWidth) / ratio;
-
-         _hdRatio = hdHeight / lowHeight;
+         
+         if (typeOfRatio == Enums.TypeOfRatio.Frame)
+         {
+            _hdRatio = hdHeight / lowHeight;
+         }
+         else if (typeOfRatio == Enums.TypeOfRatio.Road)
+         {
+            _roadHdRatio = hdHeight / lowHeight;
+         }
 
          if (lowFrame == null)
          {
@@ -265,23 +276,42 @@ namespace IDS
          _Resize(hdFrame.Bitmap, lowFrame.Bitmap);
       }
 
+      private void _GetRoadHdFromFrame(Image<Bgr, Byte> hdFrame, ref Image<Bgr, Byte> roadHdFrame, Range range)
+      {
+         roadHdFrame = new Image<Bgr, byte>(hdFrame.Size);
+         CvInvoke.cvCopy(hdFrame, roadHdFrame, IntPtr.Zero);
+         int x = Convert.ToInt32(Math.Round(_hdRatio * range.MinX));
+         int y = Convert.ToInt32(Math.Round(_hdRatio * range.MinY));
+         int width = Convert.ToInt32(Math.Round(_hdRatio * (range.MaxX - range.MinX)));
+         int height = Convert.ToInt32(Math.Round(_hdRatio * (range.MaxY - range.MinY)));
+         Rectangle rect = new Rectangle(x, y, width, height);
+         roadHdFrame.ROI = rect;
+         CvInvoke.cvShowImage("roadHdPhoto", roadHdFrame);
+      }
+
       //hlavna metoda na spracovanie kazdeho framu
       private void _MyTimerTick(object sender, EventArgs e)
       {
          _sw = Stopwatch.StartNew();
 
          _frameHD = _capture.QueryFrame();
-         //_frame = _frameHD;
-         _HdToLow(_frameHD, ref _frame);
 
-         if (_frame != null)
+         if (_frameHD != null)
          {
+            //_frame = _frameHD;
+
             if (_startFrameCapture)
             {
+               _HdToLow(_frameHD, ref _frameLow, Enums.TypeOfRatio.Frame);
+               //_GetRoadHdFromFrame(_frameHD, ref _frameRoadHD, _roadRange);
+               //_HdToLow(_frameRoadHD, ref _frameRoadLow, Enums.TypeOfRatio.Road);
                _InicializationFirstFrame();
                return;
             }
 
+            _HdToLow(_frameHD, ref _frameLow, Enums.TypeOfRatio.None);
+            //_GetRoadHdFromFrame(_frameHD, ref _frameRoadHD, _roadRange);
+            //_HdToLow(_frameRoadHD, ref _frameRoadLow, Enums.TypeOfRatio.None);
             if (_isDayScene)
             {
                _DayScene();
@@ -356,7 +386,7 @@ namespace IDS
          _tracking.FindPrevBb();
          if (_showTmpImages)
          {
-            CvInvoke.cvCopy(_frame, _contoursImage, IntPtr.Zero);
+            CvInvoke.cvCopy(_frameLow, _contoursImage, IntPtr.Zero);
             // CvInvoke.cvShowImage("predikcia", tracking.DrawPrediction(contoursImage));
          }
 
@@ -364,7 +394,6 @@ namespace IDS
 
          foreach (RoadLane lane in _roadLanes)
          {
-            _frame.DrawPolyline(lane.LanePoints.ToArray(), true, new Bgr(Color.Yellow), 2);
          }
 
          _ShowInfoAboutVehicles(newCountedVehicles);
@@ -374,7 +403,6 @@ namespace IDS
             if ((v.P2.Y > v.FirstPosition.Y) && v.NumberOfFrames > 4)
             {
                Rectangle rect = new Rectangle((int)v.P1.X, (int)v.P1.Y, (int)v.P2.X - (int)v.P1.X, (int)v.P2.Y - (int)v.P1.Y);
-               _frame.Draw(rect, new Bgr(Color.LightGreen), 2);
             }
          }
 
@@ -390,9 +418,9 @@ namespace IDS
             string s = "VYTVARAM POZADIE";
             MCvFont font = new MCvFont(FONT.CV_FONT_HERSHEY_PLAIN, 1, 1);
             Point p = new Point(15, 15);
-            _frame.Draw(s, ref font, p, new Bgr(Color.Yellow));
+            _frameLow.Draw(s, ref font, p, new Bgr(Color.Yellow));
          }
-         mainFrameViewer.Image = _frame.Bitmap;
+         mainFrameViewer.Image = _frameLow.Bitmap;
          //CvInvoke.cvShowImage("Monitoring", _frame);
       }
 
@@ -442,10 +470,10 @@ namespace IDS
          }
 
          Image<Gray, Byte> tmpForeground = _foregroundGrayFrame.Clone();
-         Image<Gray, Byte> tmpMask = new Image<Gray, byte>(_frame.Size);
-         Image<Gray, Byte> tmpSmooth = new Image<Gray, byte>(_frame.Size);
-         Image<Gray, Byte> tmpThresh = new Image<Gray, byte>(_frame.Size);
-         Image<Gray, Byte> tmpMorp = new Image<Gray, byte>(_frame.Size);
+         Image<Gray, Byte> tmpMask = new Image<Gray, byte>(_frameLow.Size);
+         Image<Gray, Byte> tmpSmooth = new Image<Gray, byte>(_frameLow.Size);
+         Image<Gray, Byte> tmpThresh = new Image<Gray, byte>(_frameLow.Size);
+         Image<Gray, Byte> tmpMorp = new Image<Gray, byte>(_frameLow.Size);
 
          for (int i = 0; i < _roadLanes.Count; i++)
          {
@@ -492,7 +520,7 @@ namespace IDS
       //metoda na identifikaciu objektu pocas noci
       private void _NightScene()
       {
-         _foregroundGrayFrame = _frame.Convert<Gray, Byte>();
+         _foregroundGrayFrame = _frameLow.Convert<Gray, Byte>();
          if (_showTmpImages)
          {
             CvInvoke.cvShowImage("Gray Image", _foregroundGrayFrame);
@@ -500,7 +528,7 @@ namespace IDS
 
          _foregroundGrayFrame = _foregroundGrayFrame.ThresholdBinary(new Gray(240), new Gray(255));
 
-         Image<Gray, Byte> roadMask = new Image<Gray, Byte>(_frame.Size);
+         Image<Gray, Byte> roadMask = new Image<Gray, Byte>(_frameLow.Size);
 
          roadMask.FillConvexPoly(_roadPoints.ToArray(), new Gray(255));
          //CvInvoke.cvAnd(foregroundGrayFrame, roadMask, foregroundGrayFrame, IntPtr.Zero);
@@ -532,7 +560,7 @@ namespace IDS
       {
          _foregroundGrayFrame._ThresholdBinary(new Gray(40), new Gray(255));
 
-         Image<Gray, Byte> roadMask = new Image<Gray, byte>(_frame.Size);
+         Image<Gray, Byte> roadMask = new Image<Gray, byte>(_frameLow.Size);
          roadMask.FillConvexPoly(_roadLanes[indexRoadLane].LanePoints.ToArray(), new Gray(255));
 
          CvInvoke.cvAnd(_foregroundGrayFrame, roadMask, _foregroundGrayFrame, IntPtr.Zero);
@@ -593,12 +621,12 @@ namespace IDS
          {
             _foregroundFrame = _CreateDiffFrame();
             _foregroundGrayFrame = _foregroundFrame.Convert<Gray, Byte>();
-            CvInvoke.cvCopy(_frame, _prevFrame, IntPtr.Zero);
+            CvInvoke.cvCopy(_frameLow, _prevFrame, IntPtr.Zero);
          }
          else if (type.CompareTo("mix") == 0)
          {
             _tempGrayFrame = _CreateDiffFrame().Convert<Gray, Byte>();
-            CvInvoke.cvCopy(_frame, _prevFrame, IntPtr.Zero);
+            CvInvoke.cvCopy(_frameLow, _prevFrame, IntPtr.Zero);
             CvInvoke.cvAnd(_CreateMOG(), _tempGrayFrame, _foregroundGrayFrame, IntPtr.Zero);
          }
          else if (type.CompareTo("MOG2") == 0)
@@ -613,18 +641,18 @@ namespace IDS
 
       private Image<Gray, Byte> _CreateAvg()
       {
-         Image<Bgr, Byte> temp = new Image<Bgr, Byte>(_frame.Size);
+         Image<Bgr, Byte> temp = new Image<Bgr, Byte>(_frameLow.Size);
 
          if (_firstFrame)
          {
             _firstFrame = false;
-            _floatFrame = _frame.Convert<Bgr, float>();
+            _floatFrame = _frameLow.Convert<Bgr, float>();
             CvInvoke.cvCopy(_floatFrame, _floatBackgroundFrame, IntPtr.Zero);
             _createBackgroundImage = true;
          }
          else
          {
-            _floatFrame = _frame.Convert<Bgr, float>();
+            _floatFrame = _frameLow.Convert<Bgr, float>();
 
             if (_frameNumber < _learningTime)
             {
@@ -638,7 +666,7 @@ namespace IDS
             }
             _backgroundFrame = _floatBackgroundFrame.Convert<Bgr, Byte>();
             //CvInvoke.cvShowImage("pozadie", _backgroundFrame);
-            CvInvoke.cvAbsDiff(_frame, _backgroundFrame, temp);
+            CvInvoke.cvAbsDiff(_frameLow, _backgroundFrame, temp);
          }
          return temp.Convert<Gray, Byte>();
       }
@@ -653,7 +681,7 @@ namespace IDS
          {
             _createBackgroundImage = false;
          }
-         _bgModel.Update(_frame, -1);
+         _bgModel.Update(_frameLow, -1);
          return _bgModel.ForgroundMask;
 
       }
@@ -662,12 +690,12 @@ namespace IDS
       {
          if (_frameNumber < _learningTime)
          {
-            _mogDetector.Update(_frame);
+            _mogDetector.Update(_frameLow);
             _createBackgroundImage = true;
          }
          else
          {
-            _mogDetector.Update(_frame, 0.1);
+            _mogDetector.Update(_frameLow, 0.1);
             _createBackgroundImage = false;
          }
          return _mogDetector.ForgroundMask;
@@ -675,8 +703,8 @@ namespace IDS
 
       private Image<Bgr, Byte> _CreateDiffFrame()
       {
-         Image<Bgr, Byte> temp = new Image<Bgr, Byte>(_frame.Size);
-         CvInvoke.cvAbsDiff(_prevFrame, _frame, temp);
+         Image<Bgr, Byte> temp = new Image<Bgr, Byte>(_frameLow.Size);
+         CvInvoke.cvAbsDiff(_prevFrame, _frameLow, temp);
 
          return temp;
       }
@@ -687,7 +715,7 @@ namespace IDS
 
          if (firstLane)
          {
-            CvInvoke.cvCopy(_frame, _bbImage, IntPtr.Zero);
+            CvInvoke.cvCopy(_frameLow, _bbImage, IntPtr.Zero);
          }
 
          //vytvorenie kontur
@@ -714,7 +742,7 @@ namespace IDS
                }
 
                // spatne porovnanie hran
-               Image<Gray, Byte> BBMask = new Image<Gray, byte>(_frame.Size);
+               Image<Gray, Byte> BBMask = new Image<Gray, byte>(_frameLow.Size);
                Point[] points = { new Point(bb.Left, bb.Top), new Point(bb.Right, bb.Top), new Point(bb.Right, bb.Bottom), new Point(bb.Left, bb.Bottom) };
                BBMask.FillConvexPoly(points, new Gray(255));
                CvInvoke.cvAnd(BBMask, _canny, BBMask, IntPtr.Zero);
@@ -859,10 +887,10 @@ namespace IDS
          {
             _frameHD = _capture.QueryFrame();
             //_frame = _frameHD;
-            _HdToLow(_frameHD, ref _frame);
+            _HdToLow(_frameHD, ref _frameLow, Enums.TypeOfRatio.Frame);
 
             string onlyfilename = OpenFileDialog.SafeFileName;
-            RoadParamForm roadParam = new RoadParamForm(_frame, onlyfilename);
+            RoadParamForm roadParam = new RoadParamForm(_frameLow, onlyfilename);
 
             roadParam.ShowDialog();
 
@@ -873,6 +901,11 @@ namespace IDS
                _roadDistancePoints = roadParam.GetRoadDistancePoints();
                RealDistance = roadParam.GetRealDistance();
                _roadLanes = roadParam.CreateRoadLanes();
+
+               _roadRange.Clear();
+               _roadRange.AddToRange(_roadPoints);
+               //_GetRoadHdFromFrame(_frameHD, ref _frameRoadHD, _roadRange);
+               //_HdToLow(_frameRoadHD, ref _frameRoadLow, Enums.TypeOfRatio.Road);
 
                _SetStartInitVariables();
                _CreateStatisticLabels();

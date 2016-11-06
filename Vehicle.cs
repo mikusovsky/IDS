@@ -163,7 +163,6 @@ namespace IDS
          int height = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P2.Y - P1.Y)));
          Rectangle rect = new Rectangle(minX, minY, width, height);
          _carPhoto.ROI = rect;
-         //CvInvoke.cvShowImage("pozadie", _carPhoto);
       }
 
       public Image<Bgr, Byte> GetCarPhoto()
