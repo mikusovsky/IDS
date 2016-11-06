@@ -394,6 +394,7 @@ namespace IDS
 
          foreach (RoadLane lane in _roadLanes)
          {
+            _frameLow.DrawPolyline(lane.LanePoints.ToArray(), true, new Bgr(Color.Yellow), 2);
          }
 
          _ShowInfoAboutVehicles(newCountedVehicles);
@@ -403,6 +404,7 @@ namespace IDS
             if ((v.P2.Y > v.FirstPosition.Y) && v.NumberOfFrames > 4)
             {
                Rectangle rect = new Rectangle((int)v.P1.X, (int)v.P1.Y, (int)v.P2.X - (int)v.P1.X, (int)v.P2.Y - (int)v.P1.Y);
+               _frameLow.Draw(rect, new Bgr(Color.LightGreen), 2);
             }
          }
 
