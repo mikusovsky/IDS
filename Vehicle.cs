@@ -2,6 +2,8 @@
 using Emgu.CV;
 using System.Drawing;
 using Emgu.CV.Structure;
+using IDS.IDS;
+using IDS.IDS.CarRecognition;
 
 namespace IDS
 {
@@ -157,16 +159,19 @@ namespace IDS
       {
          _carPhoto = new Image<Bgr, byte>(frame.Size);
          CvInvoke.cvCopy(frame, _carPhoto, IntPtr.Zero);
-         int minX = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P1.X)));
-         int minY = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P1.Y)));
-         int width = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P2.X - P1.X)));
-         int height = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P2.Y - P1.Y)));
+         int minX = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P1.X) - (5 * hdRatio))); // +10 pixels
+         int minY = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P1.Y) - (5 * hdRatio)));
+         int width = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P2.X - P1.X) + (10 * hdRatio)));
+         int height = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P2.Y - P1.Y) + (10 * hdRatio)));
          Rectangle rect = new Rectangle(minX, minY, width, height);
          _carPhoto.ROI = rect;
+         //Utils.ExtractMask(Utils.ToGray(_carPhoto));
+         //CvInvoke.cvShowImage("carPhoto", _carPhoto);
       }
 
       public Image<Bgr, Byte> GetCarPhoto()
       {
+         _carPhoto.Bitmap.Save(string.Format("D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\Output\\Images\\{0}.png", Utils.RandomString(10)), System.Drawing.Imaging.ImageFormat.Png);
          return _carPhoto;
       }
    }

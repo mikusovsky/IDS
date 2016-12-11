@@ -11,6 +11,7 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using Emgu.CV.GPU;
 using IDS.IDS;
+using IDS.IDS.CarRecognition;
 
 namespace IDS
 {
@@ -85,7 +86,7 @@ namespace IDS
       static public int FRAME_NUMBER_TO_COUNT = 15;
       static public int BIRD_EYE_WIDTH = 300;
       static public int BIRD_EYE_HEIGHT = 400;
-      static public int LEARNING_TIME_IN_SEC = 3;
+      static public int LEARNING_TIME_IN_SEC = 10;//3
       static public double LEARNING_RATE = 0.005;
 
       static public int FRAME_HEIGHT;
@@ -233,49 +234,6 @@ namespace IDS
          _perspectiveMeasurePoint2 = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
       }
 
-      private static Bitmap _Resize(Bitmap image, Bitmap newImage)
-      {
-         using (Graphics gr = Graphics.FromImage(newImage))
-         {
-            Rectangle rc = new Rectangle(0, 0, newImage.Width, newImage.Height);
-            gr.SmoothingMode = SmoothingMode.HighQuality;
-            gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            gr.DrawImage(image, rc);
-         }
-         return newImage;
-      }
-
-      private void _HdToLow(Image<Bgr, Byte> hdFrame, ref Image<Bgr, Byte> lowFrame, Enums.TypeOfRatio typeOfRatio)
-      {
-         if (hdFrame == null || hdFrame.Width == 0)
-         {
-            return;
-         }
-         double hdWidth = Convert.ToDouble(hdFrame.Width);
-         double hdHeight = Convert.ToDouble(hdFrame.Height);
-         double ratio = hdWidth / hdHeight;
-         int lowWidth = Deffinitions.LOW_FRAME_WIDTH;
-         double lowHeight = Convert.ToDouble(lowWidth) / ratio;
-         
-         if (typeOfRatio == Enums.TypeOfRatio.Frame)
-         {
-            _hdRatio = hdHeight / lowHeight;
-         }
-         else if (typeOfRatio == Enums.TypeOfRatio.Road)
-         {
-            _roadHdRatio = hdHeight / lowHeight;
-         }
-
-         if (lowFrame == null)
-         {
-            Bitmap bitmap = new Bitmap(lowWidth, Convert.ToInt32(Math.Round(lowHeight)));
-            bitmap.SetResolution(bitmap.HorizontalResolution, bitmap.VerticalResolution);
-            lowFrame = new Image<Bgr, byte>(bitmap);
-         }
-         _Resize(hdFrame.Bitmap, lowFrame.Bitmap);
-      }
-
       private void _GetRoadHdFromFrame(Image<Bgr, Byte> hdFrame, ref Image<Bgr, Byte> roadHdFrame, Range range)
       {
          roadHdFrame = new Image<Bgr, byte>(hdFrame.Size);
@@ -302,14 +260,15 @@ namespace IDS
 
             if (_startFrameCapture)
             {
-               _HdToLow(_frameHD, ref _frameLow, Enums.TypeOfRatio.Frame);
+               Utils.HdToLow(_frameHD, ref _frameLow);
+               _hdRatio = Convert.ToDouble(_frameHD.Height) / Convert.ToDouble(_frameLow.Height);
                //_GetRoadHdFromFrame(_frameHD, ref _frameRoadHD, _roadRange);
                //_HdToLow(_frameRoadHD, ref _frameRoadLow, Enums.TypeOfRatio.Road);
                _InicializationFirstFrame();
                return;
             }
 
-            _HdToLow(_frameHD, ref _frameLow, Enums.TypeOfRatio.None);
+            Utils.HdToLow(_frameHD, ref _frameLow);
             //_GetRoadHdFromFrame(_frameHD, ref _frameRoadHD, _roadRange);
             //_HdToLow(_frameRoadHD, ref _frameRoadLow, Enums.TypeOfRatio.None);
             if (_isDayScene)
@@ -577,7 +536,7 @@ namespace IDS
       //najdenie hran
       private Image<Gray, Byte> _CannyMask()
       {
-         Image<Gray, Byte> gray = _foregroundGrayFrame.PyrDown().PyrUp();
+         Image<Gray, Byte> gray = _foregroundGrayFrame;//.PyrDown().PyrUp();
          Image<Gray, Byte> cannyGray1 = gray.Canny(new Gray(50), new Gray(50));
          //Image<Gray, Byte> cannyGray1 = gray.Canny(50, 50);
          Image<Gray, Byte> cannyGray2 = cannyGray1.Clone();
@@ -844,7 +803,7 @@ namespace IDS
       //otvorenie a nacitanie videa 
       private void _LoadVideoButton_Click(object sender, EventArgs e)
       {
-         OpenFileDialog.Filter = "Media Files|*.avi;*.mp4";
+         OpenFileDialog.Filter = "Media Files|*.avi;*.mp4;*.MOV";
          OpenFileDialog.FileName = "";
          //initializedVariables = false;
          if (OpenFileDialog.ShowDialog() == DialogResult.OK)
@@ -889,7 +848,8 @@ namespace IDS
          {
             _frameHD = _capture.QueryFrame();
             //_frame = _frameHD;
-            _HdToLow(_frameHD, ref _frameLow, Enums.TypeOfRatio.Frame);
+            Utils.HdToLow(_frameHD, ref _frameLow);
+            _hdRatio = Convert.ToDouble(_frameHD.Height) / Convert.ToDouble(_frameLow.Height);
 
             string onlyfilename = OpenFileDialog.SafeFileName;
             RoadParamForm roadParam = new RoadParamForm(_frameLow, onlyfilename);
@@ -1013,6 +973,22 @@ namespace IDS
          if (e.KeyCode == Keys.N)
          {
             _StopButton_Click(sender, new EventArgs());
+         }
+      }
+
+      private void ButtonLoadDb_Click(object sender, EventArgs e)
+      {
+         using (OpenFileDialog dlg = new OpenFileDialog())
+         {
+            dlg.Title = "Open Image";
+            dlg.Filter = "bmp files (*.jpg)|*.jpg";
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+               Image<Bgr, byte> image = new Image<Bgr, byte>(new Bitmap(dlg.FileName));
+               Utils.ExtractMask(image);
+
+            }
          }
       }
    }

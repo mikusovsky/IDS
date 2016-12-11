@@ -49,6 +49,7 @@ namespace IDS
          this.CarImageOfVehicleHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
          this.CarInfoViewImageList = new System.Windows.Forms.ImageList(this.components);
          this.mainFrameViewer = new System.Windows.Forms.PictureBox();
+         this.ButtonLoadDb = new System.Windows.Forms.Button();
          ((System.ComponentModel.ISupportInitialize)(this.mainFrameViewer)).BeginInit();
          this.SuspendLayout();
          // 
@@ -59,7 +60,7 @@ namespace IDS
          // OpenFileButton
          // 
          this.OpenFileButton.Location = new System.Drawing.Point(13, 178);
-         this.OpenFileButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+         this.OpenFileButton.Margin = new System.Windows.Forms.Padding(4);
          this.OpenFileButton.Name = "OpenFileButton";
          this.OpenFileButton.Size = new System.Drawing.Size(125, 34);
          this.OpenFileButton.TabIndex = 0;
@@ -73,7 +74,7 @@ namespace IDS
          this.TypeOfSceneLabel.Location = new System.Drawing.Point(16, 42);
          this.TypeOfSceneLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
          this.TypeOfSceneLabel.Name = "TypeOfSceneLabel";
-         this.TypeOfSceneLabel.Size = new System.Drawing.Size(94, 16);
+         this.TypeOfSceneLabel.Size = new System.Drawing.Size(98, 17);
          this.TypeOfSceneLabel.TabIndex = 2;
          this.TypeOfSceneLabel.Text = "Type of scene";
          // 
@@ -82,9 +83,9 @@ namespace IDS
          this.DaySceneRadioButton.AutoSize = true;
          this.DaySceneRadioButton.Checked = true;
          this.DaySceneRadioButton.Location = new System.Drawing.Point(20, 62);
-         this.DaySceneRadioButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+         this.DaySceneRadioButton.Margin = new System.Windows.Forms.Padding(4);
          this.DaySceneRadioButton.Name = "DaySceneRadioButton";
-         this.DaySceneRadioButton.Size = new System.Drawing.Size(93, 20);
+         this.DaySceneRadioButton.Size = new System.Drawing.Size(98, 21);
          this.DaySceneRadioButton.TabIndex = 3;
          this.DaySceneRadioButton.TabStop = true;
          this.DaySceneRadioButton.Text = global::IDS.IDS.Resources.DayScene;
@@ -94,9 +95,9 @@ namespace IDS
          // 
          this.NightSceneRadioButton.AutoSize = true;
          this.NightSceneRadioButton.Location = new System.Drawing.Point(20, 90);
-         this.NightSceneRadioButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+         this.NightSceneRadioButton.Margin = new System.Windows.Forms.Padding(4);
          this.NightSceneRadioButton.Name = "NightSceneRadioButton";
-         this.NightSceneRadioButton.Size = new System.Drawing.Size(99, 20);
+         this.NightSceneRadioButton.Size = new System.Drawing.Size(106, 21);
          this.NightSceneRadioButton.TabIndex = 4;
          this.NightSceneRadioButton.Text = global::IDS.IDS.Resources.NightScene;
          this.NightSceneRadioButton.UseVisualStyleBackColor = true;
@@ -105,9 +106,9 @@ namespace IDS
          // 
          this.ShowTmpImageCheckBox.AutoSize = true;
          this.ShowTmpImageCheckBox.Location = new System.Drawing.Point(16, 149);
-         this.ShowTmpImageCheckBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+         this.ShowTmpImageCheckBox.Margin = new System.Windows.Forms.Padding(4);
          this.ShowTmpImageCheckBox.Name = "ShowTmpImageCheckBox";
-         this.ShowTmpImageCheckBox.Size = new System.Drawing.Size(103, 20);
+         this.ShowTmpImageCheckBox.Size = new System.Drawing.Size(109, 21);
          this.ShowTmpImageCheckBox.TabIndex = 6;
          this.ShowTmpImageCheckBox.Text = global::IDS.IDS.Resources.ShowDetails;
          this.ShowTmpImageCheckBox.UseVisualStyleBackColor = true;
@@ -115,7 +116,7 @@ namespace IDS
          // StopButton
          // 
          this.StopButton.Location = new System.Drawing.Point(13, 220);
-         this.StopButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+         this.StopButton.Margin = new System.Windows.Forms.Padding(4);
          this.StopButton.Name = "StopButton";
          this.StopButton.Size = new System.Drawing.Size(125, 34);
          this.StopButton.TabIndex = 7;
@@ -129,7 +130,7 @@ namespace IDS
          this.FpsLabel.Location = new System.Drawing.Point(1435, 11);
          this.FpsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
          this.FpsLabel.Name = "FpsLabel";
-         this.FpsLabel.Size = new System.Drawing.Size(36, 16);
+         this.FpsLabel.Size = new System.Drawing.Size(39, 17);
          this.FpsLabel.TabIndex = 12;
          this.FpsLabel.Text = "0 fps";
          // 
@@ -202,11 +203,22 @@ namespace IDS
          this.mainFrameViewer.TabIndex = 13;
          this.mainFrameViewer.TabStop = false;
          // 
+         // ButtonLoadDb
+         // 
+         this.ButtonLoadDb.Location = new System.Drawing.Point(20, 568);
+         this.ButtonLoadDb.Name = "ButtonLoadDb";
+         this.ButtonLoadDb.Size = new System.Drawing.Size(126, 33);
+         this.ButtonLoadDb.TabIndex = 14;
+         this.ButtonLoadDb.Text = "LoadDb";
+         this.ButtonLoadDb.UseVisualStyleBackColor = true;
+         this.ButtonLoadDb.Click += new System.EventHandler(this.ButtonLoadDb_Click);
+         // 
          // MainForm
          // 
          this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
          this.ClientSize = new System.Drawing.Size(1520, 613);
+         this.Controls.Add(this.ButtonLoadDb);
          this.Controls.Add(this.mainFrameViewer);
          this.Controls.Add(this.CarInfoView);
          this.Controls.Add(this.FpsLabel);
@@ -216,7 +228,7 @@ namespace IDS
          this.Controls.Add(this.DaySceneRadioButton);
          this.Controls.Add(this.TypeOfSceneLabel);
          this.Controls.Add(this.OpenFileButton);
-         this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+         this.Margin = new System.Windows.Forms.Padding(4);
          this.Name = "MainForm";
          this.Text = "IDS";
          this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
@@ -244,6 +256,7 @@ namespace IDS
       private System.Windows.Forms.ColumnHeader SpeedOfVehicleHeader;
       private System.Windows.Forms.ColumnHeader CarImageOfVehicleHeader;
       private System.Windows.Forms.PictureBox mainFrameViewer;
+      private System.Windows.Forms.Button ButtonLoadDb;
    }
 }
 
