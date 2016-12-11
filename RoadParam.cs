@@ -513,7 +513,7 @@ namespace IDS
                         newPoint = new Point(171, 182);
                         _roadDistancePoints.Add(newPoint);
 
-                        _realDistanceTextBox.Text = "4,5";
+                        _realDistanceTextBox.Text = "4.5";
 
                         break;
                     }
@@ -526,7 +526,7 @@ namespace IDS
                         newPoint = new Point(180, 138);
                         _roadDistancePoints.Add(newPoint);
 
-                        _realDistanceTextBox.Text = "6,3";
+                        _realDistanceTextBox.Text = "6.3";
                         break;
                     }
                 case 91:
@@ -537,7 +537,7 @@ namespace IDS
                         newPoint = new Point(183, 137);
                         _roadDistancePoints.Add(newPoint);
 
-                        _realDistanceTextBox.Text = "6,3";
+                        _realDistanceTextBox.Text = "6.3";
                         break;
                     }
                 case 92:
@@ -548,7 +548,7 @@ namespace IDS
                         newPoint = new Point(205, 185);
                         _roadDistancePoints.Add(newPoint);
 
-                        _realDistanceTextBox.Text = "6,3";
+                        _realDistanceTextBox.Text = "6.3";
                         break;
                     }
                 case 93:
@@ -559,7 +559,7 @@ namespace IDS
                         newPoint = new Point(187, 140);
                         _roadDistancePoints.Add(newPoint);
 
-                        _realDistanceTextBox.Text = "6,3";
+                        _realDistanceTextBox.Text = "6.3";
                         break;
                     }
                 case 94:
@@ -570,7 +570,7 @@ namespace IDS
                         newPoint = new Point(183, 137);
                         _roadDistancePoints.Add(newPoint);
 
-                        _realDistanceTextBox.Text = "6,3";
+                        _realDistanceTextBox.Text = "6.3";
                         break;
                     }
 
