@@ -366,7 +366,39 @@ namespace IDS
                         _roadPoints.Add(newPoint);
                         break;
                     }
-                default:
+            case 1047:
+            case 1048:
+            case 1049:
+            case 1051:
+            case 1052:
+            case 1053:
+            case 1054:
+            case 1055:
+            case 1056:
+            case 1057:
+            case 1058:
+            case 1059:
+            case 1060:
+            case 1061:
+            case 1062:
+            case 1063:
+            case 1064:
+            case 1065:
+            case 1066:
+            case 1067:
+            case 1068:
+            case 1069:
+            case 1070:
+               newPoint = new Point(76, 57);
+               _roadPoints.Add(newPoint);
+               newPoint = new Point(147, 57);
+               _roadPoints.Add(newPoint);
+               newPoint = new Point(193, 161);
+               _roadPoints.Add(newPoint);
+               newPoint = new Point(32, 161);
+               _roadPoints.Add(newPoint);
+               break;
+            default:
                     {
                         newPoint = new Point((int)(0.1 * _image.Width), (int)(0.1 * _image.Height));
                         _roadPoints.Add(newPoint);
@@ -597,16 +629,45 @@ namespace IDS
                         _realDistanceTextBox.Text = "6";
                         break;
                     }
-                default:
-                    {
-                        newPoint = new Point(20, 20);
-                        _roadDistancePoints.Add(newPoint);
+            case 1047:
+            case 1048:
+            case 1049:
+            case 1051:
+            case 1052:
+            case 1053:
+            case 1054:
+            case 1055:
+            case 1056:
+            case 1057:
+            case 1058:
+            case 1059:
+            case 1060:
+            case 1061:
+            case 1062:
+            case 1063:
+            case 1064:
+            case 1065:
+            case 1066:
+            case 1067:
+            case 1068:
+            case 1069:
+            case 1070:
+               newPoint = new Point(111, 114);
+               _roadDistancePoints.Add(newPoint);
+               newPoint = new Point(111, 135);
+               _roadDistancePoints.Add(newPoint);
+               _realDistanceTextBox.Text = "2";
+               break;
+            default:
+               {
+                  newPoint = new Point(20, 20);
+                  _roadDistancePoints.Add(newPoint);
 
-                        newPoint = new Point(20, _image.Height - 20);
-                        _roadDistancePoints.Add(newPoint);
+                  newPoint = new Point(20, _image.Height - 20);
+                  _roadDistancePoints.Add(newPoint);
 
-                        break;
-                    }
+                  break;
+               }
             }
         }
 
@@ -753,7 +814,7 @@ namespace IDS
             }
             else
             {
-                MessageBox.Show("Zle zadané číslo vzdialenosti");
+                MessageBox.Show(Resources.WrongNumberFormatForDistinct);
                 _realDistanceTextBox.Text = "";
             }
         }
