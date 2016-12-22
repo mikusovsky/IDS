@@ -1,4 +1,7 @@
-﻿namespace IDS
+﻿using System.Resources;
+using IDS.IDS;
+
+namespace IDS
 {
    partial class RoadParamForm
    {
@@ -57,7 +60,7 @@
          this._saveRoadPointsButton.Name = "_saveRoadPointsButton";
          this._saveRoadPointsButton.Size = new System.Drawing.Size(100, 38);
          this._saveRoadPointsButton.TabIndex = 1;
-         this._saveRoadPointsButton.Text = "Uložiť nastavenia cesty";
+         this._saveRoadPointsButton.Text = Resources.SaveReferenceDistinct;
          this._saveRoadPointsButton.UseVisualStyleBackColor = true;
          this._saveRoadPointsButton.Click += new System.EventHandler(this.SaveRoadPointsButton_Click);
          // 
@@ -68,7 +71,7 @@
          this._saveRoadDistancePointsButton.Name = "_saveRoadDistancePointsButton";
          this._saveRoadDistancePointsButton.Size = new System.Drawing.Size(100, 39);
          this._saveRoadDistancePointsButton.TabIndex = 2;
-         this._saveRoadDistancePointsButton.Text = "Uložiť referenčnú vzdialenosť";
+         this._saveRoadDistancePointsButton.Text = Resources.SaveReferenceDistinct;
          this._saveRoadDistancePointsButton.UseVisualStyleBackColor = true;
          this._saveRoadDistancePointsButton.Click += new System.EventHandler(this.SaveRoadDistancePointsButton_Click);
          // 

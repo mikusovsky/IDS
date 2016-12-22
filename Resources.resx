@@ -153,6 +153,12 @@
   <data name="Photo" xml:space="preserve">
     <value>Photo</value>
   </data>
+  <data name="SaveReferenceDistinct" xml:space="preserve">
+    <value>Save reference distinct</value>
+  </data>
+  <data name="SaveRoadSettings" xml:space="preserve">
+    <value>Save road settings</value>
+  </data>
   <data name="ShowDetails" xml:space="preserve">
     <value>Show details</value>
   </data>
@@ -173,6 +179,9 @@
   </data>
   <data name="WrongInputNumerForCountOfRoudLines" xml:space="preserve">
     <value>Wrong input numer  for count of roud lines</value>
+  </data>
+  <data name="WrongNumberFormatForDistinct" xml:space="preserve">
+    <value>Wrong number format for distinct</value>
   </data>
   <data name="ZeroFPS" xml:space="preserve">
     <value>0 fps</value>

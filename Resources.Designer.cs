@@ -169,6 +169,24 @@ namespace IDS.IDS {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Save reference distinct.
+        /// </summary>
+        internal static string SaveReferenceDistinct {
+            get {
+                return ResourceManager.GetString("SaveReferenceDistinct", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save road settings.
+        /// </summary>
+        internal static string SaveRoadSettings {
+            get {
+                return ResourceManager.GetString("SaveRoadSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show details.
         /// </summary>
         internal static string ShowDetails {
@@ -228,6 +246,15 @@ namespace IDS.IDS {
         internal static string WrongInputNumerForCountOfRoudLines {
             get {
                 return ResourceManager.GetString("WrongInputNumerForCountOfRoudLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong number format for distinct.
+        /// </summary>
+        internal static string WrongNumberFormatForDistinct {
+            get {
+                return ResourceManager.GetString("WrongNumberFormatForDistinct", resourceCulture);
             }
         }
         
