@@ -3,7 +3,6 @@ using Emgu.CV;
 using System.Drawing;
 using Emgu.CV.Structure;
 using IDS.IDS;
-using IDS.IDS.CarRecognition;
 
 namespace IDS
 {
@@ -31,6 +30,7 @@ namespace IDS
       private bool _used;
       private int _numberOfFrameStartCountedArea;
       private Image<Bgr, Byte> _carPhoto;
+      private Image<Bgr, Byte> _carMask;
 
       public bool WasHandled { get; set; }
 
@@ -160,18 +160,25 @@ namespace IDS
          _carPhoto = new Image<Bgr, byte>(frame.Size);
          CvInvoke.cvCopy(frame, _carPhoto, IntPtr.Zero);
          int minX = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P1.X) - (5 * hdRatio))); // +10 pixels
-         int minY = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P1.Y) - (5 * hdRatio)));
-         int width = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P2.X - P1.X) + (10 * hdRatio)));
-         int height = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P2.Y - P1.Y) + (10 * hdRatio)));
+         int minY = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P1.Y) - (hdRatio)));
+         int width = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P2.X - P1.X) + (hdRatio)));
+         int height = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P2.Y - P1.Y) + (5 * hdRatio)));
          Rectangle rect = new Rectangle(minX, minY, width, height);
          _carPhoto.ROI = rect;
-         //Utils.ExtractMask(Utils.ToGray(_carPhoto));
          //CvInvoke.cvShowImage("carPhoto", _carPhoto);
+      }
+
+      public void GetCarType()
+      {
+         _carMask = Utils.ExtractMask2(_carPhoto);
+         CvInvoke.cvShowImage("carPhoto", _carMask);
       }
 
       public Image<Bgr, Byte> GetCarPhoto()
       {
-         _carPhoto.Bitmap.Save(string.Format("D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\Output\\Images\\{0}.png", Utils.RandomString(10)), System.Drawing.Imaging.ImageFormat.Png);
+         string filePath = $"D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\Output\\Images\\{DateTime.Now.ToString(@"MMddyyyy_h_mm_tt_")}{Utils.RandomString(3)}.png";
+
+         _carPhoto.Bitmap.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
          return _carPhoto;
       }
    }

@@ -7,11 +7,8 @@ using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using Emgu.CV.VideoSurveillance;
 using System.Diagnostics;
-using System.Drawing.Drawing2D;
-using System.IO;
-using Emgu.CV.GPU;
+using CppWrapper;
 using IDS.IDS;
-using IDS.IDS.CarRecognition;
 
 namespace IDS
 {
@@ -86,7 +83,7 @@ namespace IDS
       static public int FRAME_NUMBER_TO_COUNT = 15;
       static public int BIRD_EYE_WIDTH = 300;
       static public int BIRD_EYE_HEIGHT = 400;
-      static public int LEARNING_TIME_IN_SEC = 10;//3
+      static public int LEARNING_TIME_IN_SEC = 3;
       static public double LEARNING_RATE = 0.005;
 
       static public int FRAME_HEIGHT;
@@ -402,6 +399,7 @@ namespace IDS
                   infoVehicleList.Add(v.Speed.ToString());
                   infoVehicleList.Add(string.Empty);
 
+                  v.GetCarType();
                   CarInfoViewImageList.Images.Add(v.GetCarPhoto().Bitmap);
                   CarInfoView.Items.Add(new ListViewItem(infoVehicleList.ToArray(), CarInfoViewImageList.Images.Count - 1));
                   CarInfoView.Items[CarInfoView.Items.Count - 1].EnsureVisible();
@@ -978,16 +976,35 @@ namespace IDS
 
       private void ButtonLoadDb_Click(object sender, EventArgs e)
       {
+         int noElements = 1000;
+         int[] myArray = new int[noElements];
+
+         for (int i = 0; i < noElements; i++)
+         {
+            myArray[i] = i*10;
+         }
+         //Utils.DetectRectangle();
+         /*
+         unsafe
+         {
+            fixed (int* pmyArray = &myArray[0])
+            {
+               CppWrapperClass controlCpp = new CppWrapperClass(pmyArray, noElements);
+               int sumOfArray = controlCpp.getSum();
+               sumOfArray = controlCpp.sum;
+               int adam = controlCpp.localizeLicencePlate();
+            }
+         }
+         */
          using (OpenFileDialog dlg = new OpenFileDialog())
          {
             dlg.Title = "Open Image";
-            dlg.Filter = "bmp files (*.jpg)|*.jpg";
+            dlg.Filter = "All files (*.*)|*.*";//"bmp files (*.jpg)|*.jpg|All files (*.*)|*.*";
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                Image<Bgr, byte> image = new Image<Bgr, byte>(new Bitmap(dlg.FileName));
-               Utils.ExtractMask(image);
-
+               Utils.ExtractMask2(image);
             }
          }
       }
