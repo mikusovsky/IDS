@@ -4,7 +4,7 @@ using System.Text;
 using IntervalTree;
 using Wintellect.PowerCollections;
 
-namespace IntervalTreeLib
+namespace IDS.IDS.IntervalTree
 {
    /// <summary>
    /// An Interval Tree is essentially a map from stubedIntervals to objects, which

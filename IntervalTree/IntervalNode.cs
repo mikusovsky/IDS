@@ -5,7 +5,7 @@ using System.Text;
 using IntervalTree;
 using Wintellect.PowerCollections;
 
-namespace IntervalTreeLib
+namespace IDS.IDS.IntervalTree
 {
    /// <summary>
    /// The Node class contains the interval tree information for one single node
