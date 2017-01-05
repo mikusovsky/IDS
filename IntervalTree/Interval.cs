@@ -9,33 +9,33 @@ namespace IntervalTree
    public class Interval<T, D> : IComparable<Interval<T, D>> where D : IComparable<D>
    {
 
-      private D start;
-      private D end;
-      private T data;
+      private D m_Start;
+      private D m_End;
+      private T m_Data;
 
       public Interval(D start, D end, T data)
       {
-         this.start = start;
-         this.end = end;
-         this.data = data;
+         m_Start = start;
+         m_End = end;
+         m_Data = data;
       }
 
       public D Start
       {
-         get { return start; }
-         set { start = value; }
+         get { return m_Start; }
+         set { m_Start = value; }
       }
 
       public D End
       {
-         get { return end; }
-         set { end = value; }
+         get { return m_End; }
+         set { m_End = value; }
       }
 
       public T Data
       {
-         get { return data; }
-         set { data = value; }
+         get { return m_Data; }
+         set { m_Data = value; }
       }
 
       public bool Contains(D time, ContainConstrains constraint)
@@ -71,7 +71,7 @@ namespace IntervalTree
       public bool Contains(D time)
       {
          //return time < end && time > start;
-         return time.CompareTo(end) < 0 && time.CompareTo(start) > 0;
+         return time.CompareTo(m_End) < 0 && time.CompareTo(m_Start) > 0;
       }
 
       /// <summary>
@@ -81,7 +81,7 @@ namespace IntervalTree
       /// <returns></returns>
       public bool ContainsWithStart(D time)
       {
-         return time.CompareTo(end) < 0 && time.CompareTo(start) >= 0;
+         return time.CompareTo(m_End) < 0 && time.CompareTo(m_Start) >= 0;
       }
 
       /// <summary>
@@ -91,7 +91,7 @@ namespace IntervalTree
       /// <returns></returns>
       public bool ContainsWithEnd(D time)
       {
-         return time.CompareTo(end) <= 0 && time.CompareTo(start) > 0;
+         return time.CompareTo(m_End) <= 0 && time.CompareTo(m_Start) > 0;
       }
 
       /// <summary>
@@ -101,7 +101,7 @@ namespace IntervalTree
       /// <returns></returns>
       public bool ContainsWithStartEnd(D time)
       {
-         return time.CompareTo(end) <= 0 && time.CompareTo(start) >= 0;
+         return time.CompareTo(m_End) <= 0 && time.CompareTo(m_Start) >= 0;
       }
 
       /// <summary>
@@ -112,7 +112,7 @@ namespace IntervalTree
       public bool Intersects(Interval<T, D> other)
       {
          //return other.End > start && other.Start < end;
-         return other.End.CompareTo(start) > 0 && other.Start.CompareTo(end) < 0;
+         return other.End.CompareTo(m_Start) > 0 && other.Start.CompareTo(m_End) < 0;
       }
 
 
@@ -124,13 +124,13 @@ namespace IntervalTree
       /// <returns></returns>
       public int CompareTo(Interval<T, D> other)
       {
-         if (start.CompareTo(other.Start) < 0)
+         if (m_Start.CompareTo(other.Start) < 0)
             return -1;
-         else if (start.CompareTo(other.Start) > 0)
+         else if (m_Start.CompareTo(other.Start) > 0)
             return 1;
-         else if (end.CompareTo(other.End) < 0)
+         else if (m_End.CompareTo(other.End) < 0)
             return -1;
-         else if (end.CompareTo(other.End) > 0)
+         else if (m_End.CompareTo(other.End) > 0)
             return 1;
          else
             return 0;
@@ -148,7 +148,7 @@ namespace IntervalTree
 
       public override string ToString()
       {
-         return string.Format("{0}-{1}", start, end);
+         return string.Format("{0}-{1}", m_Start, m_End);
       }
    }
 }

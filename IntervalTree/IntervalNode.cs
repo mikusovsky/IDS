@@ -12,17 +12,17 @@ namespace IDS.IDS.IntervalTree
    /// </summary>
    public class IntervalNode<T, D> where D : struct, IComparable<D>
    {
-      private OrderedDictionary<Interval<T, D>, List<Interval<T, D>>> intervals;
-      private D center;
-      private IntervalNode<T, D> leftNode;
-      private IntervalNode<T, D> rightNode;
+      private OrderedDictionary<Interval<T, D>, List<Interval<T, D>>> m_Intervals;
+      private D m_Center;
+      private IntervalNode<T, D> m_LeftNode;
+      private IntervalNode<T, D> m_RightNode;
 
       public IntervalNode()
       {
-         intervals = new OrderedDictionary<Interval<T, D>, List<Interval<T, D>>>();
-         center = default(D);
-         leftNode = null;
-         rightNode = null;
+         m_Intervals = new OrderedDictionary<Interval<T, D>, List<Interval<T, D>>>();
+         m_Center = default(D);
+         m_LeftNode = null;
+         m_RightNode = null;
       }
 
       private string debug
@@ -30,11 +30,11 @@ namespace IDS.IDS.IntervalTree
          get
          {
             StringBuilder sb = new StringBuilder();
-            foreach (var key in intervals.Keys)
+            foreach (var key in m_Intervals.Keys)
             {
                sb.AppendLine(key.ToString());
                sb.AppendLine("==");
-               foreach (var val in intervals[key])
+               foreach (var val in m_Intervals[key])
                {
                   sb.AppendLine(val.ToString());
                   sb.AppendLine("--");
@@ -50,7 +50,7 @@ namespace IDS.IDS.IntervalTree
       public IntervalNode(List<Interval<T, D>> intervalList)
       {
 
-         intervals = new OrderedDictionary<Interval<T, D>, List<Interval<T, D>>>();
+         m_Intervals = new OrderedDictionary<Interval<T, D>, List<Interval<T, D>>>();
 
          var endpoints = new OrderedSet<D>();
 
@@ -61,54 +61,54 @@ namespace IDS.IDS.IntervalTree
          }
 
          Nullable<D> median = GetMedian(endpoints);
-         center = median.GetValueOrDefault();
+         m_Center = median.GetValueOrDefault();
 
          List<Interval<T, D>> left = new List<Interval<T, D>>();
          List<Interval<T, D>> right = new List<Interval<T, D>>();
 
          foreach (Interval<T, D> interval in intervalList)
          {
-            if (interval.End.CompareTo(center) < 0)
+            if (interval.End.CompareTo(m_Center) < 0)
                left.Add(interval);
-            else if (interval.Start.CompareTo(center) > 0)
+            else if (interval.Start.CompareTo(m_Center) > 0)
                right.Add(interval);
             else
             {
                List<Interval<T, D>> posting;
-               if (!intervals.TryGetValue(interval, out posting))
+               if (!m_Intervals.TryGetValue(interval, out posting))
                {
                   posting = new List<Interval<T, D>>();
-                  intervals.Add(interval, posting);
+                  m_Intervals.Add(interval, posting);
                }
                posting.Add(interval);
             }
          }
 
          if (left.Count > 0)
-            leftNode = new IntervalNode<T, D>(left);
+            m_LeftNode = new IntervalNode<T, D>(left);
          if (right.Count > 0)
-            rightNode = new IntervalNode<T, D>(right);
+            m_RightNode = new IntervalNode<T, D>(right);
       }
 
       public IEnumerable<IList<Interval<T, D>>> Intersections
       {
          get
          {
-            if (intervals.Count == 0) yield break;
-            else if (intervals.Count == 1)
+            if (m_Intervals.Count == 0) yield break;
+            else if (m_Intervals.Count == 1)
             {
-               if (intervals.First().Value.Count > 1)
+               if (m_Intervals.First().Value.Count > 1)
                {
-                  yield return intervals.First().Value;
+                  yield return m_Intervals.First().Value;
                }
             }
             else
             {
-               var keys = intervals.Keys.ToArray();
+               var keys = m_Intervals.Keys.ToArray();
 
                int lastIntervalIndex = 0;
                List<Interval<T, D>> intersectionsKeys = new List<Interval<T, D>>();
-               for (int index = 1; index < intervals.Count; index++)
+               for (int index = 1; index < m_Intervals.Count; index++)
                {
                   var intervalKey = keys[index];
                   if (intervalKey.Intersects(keys[lastIntervalIndex]))
@@ -129,9 +129,9 @@ namespace IDS.IDS.IntervalTree
                      }
                      else
                      {
-                        if (intervals[intervalKey].Count > 1)
+                        if (m_Intervals[intervalKey].Count > 1)
                         {
-                           yield return intervals[intervalKey];
+                           yield return m_Intervals[intervalKey];
                         }
                      }
 
@@ -148,7 +148,7 @@ namespace IDS.IDS.IntervalTree
       {
          var allIntervals =
            from k in intervalKeys
-           select intervals[k];
+           select m_Intervals[k];
 
          return allIntervals.SelectMany(x => x).ToList();
       }
@@ -162,7 +162,7 @@ namespace IDS.IDS.IntervalTree
       {
          List<Interval<T, D>> result = new List<Interval<T, D>>();
 
-         foreach (var entry in intervals)
+         foreach (var entry in m_Intervals)
          {
             if (entry.Key.Contains(time, constraint))
                foreach (var interval in entry.Value)
@@ -171,10 +171,10 @@ namespace IDS.IDS.IntervalTree
                break;
          }
 
-         if (time.CompareTo(center) < 0 && leftNode != null)
-            result.AddRange(leftNode.Stab(time, constraint));
-         else if (time.CompareTo(center) > 0 && rightNode != null)
-            result.AddRange(rightNode.Stab(time, constraint));
+         if (time.CompareTo(m_Center) < 0 && m_LeftNode != null)
+            result.AddRange(m_LeftNode.Stab(time, constraint));
+         else if (time.CompareTo(m_Center) > 0 && m_RightNode != null)
+            result.AddRange(m_RightNode.Stab(time, constraint));
          return result;
       }
 
@@ -187,7 +187,7 @@ namespace IDS.IDS.IntervalTree
       {
          List<Interval<T, D>> result = new List<Interval<T, D>>();
 
-         foreach (var entry in intervals)
+         foreach (var entry in m_Intervals)
          {
             if (entry.Key.Intersects(target))
                foreach (Interval<T, D> interval in entry.Value)
@@ -196,29 +196,29 @@ namespace IDS.IDS.IntervalTree
                break;
          }
 
-         if (target.Start.CompareTo(center) < 0 && leftNode != null)
-            result.AddRange(leftNode.Query(target));
-         if (target.End.CompareTo(center) > 0 && rightNode != null)
-            result.AddRange(rightNode.Query(target));
+         if (target.Start.CompareTo(m_Center) < 0 && m_LeftNode != null)
+            result.AddRange(m_LeftNode.Query(target));
+         if (target.End.CompareTo(m_Center) > 0 && m_RightNode != null)
+            result.AddRange(m_RightNode.Query(target));
          return result;
       }
 
       public D Center
       {
-         get { return center; }
-         set { center = value; }
+         get { return m_Center; }
+         set { m_Center = value; }
       }
 
       public IntervalNode<T, D> Left
       {
-         get { return leftNode; }
-         set { leftNode = value; }
+         get { return m_LeftNode; }
+         set { m_LeftNode = value; }
       }
 
       public IntervalNode<T, D> Right
       {
-         get { return rightNode; }
-         set { rightNode = value; }
+         get { return m_RightNode; }
+         set { m_RightNode = value; }
       }
 
       /// <summary>
@@ -242,8 +242,8 @@ namespace IDS.IDS.IntervalTree
       public override string ToString()
       {
          var sb = new StringBuilder();
-         sb.Append(center + ": ");
-         foreach (var entry in intervals)
+         sb.Append(m_Center + ": ");
+         foreach (var entry in m_Intervals)
          {
             sb.Append("[" + entry.Key.Start + "," + entry.Key.End + "]:{");
             foreach (Interval<T, D> interval in entry.Value)

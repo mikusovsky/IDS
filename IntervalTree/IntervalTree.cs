@@ -18,20 +18,20 @@ namespace IDS.IDS.IntervalTree
    public class IntervalTree<T, D> where D : struct, IComparable<D>
    {
 
-      private IntervalNode<T, D> head;
-      private List<Interval<T, D>> intervalList;
-      private bool inSync;
-      private int size;
+      private IntervalNode<T, D> m_Head;
+      private List<Interval<T, D>> m_IntervalList;
+      private bool m_InSync;
+      private int m_Size;
 
       /// <summary>
       /// Instantiate a new interval tree with no stubedIntervals
       /// </summary>
       public IntervalTree()
       {
-         this.head = new IntervalNode<T, D>();
-         this.intervalList = new List<Interval<T, D>>();
-         this.inSync = true;
-         this.size = 0;
+         m_Head = new IntervalNode<T, D>();
+         m_IntervalList = new List<Interval<T, D>>();
+         m_InSync = true;
+         m_Size = 0;
       }
 
       /// <summary>
@@ -40,11 +40,11 @@ namespace IDS.IDS.IntervalTree
       /// <param name="intervalList">The list of stubedIntervals to use</param>
       public IntervalTree(List<Interval<T, D>> intervalList)
       {
-         this.head = new IntervalNode<T, D>(intervalList);
-         this.intervalList = new List<Interval<T, D>>();
-         this.intervalList.AddRange(intervalList);
-         this.inSync = true;
-         this.size = intervalList.Count;
+         m_Head = new IntervalNode<T, D>(intervalList);
+         m_IntervalList = new List<Interval<T, D>>();
+         m_IntervalList.AddRange(intervalList);
+         m_InSync = true;
+         m_Size = intervalList.Count;
       }
 
       /// <summary>
@@ -87,16 +87,16 @@ namespace IDS.IDS.IntervalTree
          switch (mode)
          {
             case StubMode.Contains:
-               stubedIntervals = head.Stab(time, ContainConstrains.None);
+               stubedIntervals = m_Head.Stab(time, ContainConstrains.None);
                break;
             case StubMode.ContainsStart:
-               stubedIntervals = head.Stab(time, ContainConstrains.IncludeStart);
+               stubedIntervals = m_Head.Stab(time, ContainConstrains.IncludeStart);
                break;
             case StubMode.ContainsStartThenEnd:
-               stubedIntervals = head.Stab(time, ContainConstrains.IncludeStart);
+               stubedIntervals = m_Head.Stab(time, ContainConstrains.IncludeStart);
                if (stubedIntervals.Count == 0)
                {
-                  stubedIntervals = head.Stab(time, ContainConstrains.IncludeEnd);
+                  stubedIntervals = m_Head.Stab(time, ContainConstrains.IncludeEnd);
                }
                break;
             default:
@@ -132,7 +132,7 @@ namespace IDS.IDS.IntervalTree
       public List<Interval<T, D>> GetIntervals(D start, D end)
       {
          Build();
-         return head.Query(new Interval<T, D>(start, end, default(T)));
+         return m_Head.Query(new Interval<T, D>(start, end, default(T)));
       }
 
       /// <summary>
@@ -142,8 +142,8 @@ namespace IDS.IDS.IntervalTree
       /// <param name="interval">interval the interval object to add</param>
       public void AddInterval(Interval<T, D> interval)
       {
-         intervalList.Add(interval);
-         inSync = false;
+         m_IntervalList.Add(interval);
+         m_InSync = false;
       }
 
       /// <summary>
@@ -156,8 +156,8 @@ namespace IDS.IDS.IntervalTree
       /// <param name="data">the data to associate</param>
       public void AddInterval(D begin, D end, T data)
       {
-         intervalList.Add(new Interval<T, D>(begin, end, data));
-         inSync = false;
+         m_IntervalList.Add(new Interval<T, D>(begin, end, data));
+         m_InSync = false;
       }
 
       /// <summary>
@@ -166,7 +166,7 @@ namespace IDS.IDS.IntervalTree
       /// <returns>true if no changes have been made since the last Build</returns>
       public bool IsInSync()
       {
-         return inSync;
+         return m_InSync;
       }
 
       /// <summary>
@@ -175,11 +175,11 @@ namespace IDS.IDS.IntervalTree
       /// </summary>
       public void Build()
       {
-         if (!inSync)
+         if (!m_InSync)
          {
-            head = new IntervalNode<T, D>(intervalList);
-            inSync = true;
-            size = intervalList.Count;
+            m_Head = new IntervalNode<T, D>(m_IntervalList);
+            m_InSync = true;
+            m_Size = m_IntervalList.Count;
          }
       }
 
@@ -190,7 +190,7 @@ namespace IDS.IDS.IntervalTree
       {
          get
          {
-            return size;
+            return m_Size;
          }
       }
 
@@ -201,7 +201,7 @@ namespace IDS.IDS.IntervalTree
       {
          get
          {
-            return intervalList.Count;
+            return m_IntervalList.Count;
          }
       }
 
@@ -214,7 +214,7 @@ namespace IDS.IDS.IntervalTree
          Build();
 
          Queue<IntervalNode<T, D>> toVisit = new Queue<IntervalNode<T, D>>();
-         toVisit.Enqueue(head);
+         toVisit.Enqueue(m_Head);
 
          do
          {
@@ -238,13 +238,13 @@ namespace IDS.IDS.IntervalTree
       {
          get
          {
-            return Algorithms.ReadOnly(intervalList);
+            return Algorithms.ReadOnly(m_IntervalList);
          }
       }
 
       public override String ToString()
       {
-         return NodeString(head, 0);
+         return NodeString(m_Head, 0);
       }
 
       private String NodeString(IntervalNode<T, D> node, int level)
