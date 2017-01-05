@@ -3,14 +3,25 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Xml;
 using Emgu.CV;
+using Emgu.CV.Features2D;
+using Emgu.CV.Flann;
 using Emgu.CV.Structure;
+using IDS.IDS.IntervalTree;
 
 namespace IDS.IDS
 {
    public static class Utils
    {
+      private static SIFTDetector SiftDetector = new SIFTDetector(); // pridate parametre
+      private static System.Windows.Forms.ProgressBar m_progressBar;
+
+
       //private static readonly LicensePlateDetector m_licencePlateDetector = new LicensePlateDetector();
+
+
+      public static string CurentVideoPath { get; set; }
 
       public static void HdToLow(Image<Bgr, Byte> hdFrame, ref Image<Bgr, Byte> lowFrame)
       {
@@ -91,7 +102,7 @@ namespace IDS.IDS
          int height = shadowPos - windowStartPost;
          Image<Bgr, byte> retImg = Corp(image, leftPos, windowStartPost + height / 5, width, 4 * height / 5);
          CvInvoke.cvShowImage("mask", retImg);
-         return null;
+         return retImg;
       }
 
       public static Image<Bgr, byte> Corp(Image<Bgr, byte> img, int x, int y, int width, int height)
@@ -435,6 +446,242 @@ namespace IDS.IDS
       public static double GetMaskMinYFromLP(double y, double width)
       {
          return (2 * y - width + Deffinitions.MASK_WIDTH_FACTOR) / 2;
+      }
+
+      public class IndecesMapping
+      {
+         public int IndexStart { get; set; }
+         public int IndexEnd { get; set; }
+         public int Similarity { get; set; }
+         public CarModel CarModel { get; set; }
+      }
+
+      /// <summary>
+      /// Concatenates descriptors from different sources (images) into single matrix.
+      /// </summary>
+      /// <param name="descriptors">Descriptors to concatenate.</param>
+      /// <returns>Concatenated matrix.</returns>
+      public static Matrix<float> ConcatDescriptors(IList<Matrix<float>> descriptors)
+      {
+         int cols = descriptors[0].Cols;
+         int rows = descriptors.Sum(a => a.Rows);
+
+         float[,] concatedDescs = new float[rows, cols];
+
+         int offset = 0;
+
+         foreach (var descriptor in descriptors)
+         {
+            // append new descriptors
+            Buffer.BlockCopy(descriptor.ManagedArray, 0, concatedDescs, offset, sizeof(float) * descriptor.ManagedArray.Length);
+            offset += sizeof(float) * descriptor.ManagedArray.Length;
+         }
+
+         return new Matrix<float>(concatedDescs);
+      }
+      
+      /// <summary>
+      /// Computes 'similarity' value (IndecesMapping.Similarity) for each image in the collection against our query image.
+      /// </summary>
+      /// <param name="dbDescriptors">Query image descriptor.</param>
+      /// <param name="queryDescriptors">Consolidated db images descriptors.</param>
+      /// <param name="images">List of IndecesMapping to hold the 'similarity' value for each image in the collection.</param>
+      public static CarModel FindMatches(Matrix<float> dbDescriptors, Matrix<float> queryDescriptors, ref IList<IndecesMapping> imap, IntervalTree<CarModel, int> carModelsInMatrix)
+      {
+         Matrix<int> indices = new Matrix<int>(queryDescriptors.Rows, 2); // matrix that will contain indices of the 2-nearest neighbors found
+         Matrix<float> dists = new Matrix<float>(queryDescriptors.Rows, 2); // matrix that will contain distances to the 2-nearest neighbors found
+         
+         // create FLANN index with 4 kd-trees and perform KNN search over it look for 2 nearest neighbours
+         Index index = new Index(dbDescriptors, 4);
+         index.KnnSearch(queryDescriptors, indices, dists, 2, 24);
+         Dictionary<CarModel, int> carModelCount = new Dictionary<CarModel, int>();
+
+         for (int i = 0; i < indices.Rows; i++)
+         {
+            // filter out all inadequate pairs based on distance between pairs
+            //if (dists.Data[i, 0] < (0.6*dists.Data[i, 1]))
+            {
+               List<CarModel> modelsOnInterval = carModelsInMatrix.Get(indices[i, 0]);
+               if (modelsOnInterval.Count == 0)
+               {
+                  continue; //TODO interval tree must contain indices values
+               }
+               CarModel model = modelsOnInterval[0];
+               if (!carModelCount.ContainsKey(model))
+               {
+                  carModelCount[model] = 0;
+               }
+               carModelCount[model]++;
+            }
+         }
+         List<KeyValuePair<CarModel, int>> keyValues = carModelCount.Keys.Select(carModel => new KeyValuePair<CarModel, int>(carModel, carModelCount[carModel])).ToList();
+         CarModel resutl = keyValues.OrderByDescending(o => o.Value).ToList()[0].Key;
+         return resutl;
+         for (int i = 0; i < indices.Rows; i++)
+         {
+            // filter out all inadequate pairs based on distance between pairs
+            if (dists.Data[i, 0] < (0.6 * dists.Data[i, 1]))
+            {
+               // find image from the db to which current descriptor range belongs and increment similarity value.
+               // in the actual implementation this should be done differently as it's not very efficient for large image collections.
+               foreach (IndecesMapping img in imap)
+               {
+                  if (img.IndexStart <= indices[i,0] && img.IndexEnd >= indices[i, 0])
+                  {
+                     img.Similarity++;
+                     Console.WriteLine($"{img.CarModel.Maker} - {img.CarModel.Model} - {img.CarModel.Generation} - {img.CarModel.ImagePath}");
+                     return null;
+                     break;
+                  }
+               }
+            }
+         }
+      }
+
+      /// <summary>
+      /// Convenience method for computing descriptors for multiple images.
+      /// On return imap is filled with structures specifying which descriptor ranges in the concatenated matrix belong to what image. 
+      /// </summary>
+      /// <param name="fileNames">Filenames of images to process.</param>
+      /// <param name="imap">List of IndecesMapping to hold descriptor ranges for each image.</param>
+      /// <returns>List of descriptors for the given images.</returns>
+      public static IList<Matrix<float>> ComputeMultipleDescriptors(List<CarModel> carModels, out IList<IndecesMapping> imap)
+      {
+         imap = new List<IndecesMapping>();
+
+         IList<Matrix<float>> descs = new List<Matrix<float>>();
+         int imagesCount = 0;
+         for (int i = 0; i < carModels.Count; i++)
+         {
+            imagesCount += carModels[i].ImagesPath.Count;
+         }
+         ProgressBarShow(imagesCount);
+         int r = 0;
+         int count = 0;
+         for (int i = 0; i < carModels.Count; i++)
+         {
+            CarModel carModel = carModels[i];
+            List<string> imagesPath = carModel.ImagesPath;
+            for (int j = 0; j < imagesPath.Count; j++)
+            {
+               var desc = ComputeSingleDescriptors(imagesPath[j]);
+               descs.Add(desc);
+
+               imap.Add(new IndecesMapping()
+               {
+                  IndexStart = r,
+                  IndexEnd = r + desc.Rows - 1,
+                  CarModel = carModel
+               });
+               Console.WriteLine($"{++count} of {imagesCount}");
+               r += desc.Rows;
+               ProgressBarIncrement();
+            }
+         }
+         Console.WriteLine("loading complete");
+         ProgressBarHide();
+         return descs;
+      }
+
+      /// <summary>
+      /// Computes image descriptors.
+      /// </summary>
+      /// <param name="fileName">Image filename.</param>
+      /// <returns>The descriptors for the given image.</returns>
+      public static Matrix<float> ComputeSingleDescriptors(string fileName)
+      {
+         return Cache.GetSurfDescriptor(fileName);
+      }
+
+      /// <summary>
+      /// Computes image descriptors.
+      /// </summary>
+      /// <param name="fileName">Image filename.</param>
+      /// <returns>The descriptors for the given image.</returns>
+      public static Matrix<float> ComputeSingleDescriptors(Image<Gray, byte> image)
+      {
+         return Cache.GetSurfDescriptor(image);
+      }
+      
+      public static void SetProgressBar(System.Windows.Forms.ProgressBar progressBar)
+      {
+         m_progressBar = progressBar;
+      }
+
+      public static void ProgressBarShow(int maximum, int step = 1)
+      {
+         m_progressBar.Maximum = maximum;
+         m_progressBar.Step = step;
+         m_progressBar.Visible = true;
+      }
+
+      public static void ProgressBarHide()
+      {
+         m_progressBar.Visible = false;
+      }
+
+      public static void ProgressBarIncrement()
+      {
+         m_progressBar.PerformStep();
+      }
+
+      public static Matrix<float> LoadDb(System.Windows.Forms.ProgressBar progressBar, ref IList<IndecesMapping> imap)
+      {
+         List<CarModel> carModels = new List<CarModel>();
+         XmlDocument config = new XmlDocument();
+         config.Load("D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDb.xml");
+         XmlNode body = config.SelectSingleNode("/body");
+         XmlNodeList makers = body.SelectNodes("maker");
+         foreach (XmlNode maker in makers)
+         {
+            string makerName = maker.Attributes.GetNamedItem("name").Value;
+            XmlNodeList models = maker.SelectNodes("model");
+            foreach (XmlNode model in models)
+            {
+               string modelName = model.Attributes.GetNamedItem("name").Value;
+               XmlNodeList generations = model.SelectNodes("generation");
+               foreach (XmlNode generation in generations)
+               {
+                  string generationName = generation.Attributes.GetNamedItem("name").Value;
+                  int from = Int32.Parse(generation.SelectSingleNode("from").InnerText);
+                  int to = Int32.Parse(generation.SelectSingleNode("to").InnerText);
+                  string path = generation.SelectSingleNode("path").InnerText;
+                  carModels.Add(new CarModel(makerName, modelName, generationName, from, to, path));
+               }
+            }
+         }
+         IList<Matrix<float>> dbDescsList = ComputeMultipleDescriptors(carModels, out imap);
+         Matrix<float> dbDesct = ConcatDescriptors(dbDescsList);
+
+         GC.Collect();
+         return dbDesct;
+      }
+
+      /// <summary>
+      /// Main method.
+      /// </summary>
+      public static IList<IndecesMapping> Match()
+      {
+         /*
+         string[] dbImages = { "1.jpg", "2.jpg", "3.jpg" };
+         string queryImage = "query.jpg";
+
+         IList<IndecesMapping> imap;
+
+         // compute descriptors for each image
+         var dbDescsList = ComputeMultipleDescriptors(dbImages, out imap);
+
+         // concatenate all DB images descriptors into single Matrix
+         Matrix<float> dbDescs = ConcatDescriptors(dbDescsList);
+
+         // compute descriptors for the query image
+         Matrix<float> queryDescriptors = ComputeSingleDescriptors(queryImage);
+
+         FindMatches(dbDescs, queryDescriptors, ref imap);
+
+         return imap;
+         */
+         return null;
       }
    }
 }

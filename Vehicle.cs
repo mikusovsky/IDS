@@ -1,6 +1,7 @@
 ﻿using System;
 using Emgu.CV;
 using System.Drawing;
+using System.IO;
 using Emgu.CV.Structure;
 using IDS.IDS;
 
@@ -176,7 +177,12 @@ namespace IDS
 
       public Image<Bgr, Byte> GetCarPhoto()
       {
-         string filePath = $"D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\Output\\Images\\{DateTime.Now.ToString(@"MMddyyyy_h_mm_tt_")}{Utils.RandomString(3)}.png";
+         string path = $"D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\Output\\Images\\{Path.GetFileName(Utils.CurentVideoPath).Split('.')[0]}";
+         if (!Directory.Exists(path))
+         {
+            Directory.CreateDirectory(path);
+         }
+         string filePath = $"{path}\\{DateTime.Now.ToString(@"MMddyyyy_h_mm_tt_")}{Utils.RandomString(3)}.png";
 
          _carPhoto.Bitmap.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
          return _carPhoto;

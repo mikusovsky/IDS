@@ -50,6 +50,8 @@ namespace IDS
          this.CarInfoViewImageList = new System.Windows.Forms.ImageList(this.components);
          this.mainFrameViewer = new System.Windows.Forms.PictureBox();
          this.ButtonLoadDb = new System.Windows.Forms.Button();
+         this.ProgresBarThis = new System.Windows.Forms.ProgressBar();
+         this.ButtonMatch = new System.Windows.Forms.Button();
          ((System.ComponentModel.ISupportInitialize)(this.mainFrameViewer)).BeginInit();
          this.SuspendLayout();
          // 
@@ -59,10 +61,9 @@ namespace IDS
          // 
          // OpenFileButton
          // 
-         this.OpenFileButton.Location = new System.Drawing.Point(13, 178);
-         this.OpenFileButton.Margin = new System.Windows.Forms.Padding(4);
+         this.OpenFileButton.Location = new System.Drawing.Point(10, 145);
          this.OpenFileButton.Name = "OpenFileButton";
-         this.OpenFileButton.Size = new System.Drawing.Size(125, 34);
+         this.OpenFileButton.Size = new System.Drawing.Size(94, 28);
          this.OpenFileButton.TabIndex = 0;
          this.OpenFileButton.Text = global::IDS.IDS.Resources.LoadVideo;
          this.OpenFileButton.UseVisualStyleBackColor = true;
@@ -71,10 +72,9 @@ namespace IDS
          // TypeOfSceneLabel
          // 
          this.TypeOfSceneLabel.AutoSize = true;
-         this.TypeOfSceneLabel.Location = new System.Drawing.Point(16, 42);
-         this.TypeOfSceneLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+         this.TypeOfSceneLabel.Location = new System.Drawing.Point(12, 34);
          this.TypeOfSceneLabel.Name = "TypeOfSceneLabel";
-         this.TypeOfSceneLabel.Size = new System.Drawing.Size(98, 17);
+         this.TypeOfSceneLabel.Size = new System.Drawing.Size(82, 15);
          this.TypeOfSceneLabel.TabIndex = 2;
          this.TypeOfSceneLabel.Text = "Type of scene";
          // 
@@ -82,10 +82,9 @@ namespace IDS
          // 
          this.DaySceneRadioButton.AutoSize = true;
          this.DaySceneRadioButton.Checked = true;
-         this.DaySceneRadioButton.Location = new System.Drawing.Point(20, 62);
-         this.DaySceneRadioButton.Margin = new System.Windows.Forms.Padding(4);
+         this.DaySceneRadioButton.Location = new System.Drawing.Point(15, 50);
          this.DaySceneRadioButton.Name = "DaySceneRadioButton";
-         this.DaySceneRadioButton.Size = new System.Drawing.Size(98, 21);
+         this.DaySceneRadioButton.Size = new System.Drawing.Size(87, 19);
          this.DaySceneRadioButton.TabIndex = 3;
          this.DaySceneRadioButton.TabStop = true;
          this.DaySceneRadioButton.Text = global::IDS.IDS.Resources.DayScene;
@@ -94,10 +93,9 @@ namespace IDS
          // NightSceneRadioButton
          // 
          this.NightSceneRadioButton.AutoSize = true;
-         this.NightSceneRadioButton.Location = new System.Drawing.Point(20, 90);
-         this.NightSceneRadioButton.Margin = new System.Windows.Forms.Padding(4);
+         this.NightSceneRadioButton.Location = new System.Drawing.Point(15, 73);
          this.NightSceneRadioButton.Name = "NightSceneRadioButton";
-         this.NightSceneRadioButton.Size = new System.Drawing.Size(106, 21);
+         this.NightSceneRadioButton.Size = new System.Drawing.Size(95, 19);
          this.NightSceneRadioButton.TabIndex = 4;
          this.NightSceneRadioButton.Text = global::IDS.IDS.Resources.NightScene;
          this.NightSceneRadioButton.UseVisualStyleBackColor = true;
@@ -105,20 +103,18 @@ namespace IDS
          // ShowTmpImageCheckBox
          // 
          this.ShowTmpImageCheckBox.AutoSize = true;
-         this.ShowTmpImageCheckBox.Location = new System.Drawing.Point(16, 149);
-         this.ShowTmpImageCheckBox.Margin = new System.Windows.Forms.Padding(4);
+         this.ShowTmpImageCheckBox.Location = new System.Drawing.Point(12, 121);
          this.ShowTmpImageCheckBox.Name = "ShowTmpImageCheckBox";
-         this.ShowTmpImageCheckBox.Size = new System.Drawing.Size(109, 21);
+         this.ShowTmpImageCheckBox.Size = new System.Drawing.Size(99, 19);
          this.ShowTmpImageCheckBox.TabIndex = 6;
          this.ShowTmpImageCheckBox.Text = global::IDS.IDS.Resources.ShowDetails;
          this.ShowTmpImageCheckBox.UseVisualStyleBackColor = true;
          // 
          // StopButton
          // 
-         this.StopButton.Location = new System.Drawing.Point(13, 220);
-         this.StopButton.Margin = new System.Windows.Forms.Padding(4);
+         this.StopButton.Location = new System.Drawing.Point(10, 179);
          this.StopButton.Name = "StopButton";
-         this.StopButton.Size = new System.Drawing.Size(125, 34);
+         this.StopButton.Size = new System.Drawing.Size(94, 28);
          this.StopButton.TabIndex = 7;
          this.StopButton.Text = global::IDS.IDS.Resources.ButtonStop_Stop;
          this.StopButton.UseVisualStyleBackColor = true;
@@ -127,10 +123,9 @@ namespace IDS
          // FpsLabel
          // 
          this.FpsLabel.AutoSize = true;
-         this.FpsLabel.Location = new System.Drawing.Point(1435, 11);
-         this.FpsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+         this.FpsLabel.Location = new System.Drawing.Point(1076, 9);
          this.FpsLabel.Name = "FpsLabel";
-         this.FpsLabel.Size = new System.Drawing.Size(39, 17);
+         this.FpsLabel.Size = new System.Drawing.Size(33, 15);
          this.FpsLabel.TabIndex = 12;
          this.FpsLabel.Text = "0 fps";
          // 
@@ -149,10 +144,10 @@ namespace IDS
          this.CarInfoView.ForeColor = System.Drawing.SystemColors.HotTrack;
          this.CarInfoView.FullRowSelect = true;
          this.CarInfoView.LargeImageList = this.CarInfoViewImageList;
-         this.CarInfoView.Location = new System.Drawing.Point(171, 42);
-         this.CarInfoView.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+         this.CarInfoView.Location = new System.Drawing.Point(128, 34);
+         this.CarInfoView.Margin = new System.Windows.Forms.Padding(2);
          this.CarInfoView.Name = "CarInfoView";
-         this.CarInfoView.Size = new System.Drawing.Size(944, 562);
+         this.CarInfoView.Size = new System.Drawing.Size(709, 457);
          this.CarInfoView.SmallImageList = this.CarInfoViewImageList;
          this.CarInfoView.TabIndex = 0;
          this.CarInfoView.UseCompatibleStateImageBehavior = false;
@@ -196,28 +191,49 @@ namespace IDS
          // 
          // mainFrameViewer
          // 
-         this.mainFrameViewer.Location = new System.Drawing.Point(1121, 42);
-         this.mainFrameViewer.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+         this.mainFrameViewer.Location = new System.Drawing.Point(841, 34);
+         this.mainFrameViewer.Margin = new System.Windows.Forms.Padding(2);
          this.mainFrameViewer.Name = "mainFrameViewer";
-         this.mainFrameViewer.Size = new System.Drawing.Size(357, 226);
+         this.mainFrameViewer.Size = new System.Drawing.Size(268, 184);
          this.mainFrameViewer.TabIndex = 13;
          this.mainFrameViewer.TabStop = false;
          // 
          // ButtonLoadDb
          // 
-         this.ButtonLoadDb.Location = new System.Drawing.Point(20, 568);
+         this.ButtonLoadDb.Location = new System.Drawing.Point(15, 462);
+         this.ButtonLoadDb.Margin = new System.Windows.Forms.Padding(2);
          this.ButtonLoadDb.Name = "ButtonLoadDb";
-         this.ButtonLoadDb.Size = new System.Drawing.Size(126, 33);
+         this.ButtonLoadDb.Size = new System.Drawing.Size(94, 27);
          this.ButtonLoadDb.TabIndex = 14;
          this.ButtonLoadDb.Text = "LoadDb";
          this.ButtonLoadDb.UseVisualStyleBackColor = true;
          this.ButtonLoadDb.Click += new System.EventHandler(this.ButtonLoadDb_Click);
          // 
+         // ButtonMatch
+         // 
+         this.ButtonMatch.Location = new System.Drawing.Point(15, 429);
+         this.ButtonMatch.Name = "ButtonMatch";
+         this.ButtonMatch.Size = new System.Drawing.Size(94, 27);
+         this.ButtonMatch.TabIndex = 16;
+         this.ButtonMatch.Text = "Match";
+         this.ButtonMatch.UseVisualStyleBackColor = true;
+         this.ButtonMatch.Click += new System.EventHandler(this.ButtonMatch_Click);
+         // 
+         // ProgresBarThis
+         // 
+         this.ProgresBarThis.Location = new System.Drawing.Point(841, 467);
+         this.ProgresBarThis.Name = "ProgresBarThis";
+         this.ProgresBarThis.Size = new System.Drawing.Size(268, 23);
+         this.ProgresBarThis.TabIndex = 15;
+         this.ProgresBarThis.Visible = false;
+         // 
          // MainForm
          // 
-         this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+         this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-         this.ClientSize = new System.Drawing.Size(1520, 613);
+         this.ClientSize = new System.Drawing.Size(1116, 498);
+         this.Controls.Add(this.ButtonMatch);
+         this.Controls.Add(this.ProgresBarThis);
          this.Controls.Add(this.ButtonLoadDb);
          this.Controls.Add(this.mainFrameViewer);
          this.Controls.Add(this.CarInfoView);
@@ -228,7 +244,6 @@ namespace IDS
          this.Controls.Add(this.DaySceneRadioButton);
          this.Controls.Add(this.TypeOfSceneLabel);
          this.Controls.Add(this.OpenFileButton);
-         this.Margin = new System.Windows.Forms.Padding(4);
          this.Name = "MainForm";
          this.Text = "IDS";
          this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
@@ -257,6 +272,8 @@ namespace IDS
       private System.Windows.Forms.ColumnHeader CarImageOfVehicleHeader;
       private System.Windows.Forms.PictureBox mainFrameViewer;
       private System.Windows.Forms.Button ButtonLoadDb;
+      private System.Windows.Forms.Button ButtonMatch;
+      private System.Windows.Forms.ProgressBar ProgresBarThis;
    }
 }
 

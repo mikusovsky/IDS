@@ -9,6 +9,8 @@ using Emgu.CV.VideoSurveillance;
 using System.Diagnostics;
 using CppWrapper;
 using IDS.IDS;
+using IDS.IDS.IntervalTree;
+using IntervalTree;
 
 namespace IDS
 {
@@ -16,6 +18,9 @@ namespace IDS
    {
       System.Windows.Forms.Timer _myTimer;
       Capture _capture;
+      private IList<Utils.IndecesMapping> m_imap;
+      private Matrix<float> m_dbDescs;
+      private IntervalTree<CarModel, int> m_intervalTree;
 
       Image<Bgr, Byte> _frameLow;
       Image<Bgr, Byte> _frameHD;
@@ -96,6 +101,7 @@ namespace IDS
       {
          InitializeComponent();
          KeyPreview = true;
+         Utils.SetProgressBar(ProgresBarThis);
       }
 
       //inicializacia premennych
@@ -808,6 +814,7 @@ namespace IDS
          {
             try
             {
+               Utils.CurentVideoPath = OpenFileDialog.FileName;
                _capture = null;
                _capture = new Capture(OpenFileDialog.FileName);
                FPS = (int)_capture.GetCaptureProperty(Emgu.CV.CvEnum.CAP_PROP.CV_CAP_PROP_FPS);
@@ -976,6 +983,18 @@ namespace IDS
 
       private void ButtonLoadDb_Click(object sender, EventArgs e)
       {
+         m_dbDescs = Utils.LoadDb(ProgresBarThis, ref m_imap);
+         if (m_imap != null)
+         {
+            m_intervalTree = new IntervalTree<CarModel, int>();
+            foreach (Utils.IndecesMapping indecesMapping in m_imap)
+            {
+               CarModel carModel = indecesMapping.CarModel;
+               Interval<CarModel, int> interval = new Interval<CarModel, int>(indecesMapping.IndexStart, indecesMapping.IndexEnd, carModel);
+               m_intervalTree.AddInterval(interval);
+            }
+         }
+         /*
          int noElements = 1000;
          int[] myArray = new int[noElements];
 
@@ -983,6 +1002,7 @@ namespace IDS
          {
             myArray[i] = i*10;
          }
+         */
          //Utils.DetectRectangle();
          /*
          unsafe
@@ -996,15 +1016,24 @@ namespace IDS
             }
          }
          */
+      }
+
+      private void ButtonMatch_Click(object sender, EventArgs e)
+      {
          using (OpenFileDialog dlg = new OpenFileDialog())
          {
             dlg.Title = "Open Image";
-            dlg.Filter = "All files (*.*)|*.*";//"bmp files (*.jpg)|*.jpg|All files (*.*)|*.*";
+            dlg.Filter = "All files (*.*)|*.*|bmp files (*.jpg)|*.jpg";//"All files (*.*)|*.*";//
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                Image<Bgr, byte> image = new Image<Bgr, byte>(new Bitmap(dlg.FileName));
-               Utils.ExtractMask2(image);
+               Image<Bgr, byte> imageMask = Utils.ExtractMask2(image);
+               // compute descriptors for the query image
+               Matrix<float> queryDescriptors = Utils.ComputeSingleDescriptors(Utils.ToGray(imageMask));
+               //Matrix<float> queryDescriptors = Utils.ComputeSingleDescriptors(Utils.ToGray(image));
+               CarModel mathecsModel = Utils.FindMatches(m_dbDescs, queryDescriptors, ref m_imap, m_intervalTree);
+               Console.WriteLine($"{mathecsModel.Maker} - {mathecsModel.Model} - {mathecsModel.Generation}");
             }
          }
       }
