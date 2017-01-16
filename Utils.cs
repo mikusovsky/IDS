@@ -1,27 +1,28 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Xml;
 using Emgu.CV;
 using Emgu.CV.Features2D;
 using Emgu.CV.Flann;
 using Emgu.CV.Structure;
+using Emgu.CV.Util;
 using IDS.IDS.IntervalTree;
 
 namespace IDS.IDS
 {
    public static class Utils
    {
-      private static SIFTDetector SiftDetector = new SIFTDetector(); // pridate parametre
       private static System.Windows.Forms.ProgressBar m_progressBar;
-
-
+      
       //private static readonly LicensePlateDetector m_licencePlateDetector = new LicensePlateDetector();
-
-
+      
       public static string CurentVideoPath { get; set; }
+      public static Dictionary<CarModel, Matrix<float>> ImportanceMaps = new Dictionary<CarModel, Matrix<float>>();
 
       public static void HdToLow(Image<Bgr, Byte> hdFrame, ref Image<Bgr, Byte> lowFrame)
       {
@@ -41,10 +42,30 @@ namespace IDS.IDS
             bitmap.SetResolution(bitmap.HorizontalResolution, bitmap.VerticalResolution);
             lowFrame = new Image<Bgr, byte>(bitmap);
          }
-         _Resize(hdFrame.Bitmap, lowFrame.Bitmap);
+         Bitmap newBitmap = lowFrame.Bitmap;
+         _Resize(hdFrame.Bitmap, ref newBitmap);
+         lowFrame.Bitmap = newBitmap;
       }
 
-      private static Bitmap _Resize(Bitmap image, Bitmap newImage)
+      public static Image<Bgr, byte> Resize(Image<Bgr, byte> image, int newWidth, int newHeight)
+      {
+         Bitmap bitmap = new Bitmap(newWidth, newHeight);
+         Image<Bgr, byte> ret = new Image<Bgr, byte>(bitmap);
+         _Resize(image.Bitmap, ref bitmap);
+         ret.Bitmap = bitmap;
+         return ret;
+      }
+
+      public static Image<Gray, byte> Resize(Image<Gray, byte> image, int newWidth, int newHeight)
+      {
+         Bitmap bitmap = new Bitmap(newWidth, newHeight);
+         Image<Gray, byte> ret = new Image<Gray, byte>(bitmap);
+         _Resize(image.Bitmap, ref bitmap);
+         ret.Bitmap = bitmap;
+         return ret;
+      }
+
+      private static void _Resize(Bitmap image, ref Bitmap newImage)
       {
          using (Graphics gr = Graphics.FromImage(newImage))
          {
@@ -54,11 +75,14 @@ namespace IDS.IDS
             gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
             gr.DrawImage(image, rc);
          }
-         return newImage;
       }
 
       public static Image<Bgr, byte> ExtractMask2(Image<Bgr, byte> image)
       {
+         if (image == null)
+         {
+            return null;
+         }
          Image<Gray, byte> grayImage = ToGray(image);
          Image<Gray, float> sobel = grayImage.Sobel(0, 1, 5);
 
@@ -95,17 +119,17 @@ namespace IDS.IDS
             _DrawLineY(sobel, windowStartPost);
             _DrawLineX(sobel, leftPos);
             _DrawLineX(sobel, rigntPos);
-            CvInvoke.cvShowImage("sobel", sobel);
-            CvInvoke.cvShowImage("cannyGray", cannyGray);
+            Utils.LogImage("sobel", sobel);
+            Utils.LogImage("cannyGray", cannyGray);
          }
          int width = rigntPos - leftPos;
          int height = shadowPos - windowStartPost;
-         Image<Bgr, byte> retImg = Corp(image, leftPos, windowStartPost + height / 5, width, 4 * height / 5);
-         CvInvoke.cvShowImage("mask", retImg);
+         Image<Bgr, byte> retImg = CorpImage(image, leftPos, windowStartPost + height / 5, width, 4 * height / 5);
+         Utils.LogImage("mask", retImg);
          return retImg;
       }
 
-      public static Image<Bgr, byte> Corp(Image<Bgr, byte> img, int x, int y, int width, int height)
+      public static Image<Bgr, byte> CorpImage(Image<Bgr, byte> img, int x, int y, int width, int height)
       {
          Image<Bgr, Byte> roiImage = new Image<Bgr, byte>(img.Bitmap);
          /*** EXTRACT BUTTON MIDDLE PART OF IMAGE FOR EXTACTION ***/
@@ -183,6 +207,55 @@ namespace IDS.IDS
          }
       }
 
+      /// <summary>
+      /// Find rectangle wich cant corespont for licence plate
+      /// </summary>
+      public static Rectangle GetLocalizationOfLicencePlate(Image<Bgr, byte> image)
+      {
+         return GetLocalizationOfLicencePlate(ToGray(image), null);
+      }
+
+      /// <summary>
+      /// Find rectangle wich cant corespont for licence plate
+      /// </summary>
+      public static Rectangle GetLocalizationOfLicencePlate(Image<Gray, byte> image, Image<Bgr, byte> color)
+      {
+         image._GammaCorrect(1.5d);
+         Image<Gray, byte> cannyGray = image.Canny(new Gray(150), new Gray(180));
+         Contour<Point> finalContour = null;
+         double maxBrightness = 0;
+         using (MemStorage storage = new MemStorage())
+         {
+            for (Contour<Point> contours = cannyGray.FindContours(Emgu.CV.CvEnum.CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE, Emgu.CV.CvEnum.RETR_TYPE.CV_RETR_LIST, storage); contours != null; contours = contours.HNext)
+            {
+               Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.015, storage);
+               Rectangle rectangle = currentContour.BoundingRectangle;
+               double ratio = Convert.ToDouble(rectangle.Height) / Convert.ToDouble(rectangle.Width);
+               if (currentContour.BoundingRectangle.Width > 20)
+               {
+                  CvInvoke.cvDrawContours(color, contours, new MCvScalar(255), new MCvScalar(255), -1, 1, Emgu.CV.CvEnum.LINE_TYPE.EIGHT_CONNECTED, new Point(0, 0));
+                  color.Draw(currentContour.BoundingRectangle, new Bgr(0, 255, 0), 1);
+               }
+               if (/*rectangle.Width > 30 && rectangle.Width < 70 && rectangle.Height > 10 && rectangle.Height < 20
+                  &&*/ratio > 0.20 && ratio < 0.5)
+               {
+                  /*double brightness = AverageBrightness(image, rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+                  if (maxBrightness < brightness)
+                  {
+                     finalContour = currentContour;
+                     maxBrightness = brightness;
+                  }
+                  */
+               }
+            }
+         }
+         if (finalContour == null)
+         {
+            return Rectangle.Empty;
+         }
+         return finalContour.BoundingRectangle;
+      }
+
       public static Image<Bgr, byte> ExtractMask(Image<Bgr, byte> image)
       {
          int imageWidth = image.Width;
@@ -207,8 +280,7 @@ namespace IDS.IDS
          //roiImage._EqualizeHist();
          roiImage._GammaCorrect(1.5d);
          //roiImage._ThresholdBinary(new Bgr(150,150,150), new Bgr(255,255,255));
-
-
+         
          Image<Gray, byte> gray1 = ToGray(roiImage);//.PyrDown().PyrUp();
          Image<Gray, byte> cannyGray = gray1.Canny(new Gray(150), new Gray(180));
 
@@ -256,8 +328,8 @@ namespace IDS.IDS
             gr.DrawImage(image.Bitmap, rc);
             imageMask.ROI = new Rectangle(maskX, maskY, maskWidth, maskHeight);
          }
-
-         CvInvoke.cvShowImage("car mask", imageMask);
+         
+         Utils.LogImage("car mask", imageMask);
          return imageMask;
       }
 
@@ -280,8 +352,8 @@ namespace IDS.IDS
 
          // let's draw a coordinate equivalent to (20,30) (20 up, 30 across)
          g.DrawString("X", new Font("Calibri", 12), new SolidBrush(Color.Black), y + 30, x - 20);
-
-         CvInvoke.cvShowImage("Plot", new Image<Rgb, byte>(bmp));
+         
+         Utils.LogImage("Plot", new Image<Rgb, byte>(bmp));
       }
 
       private static int _GetMaxDif(List<int> histogram, int gap, int maxY)
@@ -380,9 +452,23 @@ namespace IDS.IDS
          {
             for (int j = 0; j < height; j++)
             {
-               Color color = image.Bitmap.GetPixel(i + x, j + y);
-               ret += (color.R + color.G + color.B) / 3;
+               ret += (image.Data[i,j,0] + image.Data[i, j, 1] + image.Data[i, j, 2]) / 3;
                count += 1;
+            }
+         }
+         return ret / count;
+      }
+
+
+      public static double AverageBrightness(Image<Gray, byte> image, int x, int y, int width, int height)
+      {
+         double ret = 0;
+         double count = 0;
+         for (int i = 0; i < width; i++)
+         {
+            for (int j = 0; j < height; j++)
+            {
+               count += image.Data[i, j, 0];
             }
          }
          return ret / count;
@@ -454,6 +540,7 @@ namespace IDS.IDS
          public int IndexEnd { get; set; }
          public int Similarity { get; set; }
          public CarModel CarModel { get; set; }
+         public string ImageSrc { get; set; }
       }
 
       /// <summary>
@@ -486,14 +573,12 @@ namespace IDS.IDS
       /// <param name="dbDescriptors">Query image descriptor.</param>
       /// <param name="queryDescriptors">Consolidated db images descriptors.</param>
       /// <param name="images">List of IndecesMapping to hold the 'similarity' value for each image in the collection.</param>
-      public static CarModel FindMatches(Matrix<float> dbDescriptors, Matrix<float> queryDescriptors, ref IList<IndecesMapping> imap, IntervalTree<CarModel, int> carModelsInMatrix)
+      public static CarModel FindMatches(Index index, Matrix<float> queryDescriptors, ref IList<IndecesMapping> imap, IntervalTree<CarModel, int> carModelsInMatrix)
       {
          Matrix<int> indices = new Matrix<int>(queryDescriptors.Rows, 2); // matrix that will contain indices of the 2-nearest neighbors found
          Matrix<float> dists = new Matrix<float>(queryDescriptors.Rows, 2); // matrix that will contain distances to the 2-nearest neighbors found
-         
-         // create FLANN index with 4 kd-trees and perform KNN search over it look for 2 nearest neighbours
-         Index index = new Index(dbDescriptors, 4);
-         index.KnnSearch(queryDescriptors, indices, dists, 2, 24);
+
+         index.KnnSearch(queryDescriptors, indices, dists, 2, 64);//24
          Dictionary<CarModel, int> carModelCount = new Dictionary<CarModel, int>();
 
          for (int i = 0; i < indices.Rows; i++)
@@ -501,10 +586,10 @@ namespace IDS.IDS
             // filter out all inadequate pairs based on distance between pairs
             //if (dists.Data[i, 0] < (0.6*dists.Data[i, 1]))
             {
-               List<CarModel> modelsOnInterval = carModelsInMatrix.Get(indices[i, 0]);
+               List<CarModel> modelsOnInterval = carModelsInMatrix.Get(indices[i, 0], StubMode.ContainsStartThenEnd);
                if (modelsOnInterval.Count == 0)
                {
-                  continue; //TODO interval tree must contain indices values
+                  continue; //TODO interval tree must contain indices values, probably StubMode.ContainsStartThenEnd it fixed
                }
                CarModel model = modelsOnInterval[0];
                if (!carModelCount.ContainsKey(model))
@@ -556,6 +641,8 @@ namespace IDS.IDS
             imagesCount += carModels[i].ImagesPath.Count;
          }
          ProgressBarShow(imagesCount);
+         Matrix<float> importanceMap = CreateImportanceMap();
+         Image<Gray, byte> mask = MapToImage(importanceMap);
          int r = 0;
          int count = 0;
          for (int i = 0; i < carModels.Count; i++)
@@ -564,14 +651,15 @@ namespace IDS.IDS
             List<string> imagesPath = carModel.ImagesPath;
             for (int j = 0; j < imagesPath.Count; j++)
             {
-               var desc = ComputeSingleDescriptors(imagesPath[j]);
+               var desc = ComputeSingleDescriptors(imagesPath[j], mask);
                descs.Add(desc);
 
                imap.Add(new IndecesMapping()
                {
                   IndexStart = r,
                   IndexEnd = r + desc.Rows - 1,
-                  CarModel = carModel
+                  CarModel = carModel,
+                  ImageSrc = imagesPath[j]
                });
                Console.WriteLine($"{++count} of {imagesCount}");
                r += desc.Rows;
@@ -583,14 +671,29 @@ namespace IDS.IDS
          return descs;
       }
 
+      public static Image<Gray, byte> ExtractEdges(Image<Gray, byte> img)
+      {
+         //img._EqualizeHist();
+         //img._GammaCorrect(1.5d);
+         //roiImage._ThresholdBinary(new Bgr(150,150,150), new Bgr(255,255,255));
+         Image<Gray, byte> edges = img.Canny(new Gray(150), new Gray(180));
+         Utils.LogImage("edges", edges);
+         return edges;
+      } 
+
       /// <summary>
       /// Computes image descriptors.
       /// </summary>
       /// <param name="fileName">Image filename.</param>
       /// <returns>The descriptors for the given image.</returns>
-      public static Matrix<float> ComputeSingleDescriptors(string fileName)
+      public static Matrix<float> ComputeSingleDescriptors(string fileName, Image<Gray, byte> mask)
       {
-         return Cache.GetSurfDescriptor(fileName);
+         return Cache.GetSurfDescriptor(fileName, mask);
+      }
+
+      public static VectorOfKeyPoint GetKeyPoints(Image<Gray, byte> image, Image<Gray, byte> mask)
+      {
+         return Cache.GetKeyPoints(image, mask);
       }
 
       /// <summary>
@@ -600,7 +703,7 @@ namespace IDS.IDS
       /// <returns>The descriptors for the given image.</returns>
       public static Matrix<float> ComputeSingleDescriptors(Image<Gray, byte> image)
       {
-         return Cache.GetSurfDescriptor(image);
+         return Cache.GetSurfDescriptor(image, null);
       }
       
       public static void SetProgressBar(System.Windows.Forms.ProgressBar progressBar)
@@ -610,6 +713,7 @@ namespace IDS.IDS
 
       public static void ProgressBarShow(int maximum, int step = 1)
       {
+         m_progressBar.Value = 0;
          m_progressBar.Maximum = maximum;
          m_progressBar.Step = step;
          m_progressBar.Visible = true;
@@ -625,11 +729,10 @@ namespace IDS.IDS
          m_progressBar.PerformStep();
       }
 
-      public static Matrix<float> LoadDb(System.Windows.Forms.ProgressBar progressBar, ref IList<IndecesMapping> imap)
+      public static List<CarModel> GetCarModelsFromConfig()
       {
          List<CarModel> carModels = new List<CarModel>();
-         XmlDocument config = new XmlDocument();
-         config.Load("D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDb.xml");
+         XmlDocument config = Cache.GetXMLDocument("D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDb.xml");
          XmlNode body = config.SelectSingleNode("/body");
          XmlNodeList makers = body.SelectNodes("maker");
          foreach (XmlNode maker in makers)
@@ -650,38 +753,133 @@ namespace IDS.IDS
                }
             }
          }
+         return carModels;
+      }
+
+      public static Matrix<float> GetModelAvarageMap(CarModel carModel)
+      {
+         return Cache.GetModelAvarageMap(carModel);
+      }
+
+      public static Matrix<float> CreateImportanceMap()
+      {
+         List<CarModel> carModels = GetCarModelsFromConfig();
+         double minValue, maxValue;
+         Point minLoc, maxLoc;
+         int rows = Deffinitions.NORMALIZE_MASK_WIDTH;
+         int cols = Deffinitions.NORMALIZE_MASK_HEIGHT;
+         Matrix<float> importanceMap = new Matrix<float>(rows, cols);
+         ProgressBarShow(carModels.Count);
+         foreach (CarModel carModel in carModels)
+         {
+            Matrix<float> map = GetModelAvarageMap(carModel);
+            importanceMap += map;
+            ProgressBarIncrement();
+         }
+         importanceMap.MinMax(out minValue, out maxValue, out minLoc, out maxLoc);
+         importanceMap *= 255 / maxValue;
+
+         for (int i = 70; i < 105; i++)
+         {
+            for (int j = 35; j < 95; j++)
+            {
+               importanceMap[i, j] = 0;
+            }
+         }
+
+         for (int i = 0; i < 30; i++)
+         {
+            for (int j = 30 - i; j >= 0; j--)
+            {
+               importanceMap[127 - i, j] = 0;
+            }
+         }
+
+         for (int i = 0; i < 30; i++)
+         {
+            for (int j = 30 - i; j >= 0; j--)
+            {
+               importanceMap[127 - i, 127 - j] = 0;
+            }
+         }
+
+         for (int i = 0; i < rows; i++)
+         {
+            for (int j = 0; j < cols; j++)
+            {
+               if (importanceMap[i, j] < 70)
+               {
+                  importanceMap[i, j] = 0;
+               }
+            }
+         }
+
+         LogImage("ImportanceMap", MapToImage(importanceMap));
+         ProgressBarHide();
+         return importanceMap;
+      }
+
+      public static Image<Gray, byte> MapToImage(Matrix<float> map)
+      {
+         Image<Gray, byte> image = new Image<Gray, byte>(new byte[map.Rows,map.Cols,1]);
+         for (int i = 0; i < map.Rows; i++)
+         {
+            for (int j = 0; j < map.Cols; j++)
+            {
+               image[i, j] = new Gray(Convert.ToInt32(map[i, j]));
+            }
+         }
+         return image;
+      } 
+
+      public static Matrix<float> LoadDb(ref IList<IndecesMapping> imap)
+      {
+         List<CarModel> carModels = GetCarModelsFromConfig();
          IList<Matrix<float>> dbDescsList = ComputeMultipleDescriptors(carModels, out imap);
          Matrix<float> dbDesct = ConcatDescriptors(dbDescsList);
-
+         dbDescsList = null;
          GC.Collect();
          return dbDesct;
       }
 
-      /// <summary>
-      /// Main method.
-      /// </summary>
-      public static IList<IndecesMapping> Match()
+      public static void LogImage(string text, IntPtr image)
       {
-         /*
-         string[] dbImages = { "1.jpg", "2.jpg", "3.jpg" };
-         string queryImage = "query.jpg";
+         if (Deffinitions.DEBUG_MODE)
+         {
+            CvInvoke.cvShowImage(text, image);
+         }
+      }
 
-         IList<IndecesMapping> imap;
+      public static ImageFormat GetImageFormatFromFileExtension(string extension)
+      {
+         switch (extension.ToLower())
+         {
+            case @".bmp":
+               return ImageFormat.Bmp;
 
-         // compute descriptors for each image
-         var dbDescsList = ComputeMultipleDescriptors(dbImages, out imap);
+            case @".gif":
+               return ImageFormat.Gif;
 
-         // concatenate all DB images descriptors into single Matrix
-         Matrix<float> dbDescs = ConcatDescriptors(dbDescsList);
+            case @".ico":
+               return ImageFormat.Icon;
 
-         // compute descriptors for the query image
-         Matrix<float> queryDescriptors = ComputeSingleDescriptors(queryImage);
+            case @".jpg":
+            case @".jpeg":
+               return ImageFormat.Jpeg;
 
-         FindMatches(dbDescs, queryDescriptors, ref imap);
+            case @".png":
+               return ImageFormat.Png;
 
-         return imap;
-         */
-         return null;
+            case @".tif":
+            case @".tiff":
+               return ImageFormat.Tiff;
+
+            case @".wmf":
+               return ImageFormat.Wmf;
+
+            default:
+               throw new NotImplementedException();
+         }
       }
    }
 }

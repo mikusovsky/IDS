@@ -15,5 +15,8 @@
       public const double MASK_HEIGHT_FACTOR = 1.8;
 
       public const double HEIGHT_TO_WIDTH = 1.5;
+
+      public const int NORMALIZE_MASK_WIDTH = 128;
+      public const int NORMALIZE_MASK_HEIGHT = 128;
    }
 }

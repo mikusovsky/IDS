@@ -106,11 +106,29 @@ namespace IDS.IDS {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Crate imp. map.
+        /// </summary>
+        internal static string CreateImportanceMap {
+            get {
+                return ResourceManager.GetString("CreateImportanceMap", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Day Scene.
         /// </summary>
         internal static string DayScene {
             get {
                 return ResourceManager.GetString("DayScene", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LoadDb.
+        /// </summary>
+        internal static string LoadDb {
+            get {
+                return ResourceManager.GetString("LoadDb", resourceCulture);
             }
         }
         
@@ -142,11 +160,29 @@ namespace IDS.IDS {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Match.
+        /// </summary>
+        internal static string Match {
+            get {
+                return ResourceManager.GetString("Match", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Night Scene.
         /// </summary>
         internal static string NightScene {
             get {
                 return ResourceManager.GetString("NightScene", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NormalizeDb.
+        /// </summary>
+        internal static string NormalizeDb {
+            get {
+                return ResourceManager.GetString("NormalizeDb", resourceCulture);
             }
         }
         

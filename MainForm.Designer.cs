@@ -52,6 +52,9 @@ namespace IDS
          this.ButtonLoadDb = new System.Windows.Forms.Button();
          this.ProgresBarThis = new System.Windows.Forms.ProgressBar();
          this.ButtonMatch = new System.Windows.Forms.Button();
+         this.ButtonNormalizeDb = new System.Windows.Forms.Button();
+         this.button1 = new System.Windows.Forms.Button();
+         this.button2 = new System.Windows.Forms.Button();
          ((System.ComponentModel.ISupportInitialize)(this.mainFrameViewer)).BeginInit();
          this.SuspendLayout();
          // 
@@ -61,7 +64,7 @@ namespace IDS
          // 
          // OpenFileButton
          // 
-         this.OpenFileButton.Location = new System.Drawing.Point(10, 145);
+         this.OpenFileButton.Location = new System.Drawing.Point(17, 145);
          this.OpenFileButton.Name = "OpenFileButton";
          this.OpenFileButton.Size = new System.Drawing.Size(94, 28);
          this.OpenFileButton.TabIndex = 0;
@@ -72,7 +75,7 @@ namespace IDS
          // TypeOfSceneLabel
          // 
          this.TypeOfSceneLabel.AutoSize = true;
-         this.TypeOfSceneLabel.Location = new System.Drawing.Point(12, 34);
+         this.TypeOfSceneLabel.Location = new System.Drawing.Point(14, 34);
          this.TypeOfSceneLabel.Name = "TypeOfSceneLabel";
          this.TypeOfSceneLabel.Size = new System.Drawing.Size(82, 15);
          this.TypeOfSceneLabel.TabIndex = 2;
@@ -93,7 +96,7 @@ namespace IDS
          // NightSceneRadioButton
          // 
          this.NightSceneRadioButton.AutoSize = true;
-         this.NightSceneRadioButton.Location = new System.Drawing.Point(15, 73);
+         this.NightSceneRadioButton.Location = new System.Drawing.Point(16, 75);
          this.NightSceneRadioButton.Name = "NightSceneRadioButton";
          this.NightSceneRadioButton.Size = new System.Drawing.Size(95, 19);
          this.NightSceneRadioButton.TabIndex = 4;
@@ -103,7 +106,7 @@ namespace IDS
          // ShowTmpImageCheckBox
          // 
          this.ShowTmpImageCheckBox.AutoSize = true;
-         this.ShowTmpImageCheckBox.Location = new System.Drawing.Point(12, 121);
+         this.ShowTmpImageCheckBox.Location = new System.Drawing.Point(17, 120);
          this.ShowTmpImageCheckBox.Name = "ShowTmpImageCheckBox";
          this.ShowTmpImageCheckBox.Size = new System.Drawing.Size(99, 19);
          this.ShowTmpImageCheckBox.TabIndex = 6;
@@ -112,7 +115,7 @@ namespace IDS
          // 
          // StopButton
          // 
-         this.StopButton.Location = new System.Drawing.Point(10, 179);
+         this.StopButton.Location = new System.Drawing.Point(17, 179);
          this.StopButton.Name = "StopButton";
          this.StopButton.Size = new System.Drawing.Size(94, 28);
          this.StopButton.TabIndex = 7;
@@ -145,7 +148,7 @@ namespace IDS
          this.CarInfoView.FullRowSelect = true;
          this.CarInfoView.LargeImageList = this.CarInfoViewImageList;
          this.CarInfoView.Location = new System.Drawing.Point(128, 34);
-         this.CarInfoView.Margin = new System.Windows.Forms.Padding(2);
+         this.CarInfoView.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
          this.CarInfoView.Name = "CarInfoView";
          this.CarInfoView.Size = new System.Drawing.Size(709, 457);
          this.CarInfoView.SmallImageList = this.CarInfoViewImageList;
@@ -192,7 +195,7 @@ namespace IDS
          // mainFrameViewer
          // 
          this.mainFrameViewer.Location = new System.Drawing.Point(841, 34);
-         this.mainFrameViewer.Margin = new System.Windows.Forms.Padding(2);
+         this.mainFrameViewer.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
          this.mainFrameViewer.Name = "mainFrameViewer";
          this.mainFrameViewer.Size = new System.Drawing.Size(268, 184);
          this.mainFrameViewer.TabIndex = 13;
@@ -200,24 +203,14 @@ namespace IDS
          // 
          // ButtonLoadDb
          // 
-         this.ButtonLoadDb.Location = new System.Drawing.Point(15, 462);
-         this.ButtonLoadDb.Margin = new System.Windows.Forms.Padding(2);
+         this.ButtonLoadDb.Location = new System.Drawing.Point(17, 462);
+         this.ButtonLoadDb.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
          this.ButtonLoadDb.Name = "ButtonLoadDb";
          this.ButtonLoadDb.Size = new System.Drawing.Size(94, 27);
          this.ButtonLoadDb.TabIndex = 14;
-         this.ButtonLoadDb.Text = "LoadDb";
+         this.ButtonLoadDb.Text = Resources.LoadDb;
          this.ButtonLoadDb.UseVisualStyleBackColor = true;
          this.ButtonLoadDb.Click += new System.EventHandler(this.ButtonLoadDb_Click);
-         // 
-         // ButtonMatch
-         // 
-         this.ButtonMatch.Location = new System.Drawing.Point(15, 429);
-         this.ButtonMatch.Name = "ButtonMatch";
-         this.ButtonMatch.Size = new System.Drawing.Size(94, 27);
-         this.ButtonMatch.TabIndex = 16;
-         this.ButtonMatch.Text = "Match";
-         this.ButtonMatch.UseVisualStyleBackColor = true;
-         this.ButtonMatch.Click += new System.EventHandler(this.ButtonMatch_Click);
          // 
          // ProgresBarThis
          // 
@@ -227,11 +220,45 @@ namespace IDS
          this.ProgresBarThis.TabIndex = 15;
          this.ProgresBarThis.Visible = false;
          // 
+         // ButtonMatch
+         // 
+         this.ButtonMatch.Location = new System.Drawing.Point(17, 401);
+         this.ButtonMatch.Name = "ButtonMatch";
+         this.ButtonMatch.Size = new System.Drawing.Size(94, 27);
+         this.ButtonMatch.TabIndex = 16;
+         this.ButtonMatch.Text = Resources.Match;
+         this.ButtonMatch.UseVisualStyleBackColor = true;
+         this.ButtonMatch.Click += new System.EventHandler(this.ButtonMatch_Click);
+         // 
+         // ButtonNormalizeDb
+         // 
+         this.ButtonNormalizeDb.Location = new System.Drawing.Point(17, 316);
+         this.ButtonNormalizeDb.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+         this.ButtonNormalizeDb.Name = "ButtonNormalizeDb";
+         this.ButtonNormalizeDb.Size = new System.Drawing.Size(94, 28);
+         this.ButtonNormalizeDb.TabIndex = 17;
+         this.ButtonNormalizeDb.Text = Resources.NormalizeDb;
+         this.ButtonNormalizeDb.UseVisualStyleBackColor = true;
+         this.ButtonNormalizeDb.Click += new System.EventHandler(this.ButtonNormalizeDb_Click);
+         // 
+         // button2
+         // 
+         this.button2.Location = new System.Drawing.Point(17, 434);
+         this.button2.Name = "ButtonCreateImportanceMapId";
+         this.button2.Size = new System.Drawing.Size(92, 23);
+         this.button2.TabIndex = 19;
+         this.button2.Text = Resources.CreateImportanceMap;
+         this.button2.UseVisualStyleBackColor = true;
+         this.button2.Click += new System.EventHandler(this.ButtonCreateImportanceMap_Click);
+         // 
          // MainForm
          // 
          this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
          this.ClientSize = new System.Drawing.Size(1116, 498);
+         this.Controls.Add(this.button2);
+         this.Controls.Add(this.button1);
+         this.Controls.Add(this.ButtonNormalizeDb);
          this.Controls.Add(this.ButtonMatch);
          this.Controls.Add(this.ProgresBarThis);
          this.Controls.Add(this.ButtonLoadDb);
@@ -274,6 +301,9 @@ namespace IDS
       private System.Windows.Forms.Button ButtonLoadDb;
       private System.Windows.Forms.Button ButtonMatch;
       private System.Windows.Forms.ProgressBar ProgresBarThis;
+      private System.Windows.Forms.Button ButtonNormalizeDb;
+      private System.Windows.Forms.Button button1;
+      private System.Windows.Forms.Button button2;
    }
 }
 

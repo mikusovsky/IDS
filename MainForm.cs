@@ -7,8 +7,12 @@ using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using Emgu.CV.VideoSurveillance;
 using System.Diagnostics;
+using System.IO;
 using CppWrapper;
+using Emgu.CV.Flann;
+using Emgu.CV.Util;
 using IDS.IDS;
+using IDS.IDS.DataAugmentation;
 using IDS.IDS.IntervalTree;
 using IntervalTree;
 
@@ -20,6 +24,7 @@ namespace IDS
       Capture _capture;
       private IList<Utils.IndecesMapping> m_imap;
       private Matrix<float> m_dbDescs;
+      private Index m_index;
       private IntervalTree<CarModel, int> m_intervalTree;
 
       Image<Bgr, Byte> _frameLow;
@@ -983,14 +988,15 @@ namespace IDS
 
       private void ButtonLoadDb_Click(object sender, EventArgs e)
       {
-         m_dbDescs = Utils.LoadDb(ProgresBarThis, ref m_imap);
+         m_dbDescs = Utils.LoadDb(ref m_imap);
+         // create FLANN index with 4 kd-trees and perform KNN search over it look for 2 nearest neighbours
+         m_index = new Index(m_dbDescs, 4);
          if (m_imap != null)
          {
             m_intervalTree = new IntervalTree<CarModel, int>();
             foreach (Utils.IndecesMapping indecesMapping in m_imap)
             {
-               CarModel carModel = indecesMapping.CarModel;
-               Interval<CarModel, int> interval = new Interval<CarModel, int>(indecesMapping.IndexStart, indecesMapping.IndexEnd, carModel);
+               Interval<CarModel, int> interval = new Interval<CarModel, int>(indecesMapping.IndexStart, indecesMapping.IndexEnd, indecesMapping.CarModel);
                m_intervalTree.AddInterval(interval);
             }
          }
@@ -1023,19 +1029,81 @@ namespace IDS
          using (OpenFileDialog dlg = new OpenFileDialog())
          {
             dlg.Title = "Open Image";
-            dlg.Filter = "All files (*.*)|*.*|bmp files (*.jpg)|*.jpg";//"All files (*.*)|*.*";//
+            dlg.Filter = "All files (*.*)|*.*|bmp files (*.jpg)|*.jpg"; //"All files (*.*)|*.*";//
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                Image<Bgr, byte> image = new Image<Bgr, byte>(new Bitmap(dlg.FileName));
-               Image<Bgr, byte> imageMask = Utils.ExtractMask2(image);
+               Image<Bgr, byte> mask = Utils.ExtractMask2(image);
+               mask = Augumentation.ChangeBrightness(mask, 1.5);
+               Image<Gray, byte> grayMask = Utils.ToGray(mask);
                // compute descriptors for the query image
-               Matrix<float> queryDescriptors = Utils.ComputeSingleDescriptors(Utils.ToGray(imageMask));
-               //Matrix<float> queryDescriptors = Utils.ComputeSingleDescriptors(Utils.ToGray(image));
-               CarModel mathecsModel = Utils.FindMatches(m_dbDescs, queryDescriptors, ref m_imap, m_intervalTree);
+               /*
+                Rectangle licencePlateLocalization = Utils.GetLocalizationOfLicencePlate(grayMask, mask); // toto corect inside code
+                if (!licencePlateLocalization.IsEmpty)
+                {
+                   image.Draw(licencePlateLocalization, new Bgr(Color.Red), 1);
+                   // fill tu black licence plate
+                   Utils.LogImage("localization of licence plate", mask);
+                }
+                */
+               Utils.LogImage("grayMask mask", grayMask);
+               Image<Gray, byte> normalisedGrayMask = Utils.Resize(grayMask, Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT);
+               Matrix<float> queryDescriptors = Utils.ComputeSingleDescriptors(normalisedGrayMask);
+               //Matrix<float> queryDescriptors = Utils.ComputeSingleDescriptors(Utils.Resize(Utils.ToGray(image), Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT));
+               Utils.LogImage("normalized mask", normalisedGrayMask);
+               CarModel mathecsModel = Utils.FindMatches(m_index, queryDescriptors, ref m_imap, m_intervalTree);
                Console.WriteLine($"{mathecsModel.Maker} - {mathecsModel.Model} - {mathecsModel.Generation}");
             }
          }
+      }
+
+      private void ButtonNormalizeDb_Click(object sender, EventArgs e)
+      {
+         Console.WriteLine("Normalizing");
+         Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+         List<CarModel> carModels = Utils.GetCarModelsFromConfig();
+         int imageId = 1;
+         for (int i = 0; i < carModels.Count; i++)
+         {
+            CarModel carModel = carModels[i];
+            List<string> imagesPath = carModel.ImagesPath;
+            for (int j = 0; j < imagesPath.Count; j++)
+            {
+               string imagePath = imagesPath[j];
+               using (Image<Gray, byte> img = new Image<Gray, byte>(imagePath))
+               {
+                  string normalizedPath = Path.GetDirectoryName(imagePath)?.Replace("TrainingDb", "TrainingDbNormalized");
+                  string fileExtension = Path.GetExtension(imagePath);
+                  System.Drawing.Imaging.ImageFormat imageFormat = Utils.GetImageFormatFromFileExtension(fileExtension);
+
+                  List<Image<Gray, byte>> augumentedImages = new List<Image<Gray, byte>>();
+                  augumentedImages.Add(img);
+                  //Augumentation.MakeAugumentation(ref augumentedImages);
+
+                  foreach (Image<Gray, byte> augumentedImage in augumentedImages)
+                  {
+                     string imageNameNormalized = $"{imageId++}_Normalized{fileExtension}";
+                     Image<Gray, byte> normalizedImage = Utils.Resize(augumentedImage, Deffinitions.NORMALIZE_MASK_WIDTH,
+                        Deffinitions.NORMALIZE_MASK_HEIGHT);
+                     string normalizedImagePath = $"{normalizedPath}\\{imageNameNormalized}";
+
+                     if (!Directory.Exists(normalizedPath))
+                     {
+                        Directory.CreateDirectory(normalizedPath);
+                     }
+                     normalizedImage.Bitmap.Save(normalizedImagePath, imageFormat);
+                  }
+               }
+            }
+         }
+         watch.Stop();
+         Console.WriteLine($"Normalized finished - {watch.ElapsedMilliseconds}ms");
+      }
+
+      private void ButtonCreateImportanceMap_Click(object sender, EventArgs e)
+      {
+         Utils.CreateImportanceMap();
       }
    }
 }

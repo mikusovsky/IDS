@@ -132,8 +132,14 @@
   <data name="CarType" xml:space="preserve">
     <value>Car type</value>
   </data>
+  <data name="CreateImportanceMap" xml:space="preserve">
+    <value>Crate imp. map</value>
+  </data>
   <data name="DayScene" xml:space="preserve">
     <value>Day Scene</value>
+  </data>
+  <data name="LoadDb" xml:space="preserve">
+    <value>LoadDb</value>
   </data>
   <data name="LoadVideo" xml:space="preserve">
     <value>Load video</value>
@@ -144,8 +150,14 @@
   <data name="MainFrameName" xml:space="preserve">
     <value>IDS</value>
   </data>
+  <data name="Match" xml:space="preserve">
+    <value>Match</value>
+  </data>
   <data name="NightScene" xml:space="preserve">
     <value>Night Scene</value>
+  </data>
+  <data name="NormalizeDb" xml:space="preserve">
+    <value>NormalizeDb</value>
   </data>
   <data name="PersonalVehicles" xml:space="preserve">
     <value>Personal</value>

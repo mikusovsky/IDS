@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml;
 using Emgu.CV;
 using Emgu.CV.Features2D;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
+using NetTopologySuite.Triangulate;
 
 namespace IDS.IDS
 {
@@ -15,10 +17,83 @@ namespace IDS.IDS
       private const double SURF_HESSIAN_THRESH = 300;
       private const bool SURF_EXTENDED_FLAG = true;
       private static SURFDetector SurfDetector = new SURFDetector(SURF_HESSIAN_THRESH, SURF_EXTENDED_FLAG);
+      private static SIFTDetector SiftDetector = new SIFTDetector(); // pridate parametre
       private static Dictionary<string, Matrix<float>> SurfDescriptors = new Dictionary<string, Matrix<float>>();
+      private static HashSet<string> Was = new HashSet<string>();
+      private static Dictionary<string, XmlDocument> XmlDocuments = new Dictionary<string, XmlDocument>();
+      private static Dictionary<string, Matrix<float>> AvarageModelMaps = new Dictionary<string, Matrix<float>>();
 
-      public static Matrix<float> GetSurfDescriptor(string imagePath)
+      public static XmlDocument GetXMLDocument(string path)
       {
+         if (!XmlDocuments.ContainsKey(path))
+         {
+            XmlDocument config = new XmlDocument();
+            config.Load(path);
+            XmlDocuments[path] = config;
+         }
+         return XmlDocuments[path];
+      }
+
+      public static Matrix<float> GetModelAvarageMap(CarModel carModel)
+      {
+         int rows = Deffinitions.NORMALIZE_MASK_WIDTH;
+         int cols = Deffinitions.NORMALIZE_MASK_HEIGHT;
+         Matrix<float> map = new Matrix<float>(rows, cols);
+         string carModelName = $"{carModel.Maker}-{carModel.Model}-{carModel.Generation}-AvarageMap.cache";
+         string cachePath = $"{Deffinitions.CACHE_PATH}\\{carModelName}";
+         if (AvarageModelMaps.ContainsKey(carModelName))
+         {
+            return AvarageModelMaps[carModelName];
+         }
+         if (File.Exists(cachePath))
+         {
+            map = LoadMatrix(cachePath);
+            AvarageModelMaps[carModelName] = map;
+            return map;
+         }
+         float maxValue = 0;
+         for (int i = 0; i < carModel.ImagesPath.Count; i++)
+         {
+            using (Image<Gray, byte> img = new Image<Gray, byte>(carModel.ImagesPath[i]))
+            using (Image<Gray, byte> normalizedImage = Utils.Resize(img, rows, cols))
+            using (Image<Gray, byte> cannyGray = normalizedImage.Canny(new Gray(10), new Gray(60)))
+            {
+               for (int j = 0; j < cannyGray.Rows; j++)
+               {
+                  for (int k = 0; k < cannyGray.Cols; k++)
+                  {
+                     map[j, k] += Convert.ToSingle(cannyGray[j, k].Intensity);
+                     if (i == carModel.ImagesPath.Count - 1 && maxValue < map[j, k])
+                     {
+                        maxValue = map[j, k];
+                     }
+                  }
+               }
+            }
+         }
+
+         for (int j = 0; j < rows; j++)
+         {
+            for (int k = 0; k < cols; k++)
+            {
+               map[j, k] *= 255 / maxValue;
+               if (map[j, k] < 100)
+               {
+                  map[j, k] = 0;
+               }
+            }
+         }
+         SaveMatrix(cachePath, map);
+         AvarageModelMaps[carModelName] = map;
+         return map;
+      }
+
+      public static Matrix<float> GetSurfDescriptor(string imagePath, Image<Gray, byte> mask)
+      {
+         if (!Was.Add(Path.GetFileName(imagePath)))
+         {
+            Console.WriteLine("duplicateName - " + imagePath);
+         }
          if (SurfDescriptors.ContainsKey(imagePath))
          {
             return SurfDescriptors[imagePath];
@@ -26,47 +101,72 @@ namespace IDS.IDS
 
          Matrix<float> descs;
          string imageName = Path.GetFileName(imagePath);
-         string cachePath = $"{Deffinitions.CACHE_PATH}\\{Path.GetFileName(imageName)}.cache";
+         string cachePath = $"{Deffinitions.CACHE_PATH}\\{imageName}.cache";
          if (File.Exists(cachePath))
          {
-            string[] lines = File.ReadAllLines(cachePath);
-            descs = new Matrix<float>(lines.Length, lines[0].Split(' ').Length);
-            for (int i = 0; i < lines.Length; i++)
-            {
-               float[] values = lines[i].Split(' ').ToList().Select(x => (float) Convert.ToDouble(x)).ToArray();
-               for (int j = 0; j < values.Length; j++)
-               {
-                  descs[i, j] = values[j];
-               }
-            }
+            descs = LoadMatrix(cachePath);
             return descs;
          }
 
-         using (Image<Gray, Byte> img = new Image<Gray, byte>(imagePath))
+         using (Image<Gray, byte> img = new Image<Gray, byte>(imagePath))
          {
-            VectorOfKeyPoint keyPoints = SurfDetector.DetectKeyPointsRaw(img, null);
-            descs = SurfDetector.ComputeDescriptorsRaw(img, null, keyPoints);
+            descs = GetSurfDescriptor(img, mask);
          }
 
-         using (TextWriter tw = new StreamWriter(cachePath))
+         SaveMatrix(cachePath, descs);
+         SurfDescriptors[imagePath] = descs;
+         return descs;
+      }
+
+      public static VectorOfKeyPoint GetKeyPoints(Image<Gray, byte> image, Image<Gray, byte> mask)
+      {
+         return SurfDetector.DetectKeyPointsRaw(image, mask);
+      }
+
+      public static Matrix<float> GetSurfDescriptor(Image<Gray, byte> image, Image<Gray, byte> mask)
+      {
+         Image<Gray, byte> edges = image; //Utils.ExtractEdges(image);
+         VectorOfKeyPoint keyPoints = GetKeyPoints(edges, null);
+         return SurfDetector.ComputeDescriptorsRaw(edges, null, keyPoints);
+      }
+
+      private static Matrix<float> LoadMatrix(string path)
+      {
+         if (!File.Exists(path))
          {
-            for (int i = 0; i < descs.Rows; i++)
+            return null;
+         }
+         string[] lines = File.ReadAllLines(path);
+         Matrix<float> map = null;
+         for (int i = 0; i < lines.Length; i++)
+         {
+            float[] values = lines[i].Split(' ').ToList().Select(x => (float)Convert.ToDouble(x)).ToArray();
+            if (map == null)
             {
-               for (int j = 0; j < descs.Cols; j++)
+               map = new Matrix<float>(lines.Length, values.Length);
+            }
+            for (int j = 0; j < values.Length; j++)
+            {
+               map[i, j] = values[j];
+            }
+         }
+         return map;
+      }
+
+      private static void SaveMatrix(string path, Matrix<float> matrix)
+      {
+         using (TextWriter tw = new StreamWriter(path))
+         {
+            for (int i = 0; i < matrix.Rows; i++)
+            {
+               for (int j = 0; j < matrix.Cols; j++)
                {
-                  tw.Write($"{(j != 0 ? " " : "")}{descs[i, j]}");
+                  tw.Write($"{(j != 0 ? " " : "")}{matrix[i, j]}");
                }
                tw.WriteLine();
             }
             tw.Flush();
          }
-         return descs;
-      }
-      
-      public static Matrix<float> GetSurfDescriptor(Image<Gray, byte> imagePath)
-      {
-         VectorOfKeyPoint keyPoints = SurfDetector.DetectKeyPointsRaw(imagePath, null);
-         return SurfDetector.ComputeDescriptorsRaw(imagePath, null, keyPoints);
       }
    }
 }
