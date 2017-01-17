@@ -26,6 +26,7 @@ namespace IDS
       private Matrix<float> m_dbDescs;
       private Index m_index;
       private IntervalTree<CarModel, int> m_intervalTree;
+      private Matrix<float> m_importanceMap;
 
       Image<Bgr, Byte> _frameLow;
       Image<Bgr, Byte> _frameHD;
@@ -988,7 +989,8 @@ namespace IDS
 
       private void ButtonLoadDb_Click(object sender, EventArgs e)
       {
-         m_dbDescs = Utils.LoadDb(ref m_imap);
+         m_importanceMap = Utils.CreateImportanceMap();
+         m_dbDescs = Utils.LoadDb(ref m_imap, m_importanceMap);
          // create FLANN index with 4 kd-trees and perform KNN search over it look for 2 nearest neighbours
          m_index = new Index(m_dbDescs, 4);
          if (m_imap != null)
@@ -1035,22 +1037,13 @@ namespace IDS
             {
                Image<Bgr, byte> image = new Image<Bgr, byte>(new Bitmap(dlg.FileName));
                Image<Bgr, byte> mask = Utils.ExtractMask2(image);
-               mask = Augumentation.ChangeBrightness(mask, 1.5);
                Image<Gray, byte> grayMask = Utils.ToGray(mask);
-               // compute descriptors for the query image
-               /*
-                Rectangle licencePlateLocalization = Utils.GetLocalizationOfLicencePlate(grayMask, mask); // toto corect inside code
-                if (!licencePlateLocalization.IsEmpty)
-                {
-                   image.Draw(licencePlateLocalization, new Bgr(Color.Red), 1);
-                   // fill tu black licence plate
-                   Utils.LogImage("localization of licence plate", mask);
-                }
-                */
                Utils.LogImage("grayMask mask", grayMask);
-               Image<Gray, byte> normalisedGrayMask = Utils.Resize(grayMask, Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT);
-               Matrix<float> queryDescriptors = Utils.ComputeSingleDescriptors(normalisedGrayMask);
-               //Matrix<float> queryDescriptors = Utils.ComputeSingleDescriptors(Utils.Resize(Utils.ToGray(image), Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT));
+               grayMask._EqualizeHist();
+               grayMask._GammaCorrect(2.5d);
+               Image<Gray, byte> normalisedGrayMask = Utils.Resize(/*Utils.ToGray(image)*/grayMask, Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT);
+
+               Matrix<float> queryDescriptors = Utils.ComputeSingleDescriptors(normalisedGrayMask, m_importanceMap);
                Utils.LogImage("normalized mask", normalisedGrayMask);
                CarModel mathecsModel = Utils.FindMatches(m_index, queryDescriptors, ref m_imap, m_intervalTree);
                Console.WriteLine($"{mathecsModel.Maker} - {mathecsModel.Model} - {mathecsModel.Generation}");

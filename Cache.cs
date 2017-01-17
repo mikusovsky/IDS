@@ -88,7 +88,7 @@ namespace IDS.IDS
          return map;
       }
 
-      public static Matrix<float> GetSurfDescriptor(string imagePath, Image<Gray, byte> mask)
+      public static Matrix<float> GetSurfDescriptor(string imagePath, Matrix<float> importanceMap = null)
       {
          if (!Was.Add(Path.GetFileName(imagePath)))
          {
@@ -110,24 +110,39 @@ namespace IDS.IDS
 
          using (Image<Gray, byte> img = new Image<Gray, byte>(imagePath))
          {
-            descs = GetSurfDescriptor(img, mask);
+            descs = GetSurfDescriptor(img, importanceMap);
          }
-
          SaveMatrix(cachePath, descs);
          SurfDescriptors[imagePath] = descs;
          return descs;
       }
 
-      public static VectorOfKeyPoint GetKeyPoints(Image<Gray, byte> image, Image<Gray, byte> mask)
+      public static VectorOfKeyPoint GetKeyPoints(Image<Gray, byte> image)
       {
-         return SurfDetector.DetectKeyPointsRaw(image, mask);
+         return SurfDetector.DetectKeyPointsRaw(image, null);
       }
 
-      public static Matrix<float> GetSurfDescriptor(Image<Gray, byte> image, Image<Gray, byte> mask)
+      public static Matrix<float> GetSurfDescriptor(Image<Gray, byte> image, Matrix<float> importanceMap = null)
       {
-         Image<Gray, byte> edges = image; //Utils.ExtractEdges(image);
-         VectorOfKeyPoint keyPoints = GetKeyPoints(edges, null);
-         return SurfDetector.ComputeDescriptorsRaw(edges, null, keyPoints);
+         Image<Gray, byte> testImage = image;
+         using (Matrix<float> map = Utils.ImageToMap(image))
+         {
+            if (importanceMap != null)
+            {
+               for (int i = 0; i < map.Rows; i++)
+               {
+                  for (int j = 0; j < map.Cols; j++)
+                  {
+                     map[i, j] *= (importanceMap[i, j]/255);
+                  }
+               }
+               testImage = Utils.MapToImage(map);
+               Utils.LogImage("image after mask aplication", testImage);
+            }
+            Image<Gray, byte> edges = testImage; //Utils.ExtractEdges(image);
+            VectorOfKeyPoint keyPoints = GetKeyPoints(edges);
+            return SurfDetector.ComputeDescriptorsRaw(edges, null, keyPoints);
+         }
       }
 
       private static Matrix<float> LoadMatrix(string path)
@@ -155,6 +170,10 @@ namespace IDS.IDS
 
       private static void SaveMatrix(string path, Matrix<float> matrix)
       {
+         if (matrix == null)
+         {
+            return;
+         }
          using (TextWriter tw = new StreamWriter(path))
          {
             for (int i = 0; i < matrix.Rows; i++)
