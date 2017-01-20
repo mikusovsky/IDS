@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -568,10 +569,31 @@ namespace IDS.IDS
          m_progressBar.PerformStep();
       }
 
-      public static List<CarModel> GetCarModelsFromConfig()
+      public static List<CarModel> GetAllCarModels(Deffinitions.DbType type = Deffinitions.DbType.Trainig)
+      {
+         string configPath;
+         switch (type)
+         {
+            case Deffinitions.DbType.Trainig:
+               configPath = Deffinitions.TRAINING_DB_CONFIG_PATH;
+               break;
+
+            case Deffinitions.DbType.Testing:
+               configPath = Deffinitions.TESTING_DB_CONFIG_PATH;
+               break;
+
+            default:
+               configPath = Deffinitions.TRAINING_DB_CONFIG_PATH;
+               break;
+         }
+         List<CarModel> ret = _GetCarModelsFromConfig(configPath);
+         return ret;
+      }
+
+      private static List<CarModel> _GetCarModelsFromConfig(string dbConfigPath)
       {
          List<CarModel> carModels = new List<CarModel>();
-         XmlDocument config = Cache.GetXMLDocument("D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDb.xml");
+         XmlDocument config = Cache.GetXMLDocument(dbConfigPath);
          XmlNode body = config.SelectSingleNode("/body");
          XmlNodeList makers = body.SelectNodes("maker");
          foreach (XmlNode maker in makers)
@@ -602,7 +624,7 @@ namespace IDS.IDS
 
       public static Matrix<float> CreateImportanceMap()
       {
-         List<CarModel> carModels = GetCarModelsFromConfig();
+         List<CarModel> carModels = GetAllCarModels();
          double minValue, maxValue;
          Point minLoc, maxLoc;
          int rows = Deffinitions.NORMALIZE_MASK_WIDTH;

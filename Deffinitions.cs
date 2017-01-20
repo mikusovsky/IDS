@@ -1,6 +1,6 @@
 ﻿namespace IDS.IDS
 {
-   static class Deffinitions
+   public static class Deffinitions
    {
       public const bool DEBUG_MODE = true;
       public const string SUM_CARS = "sumCars";
@@ -8,6 +8,9 @@
       public const string TOTAL_SUM = "totalSum";
 
       public const string CACHE_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\Cache";
+      public const string TRAINING_DB_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDb.xml";
+
+      public const string TESTING_DB_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbTesting.xml";
 
       public const int LOW_FRAME_WIDTH = 320;
 
@@ -18,5 +21,11 @@
 
       public const int NORMALIZE_MASK_WIDTH = 128;
       public const int NORMALIZE_MASK_HEIGHT = 128;
+
+      public enum DbType
+      {
+         Trainig = 1,
+         Testing = 2
+      }
    }
 }

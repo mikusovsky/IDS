@@ -37,9 +37,13 @@ namespace IDS.IDS.Classificator
 
       private Matrix<float> _LoadDb(ref IList<SurfClassificator.IndecesMapping> imap, Matrix<float> importanceMap = null)
       {
-         List<CarModel> carModels = Utils.GetCarModelsFromConfig();
+         List<CarModel> carModels = Utils.GetAllCarModels();
          IList<Matrix<float>> dbDescsList = ComputeMultipleDescriptors(carModels, out imap, importanceMap);
          Matrix<float> dbDesct = ConcatDescriptors(dbDescsList);
+         foreach (Matrix<float> m in dbDescsList)
+         {
+            m.Dispose();
+         }
          dbDescsList = null;
          GC.Collect();
          return dbDesct;

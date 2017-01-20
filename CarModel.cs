@@ -13,6 +13,11 @@ namespace IDS.IDS
       public string ImagePath;
       public List<string> ImagesPath = new List<string>();
 
+      public string ID
+      {
+         get { return $"{Maker}_{Model}_{Generation}"; }
+      }
+
       public CarModel(string maker, string model, string generation, int from, int to, string imagePath)
       {
          Maker = maker;

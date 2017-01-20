@@ -244,12 +244,12 @@ namespace IDS
          // button2
          // 
          this.button2.Location = new System.Drawing.Point(17, 434);
-         this.button2.Name = "ButtonCreateImportanceMapId";
+         this.button2.Name = "ButtonTestId";
          this.button2.Size = new System.Drawing.Size(92, 23);
          this.button2.TabIndex = 19;
-         this.button2.Text = Resources.CreateImportanceMap;
+         this.button2.Text = Resources.Test;
          this.button2.UseVisualStyleBackColor = true;
-         this.button2.Click += new System.EventHandler(this.ButtonCreateImportanceMap_Click);
+         this.button2.Click += new System.EventHandler(this.ButtonTest_Click);
          // 
          // MainForm
          // 

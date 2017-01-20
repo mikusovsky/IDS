@@ -180,6 +180,9 @@
   <data name="SumText" xml:space="preserve">
     <value>Sum</value>
   </data>
+  <data name="Test" xml:space="preserve">
+    <value>Test</value>
+  </data>
   <data name="Together" xml:space="preserve">
     <value>Together</value>
   </data>

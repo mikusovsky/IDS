@@ -15,6 +15,7 @@ using IDS.IDS;
 using IDS.IDS.Classificator;
 using IDS.IDS.DataAugmentation;
 using IDS.IDS.IntervalTree;
+using IDS.IDS.Testing;
 using IntervalTree;
 
 namespace IDS
@@ -886,11 +887,9 @@ namespace IDS
       //vytvorenie GUI pre statisticke informacie
       private void _CreateStatisticLabels()
       {
-
          int x = 512;
          int y = 73;
          int dy = 24;
-
 
          for (int i = 1; i <= _roadLanes.Count; i++)
          {
@@ -953,10 +952,7 @@ namespace IDS
          Controls.Add(sumCars);
          Controls.Add(sumTrucks);
          Controls.Add(totalSum);
-
-
       }
-
 
       private void _StopButton_Click(object sender, EventArgs e)
       {
@@ -1031,7 +1027,7 @@ namespace IDS
       {
          Console.WriteLine("Normalizing");
          Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
-         List<CarModel> carModels = Utils.GetCarModelsFromConfig();
+         List<CarModel> carModels = Utils.GetAllCarModels();
          int imageId = 1;
          for (int i = 0; i < carModels.Count; i++)
          {
@@ -1070,9 +1066,11 @@ namespace IDS
          Console.WriteLine($"Normalized finished - {watch.ElapsedMilliseconds}ms");
       }
 
-      private void ButtonCreateImportanceMap_Click(object sender, EventArgs e)
+      private void ButtonTest_Click(object sender, EventArgs e)
       {
-         Utils.CreateImportanceMap();
+         IClassificator classificator = new SurfClassificator();
+         Test test = new Test();
+         test.Execute(classificator);
       }
    }
 }
