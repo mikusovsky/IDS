@@ -12,6 +12,7 @@ using CppWrapper;
 using Emgu.CV.Flann;
 using Emgu.CV.Util;
 using IDS.IDS;
+using IDS.IDS.Classificator;
 using IDS.IDS.DataAugmentation;
 using IDS.IDS.IntervalTree;
 using IntervalTree;
@@ -20,13 +21,9 @@ namespace IDS
 {
    public partial class MainForm : Form
    {
+      IClassificator Classificator = new SurfClassificator();
       System.Windows.Forms.Timer _myTimer;
       Capture _capture;
-      private IList<Utils.IndecesMapping> m_imap;
-      private Matrix<float> m_dbDescs;
-      private Index m_index;
-      private IntervalTree<CarModel, int> m_intervalTree;
-      private Matrix<float> m_importanceMap;
 
       Image<Bgr, Byte> _frameLow;
       Image<Bgr, Byte> _frameHD;
@@ -989,19 +986,7 @@ namespace IDS
 
       private void ButtonLoadDb_Click(object sender, EventArgs e)
       {
-         m_importanceMap = Utils.CreateImportanceMap();
-         m_dbDescs = Utils.LoadDb(ref m_imap, m_importanceMap);
-         // create FLANN index with 4 kd-trees and perform KNN search over it look for 2 nearest neighbours
-         m_index = new Index(m_dbDescs, 4);
-         if (m_imap != null)
-         {
-            m_intervalTree = new IntervalTree<CarModel, int>();
-            foreach (Utils.IndecesMapping indecesMapping in m_imap)
-            {
-               Interval<CarModel, int> interval = new Interval<CarModel, int>(indecesMapping.IndexStart, indecesMapping.IndexEnd, indecesMapping.CarModel);
-               m_intervalTree.AddInterval(interval);
-            }
-         }
+         Classificator.LoadDb();
          /*
          int noElements = 1000;
          int[] myArray = new int[noElements];
@@ -1036,16 +1021,7 @@ namespace IDS
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                Image<Bgr, byte> image = new Image<Bgr, byte>(new Bitmap(dlg.FileName));
-               Image<Bgr, byte> mask = Utils.ExtractMask2(image);
-               Image<Gray, byte> grayMask = Utils.ToGray(mask);
-               Utils.LogImage("grayMask mask", grayMask);
-               grayMask._EqualizeHist();
-               grayMask._GammaCorrect(2.5d);
-               Image<Gray, byte> normalisedGrayMask = Utils.Resize(/*Utils.ToGray(image)*/grayMask, Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT);
-
-               Matrix<float> queryDescriptors = Utils.ComputeSingleDescriptors(normalisedGrayMask, m_importanceMap);
-               Utils.LogImage("normalized mask", normalisedGrayMask);
-               CarModel mathecsModel = Utils.FindMatches(m_index, queryDescriptors, ref m_imap, m_intervalTree);
+               CarModel mathecsModel = Classificator.Match(image);
                Console.WriteLine($"{mathecsModel.Maker} - {mathecsModel.Model} - {mathecsModel.Generation}");
             }
          }
