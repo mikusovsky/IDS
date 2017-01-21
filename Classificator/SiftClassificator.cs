@@ -10,7 +10,7 @@ using IntervalTree;
 
 namespace IDS.IDS.Classificator
 {
-   public class SurfClassificator : IClassificator
+   public class SiftClassificator : IClassificator
    {
       private IList<IndecesMapping> m_imap;
       private Matrix<float> m_dbDescs;
@@ -75,7 +75,7 @@ namespace IDS.IDS.Classificator
             List<string> imagesPath = carModel.ImagesPath;
             for (int j = 0; j < imagesPath.Count; j++)
             {
-               var desc = ComputeSingleDescriptors(imagesPath[j], importanceMap, Deffinitions.DescriptorType.SURF);
+               var desc = ComputeSingleDescriptors(imagesPath[j], importanceMap);
                if (desc != null)
                {
                   descs.Add(desc);
@@ -97,7 +97,7 @@ namespace IDS.IDS.Classificator
          Utils.ProgressBarHide();
          return descs;
       }
-      
+
       /// <summary>
       /// Concatenates descriptors from different sources (images) into single matrix.
       /// </summary>
@@ -127,9 +127,9 @@ namespace IDS.IDS.Classificator
       /// </summary>
       /// <param name="fileName">Image filename.</param>
       /// <returns>The descriptors for the given image.</returns>
-      public static Matrix<float> ComputeSingleDescriptors(string fileName, Matrix<float> importanceMap, Deffinitions.DescriptorType descriptorType)
+      public static Matrix<float> ComputeSingleDescriptors(string fileName, Matrix<float> importanceMap = null)
       {
-         return Cache.GetDescriptor(fileName, importanceMap, descriptorType);
+         return Cache.GetDescriptor(fileName, importanceMap, Deffinitions.DescriptorType.SIFT);
       }
 
       public static VectorOfKeyPoint GetKeyPoints(Image<Gray, byte> image, Deffinitions.DescriptorType descriptorType)
@@ -144,7 +144,7 @@ namespace IDS.IDS.Classificator
       /// <returns>The descriptors for the given image.</returns>
       public static Matrix<float> ComputeSingleDescriptors(Image<Gray, byte> image, Matrix<float> importanceMap = null)
       {
-         return Cache.GetDescriptor(image, importanceMap, Deffinitions.DescriptorType.SURF);
+         return Cache.GetDescriptor(image, importanceMap, Deffinitions.DescriptorType.SIFT);
       }
 
       public CarModel Match(Image<Bgr, byte> image)

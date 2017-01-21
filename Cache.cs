@@ -7,18 +7,15 @@ using Emgu.CV;
 using Emgu.CV.Features2D;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
-using NetTopologySuite.Triangulate;
 
 namespace IDS.IDS
 {
    public static class Cache
    {
 
-      private const double SURF_HESSIAN_THRESH = 300;
-      private const bool SURF_EXTENDED_FLAG = true;
-      private static SURFDetector SurfDetector = new SURFDetector(SURF_HESSIAN_THRESH, SURF_EXTENDED_FLAG);
-      private static SIFTDetector SiftDetector = new SIFTDetector(); // pridate parametre
-      private static Dictionary<string, Matrix<float>> SurfDescriptors = new Dictionary<string, Matrix<float>>();
+      private static SURFDetector SurfDetector = new SURFDetector(300, true);
+      private static SIFTDetector SiftDetector = new SIFTDetector(75, 6, 0.04, 10, 1.6); // pridate parametre
+      private static Dictionary<string, Matrix<float>> Descriptors = new Dictionary<string, Matrix<float>>();
       private static HashSet<string> Was = new HashSet<string>();
       private static Dictionary<string, XmlDocument> XmlDocuments = new Dictionary<string, XmlDocument>();
       private static Dictionary<string, Matrix<float>> AvarageModelMaps = new Dictionary<string, Matrix<float>>();
@@ -88,18 +85,33 @@ namespace IDS.IDS
          return map;
       }
 
-      public static Matrix<float> GetSurfDescriptor(string imagePath, Matrix<float> importanceMap = null)
+      public static Matrix<float> GetDescriptor(Image<Gray, byte> image, Matrix<float> importanceMap, Deffinitions.DescriptorType descriptor)
+      {
+         Matrix<float> descs = null;
+         switch (descriptor)
+         {
+            case Deffinitions.DescriptorType.SURF:
+               descs = _GetSurfDescriptor(image, importanceMap);
+               break;
+            case Deffinitions.DescriptorType.SIFT:
+               descs = _GetSiftDescriptor(image, importanceMap);
+               break;
+         }
+         return descs;
+      }
+
+      public static Matrix<float> GetDescriptor(string imagePath, Matrix<float> importanceMap, Deffinitions.DescriptorType descriptor)
       {
          if (!Was.Add(Path.GetFileName(imagePath)))
          {
             Console.WriteLine("duplicateName - " + imagePath);
          }
-         if (SurfDescriptors.ContainsKey(imagePath))
+         if (Descriptors.ContainsKey(imagePath))
          {
-            return SurfDescriptors[imagePath];
+            return Descriptors[imagePath];
          }
 
-         Matrix<float> descs;
+         Matrix<float> descs = null;
          string imageName = Path.GetFileName(imagePath);
          string cachePath = $"{Deffinitions.CACHE_PATH}\\{imageName}.cache";
          if (File.Exists(cachePath))
@@ -110,19 +122,31 @@ namespace IDS.IDS
 
          using (Image<Gray, byte> img = new Image<Gray, byte>(imagePath))
          {
-            descs = GetSurfDescriptor(img, importanceMap);
+            switch (descriptor)
+            {
+               case Deffinitions.DescriptorType.SURF:
+                  descs = _GetSurfDescriptor(img, importanceMap);
+                  break;
+               case Deffinitions.DescriptorType.SIFT:
+                  descs = _GetSiftDescriptor(img, importanceMap);
+                  break;
+            }
          }
          SaveMatrix(cachePath, descs);
-         SurfDescriptors[imagePath] = descs;
+         Descriptors[imagePath] = descs;
          return descs;
       }
 
-      public static VectorOfKeyPoint GetKeyPoints(Image<Gray, byte> image)
+      public static VectorOfKeyPoint GetKeyPoints(Image<Gray, byte> image, Deffinitions.DescriptorType descriptorType)
       {
+         if (descriptorType == Deffinitions.DescriptorType.SIFT)
+         {
+            return SiftDetector.DetectKeyPointsRaw(image, null);
+         }
          return SurfDetector.DetectKeyPointsRaw(image, null);
       }
 
-      public static Matrix<float> GetSurfDescriptor(Image<Gray, byte> image, Matrix<float> importanceMap = null)
+      private static Matrix<float> _GetSurfDescriptor(Image<Gray, byte> image, Matrix<float> importanceMap = null)
       {
          Image<Gray, byte> testImage = image;
          using (Matrix<float> map = Utils.ImageToMap(image))
@@ -133,15 +157,38 @@ namespace IDS.IDS
                {
                   for (int j = 0; j < map.Cols; j++)
                   {
-                     map[i, j] *= (importanceMap[i, j]/255);
+                     map[i, j] *= (importanceMap[i, j] / 255);
                   }
                }
                testImage = Utils.MapToImage(map);
                Utils.LogImage("image after mask aplication", testImage);
             }
             Image<Gray, byte> edges = testImage; //Utils.ExtractEdges(image);
-            VectorOfKeyPoint keyPoints = GetKeyPoints(edges);
+            VectorOfKeyPoint keyPoints = GetKeyPoints(edges, Deffinitions.DescriptorType.SURF);
             return SurfDetector.ComputeDescriptorsRaw(edges, null, keyPoints);
+         }
+      }
+
+      private static Matrix<float> _GetSiftDescriptor(Image<Gray, byte> image, Matrix<float> importanceMap = null)
+      {
+         Image<Gray, byte> testImage = image;
+         using (Matrix<float> map = Utils.ImageToMap(image))
+         {
+            if (importanceMap != null)
+            {
+               for (int i = 0; i < map.Rows; i++)
+               {
+                  for (int j = 0; j < map.Cols; j++)
+                  {
+                     map[i, j] *= (importanceMap[i, j] / 255);
+                  }
+               }
+               testImage = Utils.MapToImage(map);
+               Utils.LogImage("image after mask aplication", testImage);
+            }
+            Image<Gray, byte> edges = testImage; //Utils.ExtractEdges(image);
+            VectorOfKeyPoint keyPoints = GetKeyPoints(edges, Deffinitions.DescriptorType.SIFT);
+            return SiftDetector.ComputeDescriptorsRaw(edges, null, keyPoints);
          }
       }
 

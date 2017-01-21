@@ -133,7 +133,7 @@ namespace IDS.IDS
 
       public static Image<Bgr, byte> CorpImage(Image<Bgr, byte> img, int x, int y, int width, int height)
       {
-         Image<Bgr, Byte> roiImage = new Image<Bgr, byte>(img.Bitmap);
+         Image<Bgr, byte> roiImage = new Image<Bgr, byte>(img.Bitmap);
          /*** EXTRACT BUTTON MIDDLE PART OF IMAGE FOR EXTACTION ***/
          using (Graphics gr = Graphics.FromImage(roiImage.Bitmap))
          {
@@ -145,6 +145,24 @@ namespace IDS.IDS
             roiImage.ROI = new Rectangle(x, y, width, height);
          }
          return roiImage;
+      }
+
+      public static Image<Gray, byte> CorpImage(Image<Gray, byte> img, int x, int y, int width, int height)
+      {
+         Bitmap tempBitmap = new Bitmap(img.Width, img.Height);
+         Image<Bgr, Byte> roiImage = new Image<Bgr, Byte>(tempBitmap);
+         /*** EXTRACT BUTTON MIDDLE PART OF IMAGE FOR EXTACTION ***/
+         using (Graphics gr = Graphics.FromImage(roiImage.Bitmap))
+         {
+            gr.DrawImage(img.Bitmap, 0, 0);
+            Rectangle rc = new Rectangle(0, 0, img.Width, img.Height);
+            gr.SmoothingMode = SmoothingMode.HighQuality;
+            gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            gr.DrawImage(img.Bitmap, rc);
+            roiImage.ROI = new Rectangle(x, y, width, height);
+         }
+         return ToGray(roiImage);
       }
 
       private static int _GetMinFromLeft(List<int> values)
@@ -569,13 +587,17 @@ namespace IDS.IDS
          m_progressBar.PerformStep();
       }
 
-      public static List<CarModel> GetAllCarModels(Deffinitions.DbType type = Deffinitions.DbType.Trainig)
+      public static List<CarModel> GetAllCarModels(Deffinitions.DbType type = Deffinitions.DbType.Training)
       {
          string configPath;
          switch (type)
          {
-            case Deffinitions.DbType.Trainig:
+            case Deffinitions.DbType.Training:
                configPath = Deffinitions.TRAINING_DB_CONFIG_PATH;
+               break;
+
+            case Deffinitions.DbType.TrainingNormalized:
+               configPath = Deffinitions.TRAINING_DB_NORMALIZED_CONFIG_PATH;
                break;
 
             case Deffinitions.DbType.Testing:
@@ -624,7 +646,7 @@ namespace IDS.IDS
 
       public static Matrix<float> CreateImportanceMap()
       {
-         List<CarModel> carModels = GetAllCarModels();
+         List<CarModel> carModels = GetAllCarModels(Deffinitions.DbType.TrainingNormalized);
          double minValue, maxValue;
          Point minLoc, maxLoc;
          int rows = Deffinitions.NORMALIZE_MASK_WIDTH;

@@ -21,7 +21,7 @@ namespace IDS.IDS.Testing
 
       public double GetPercentage()
       {
-         return 100 * GetCorrectMatchCount() / m_matches.Count;
+         return Math.Round(100 * GetCorrectMatchCount() / m_matches.Count, 2);
       }
 
       public double GetCorrectMatchCount()

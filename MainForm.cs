@@ -1017,8 +1017,14 @@ namespace IDS
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                Image<Bgr, byte> image = new Image<Bgr, byte>(new Bitmap(dlg.FileName));
+               Image<Gray, byte> newImage = Augumentation.GetPerspectiveTransform(
+                  Utils.ToGray(Utils.Resize(image, Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_WIDTH)),
+                  0, 10);
+               Utils.LogImage("Affined", newImage);
+               /*
                CarModel mathecsModel = Classificator.Match(image);
                Console.WriteLine($"{mathecsModel.Maker} - {mathecsModel.Model} - {mathecsModel.Generation}");
+               */
             }
          }
       }
@@ -1026,9 +1032,10 @@ namespace IDS
       private void ButtonNormalizeDb_Click(object sender, EventArgs e)
       {
          Console.WriteLine("Normalizing");
-         Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+         Stopwatch watch = Stopwatch.StartNew();
          List<CarModel> carModels = Utils.GetAllCarModels();
          int imageId = 1;
+         Utils.ProgressBarShow(carModels.Count);
          for (int i = 0; i < carModels.Count; i++)
          {
             CarModel carModel = carModels[i];
@@ -1043,32 +1050,37 @@ namespace IDS
                   System.Drawing.Imaging.ImageFormat imageFormat = Utils.GetImageFormatFromFileExtension(fileExtension);
 
                   List<Image<Gray, byte>> augumentedImages = new List<Image<Gray, byte>>();
-                  augumentedImages.Add(img);
-                  //Augumentation.MakeAugumentation(ref augumentedImages);
+                  Image<Gray, byte> normalizedImage = Utils.Resize(img, Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT);
+                  augumentedImages.Add(normalizedImage);
+                  Augumentation.MakeAugumentation(ref augumentedImages);
 
                   foreach (Image<Gray, byte> augumentedImage in augumentedImages)
                   {
                      string imageNameNormalized = $"{imageId++}_Normalized{fileExtension}";
-                     Image<Gray, byte> normalizedImage = Utils.Resize(augumentedImage, Deffinitions.NORMALIZE_MASK_WIDTH,
-                        Deffinitions.NORMALIZE_MASK_HEIGHT);
+                     
                      string normalizedImagePath = $"{normalizedPath}\\{imageNameNormalized}";
 
                      if (!Directory.Exists(normalizedPath))
                      {
                         Directory.CreateDirectory(normalizedPath);
                      }
-                     normalizedImage.Bitmap.Save(normalizedImagePath, imageFormat);
+                     augumentedImage.Bitmap.Save(normalizedImagePath, imageFormat);
                   }
                }
             }
+            Utils.ProgressBarIncrement();
          }
+         Utils.ProgressBarHide();
          watch.Stop();
          Console.WriteLine($"Normalized finished - {watch.ElapsedMilliseconds}ms");
       }
 
       private void ButtonTest_Click(object sender, EventArgs e)
       {
-         IClassificator classificator = new SurfClassificator();
+         IClassificator classificator;
+         //classificator = new SurfClassificator();
+         classificator = new SiftClassificator();
+
          Test test = new Test();
          test.Execute(classificator);
       }
