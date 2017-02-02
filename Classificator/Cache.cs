@@ -12,9 +12,9 @@ namespace IDS.IDS
 {
    public static class Cache
    {
-
-      private static SURFDetector SurfDetector = new SURFDetector(300, true);
+      private static SURFDetector SurfDetector = new SURFDetector(300, true, 4, 5);
       private static SIFTDetector SiftDetector = new SIFTDetector(75, 6, 0.04, 10, 1.6); // pridate parametre
+      private static HOGDescriptor HogDescriptor = new HOGDescriptor(); // TODO 
       private static Dictionary<string, Matrix<float>> Descriptors = new Dictionary<string, Matrix<float>>();
       private static HashSet<string> Was = new HashSet<string>();
       private static Dictionary<string, XmlDocument> XmlDocuments = new Dictionary<string, XmlDocument>();
@@ -100,20 +100,23 @@ namespace IDS.IDS
          return descs;
       }
 
-      public static Matrix<float> GetDescriptor(string imagePath, Matrix<float> importanceMap, Deffinitions.DescriptorType descriptor)
+      public static Matrix<float> GetDescriptor(string imagePath, Matrix<float> importanceMap, Deffinitions.DescriptorType descriptor, Deffinitions.DbType dbType)
       {
-         if (!Was.Add(Path.GetFileName(imagePath)))
+         string imagePathDesriptor = imagePath + descriptor + dbType;
+         /*
+         if (!Was.Add(Path.GetFileName(imagePathDesriptor)))
          {
-            Console.WriteLine("duplicateName - " + imagePath);
+            Console.WriteLine("duplicateName - " + imagePathDesriptor);
          }
-         if (Descriptors.ContainsKey(imagePath))
+         */
+         if (Descriptors.ContainsKey(imagePathDesriptor))
          {
-            return Descriptors[imagePath];
+            return Descriptors[imagePathDesriptor];
          }
 
          Matrix<float> descs = null;
          string imageName = Path.GetFileName(imagePath);
-         string cachePath = $"{Deffinitions.CACHE_PATH}\\{imageName}.cache";
+         string cachePath = $"{Deffinitions.CACHE_PATH}\\{imageName}_descriptor{descriptor}_dbType{dbType}.cache";
          if (File.Exists(cachePath))
          {
             descs = LoadMatrix(cachePath);

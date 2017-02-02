@@ -36,5 +36,20 @@ namespace IDS.IDS
             ImagesPath.Add(file);
          }
       }
+
+      public override int GetHashCode()
+      {
+         return ID.GetHashCode();
+      }
+
+      public override bool Equals(object obj)
+      {
+         var other = obj as CarModel;
+         if (other == null)
+         {
+            return false;
+         }
+         return ID == other.ID;
+      }
    }
 }

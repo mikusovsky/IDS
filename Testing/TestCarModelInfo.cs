@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Text;
 
 namespace IDS.IDS.Testing
 {
@@ -17,6 +19,23 @@ namespace IDS.IDS.Testing
       public void Add(CarModel model)
       {
          m_matches.Add(model);
+      }
+
+      public string GetGroupsSorted()
+      {
+         StringBuilder sb = new StringBuilder();
+         var numberGroups = m_matches.GroupBy(o => o.ID);
+         numberGroups = numberGroups.OrderByDescending(o => o.Count());
+         foreach (var grp in numberGroups)
+         {
+            string modelId = grp.Key;
+            int matchesCount = grp.Count();
+            if (grp.Key != CarModel.ID)
+            {
+               sb.Append($"{modelId}\t{matchesCount}/{m_matches.Count}\t");
+            }
+         }
+         return sb.ToString();
       }
 
       public double GetPercentage()

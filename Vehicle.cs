@@ -171,12 +171,13 @@ namespace IDS
 
       public void GetCarType()
       {
-         _carMask = Utils.ExtractMask2(_carPhoto);
+         _carMask = Utils.ExtractMask3(_carPhoto);
          CvInvoke.cvShowImage("carPhoto", _carMask);
       }
 
       public Image<Bgr, Byte> GetCarPhoto()
       {
+         /*
          string path = $"D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\Output\\Images\\{Path.GetFileName(Utils.CurentVideoPath).Split('.')[0]}";
          if (!Directory.Exists(path))
          {
@@ -185,6 +186,7 @@ namespace IDS
          string filePath = $"{path}\\{DateTime.Now.ToString(@"MMddyyyy_h_mm_tt_")}{Utils.RandomString(3)}.png";
 
          _carPhoto.Bitmap.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
+         */
          return _carPhoto;
       }
    }

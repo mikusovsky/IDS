@@ -2,17 +2,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Xml;
 using Emgu.CV;
+using Emgu.CV.CvEnum;
 using Emgu.CV.Features2D;
 using Emgu.CV.Flann;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using IDS.IDS.Classificator;
+using IDS.IDS.DataAugmentation;
 using IDS.IDS.IntervalTree;
 
 namespace IDS.IDS
@@ -126,12 +130,151 @@ namespace IDS.IDS
          }
          int width = rigntPos - leftPos;
          int height = shadowPos - windowStartPost;
-         Image<Bgr, byte> retImg = CorpImage(image, leftPos, windowStartPost + height / 5, width, 4 * height / 5);
+         Image<Bgr, byte> retImg = CropImage(image, leftPos, windowStartPost + height / 5, width, 4 * height / 5);
          Utils.LogImage("mask", retImg);
          return retImg;
       }
 
-      public static Image<Bgr, byte> CorpImage(Image<Bgr, byte> img, int x, int y, int width, int height)
+      public static Image<Bgr, byte> ExtractMask3(Image<Bgr, byte> image)
+      {
+         if (image == null)
+         {
+            return null;
+         }
+         Image<Gray, byte> grayImage = ToGray(image);
+         Image<Gray, float> sobel = grayImage.Sobel(0, 1, 5);
+
+         double maxRowSum = float.MinValue;
+         int shadowPos = -1;
+         List<int> values = new List<int>();
+         for (int i = 0; i < sobel.Rows; i++)
+         {
+            int actualRow = 0;
+            for (int j = 0; j < sobel.Cols; j++)
+            {
+               actualRow += sobel[i, j].Intensity > 0 ? 1 : 0;
+            }
+            values.Add(actualRow);
+            if (maxRowSum < actualRow)
+            {
+               shadowPos = i;
+               maxRowSum = actualRow;
+            }
+         }
+
+         int width = Deffinitions.MASK_WIDTH_FROM_FRAME;
+         int height = Deffinitions.MASK_HEIGHT_FROM_FRAME;
+         int halfWidth = Deffinitions.MASK_WIDTH_FROM_FRAME / 2;
+         double minDiffSum = Int32.MaxValue;
+         int minX = 0;
+         using (Image<Gray, byte> edges = grayImage/*grayImage.Canny(new Gray(10), new Gray(60))*/)
+         {
+            for (int i = 0; i + Deffinitions.MASK_WIDTH_FROM_FRAME < edges.Width; i++)
+            {
+               if (i == 47)
+               {
+                  int g = 0;
+                  g++;
+               }
+               using (Image<Gray, byte> subFrame = CropImage(edges, i, shadowPos - height, width, height))
+               using (Image<Gray, byte> left = CropImage(subFrame, 0, 0, halfWidth, height))
+               using (Image<Gray, byte> right = CropImage(subFrame, halfWidth, 0, halfWidth, height).Flip(FLIP.HORIZONTAL))
+               using (Image<Gray, byte> difference = left.AbsDiff(right).ThresholdBinary(new Gray(60), new Gray(255)))
+               {
+                  //Console.WriteLine($"{i} - {subFrame.Rows},{subFrame.Cols} ==> {left.Rows}=={right.Rows}, {left.Cols}=={right.Cols}");
+
+                  double diffSum = 0;
+                  for (int j = 0; j < difference.Rows; j++)
+                  {
+                     for (int k = 0; k < difference.Cols; k++)
+                     {
+                        diffSum += difference[j, k].Intensity;
+                     }
+                  }
+                  if (minDiffSum > diffSum)
+                  {
+                     minX = i;
+                     minDiffSum = diffSum;
+                  }
+
+               }
+            }
+         }
+         Image<Bgr, byte> retImg = CropImage(image, minX, shadowPos - height, width, height);
+         //Utils.LogImage("mask", retImg);
+         return retImg;
+      }
+
+      public static Image<Gray, byte> ExtractMask3(Image<Gray, byte> grayImage)
+      {
+         if (grayImage == null)
+         {
+            return null;
+         }
+         Image<Gray, float> sobel = grayImage.Sobel(0, 1, 5);
+
+         double maxRowSum = float.MinValue;
+         int shadowPos = -1;
+         List<int> values = new List<int>();
+         for (int i = 0; i < sobel.Rows; i++)
+         {
+            int actualRow = 0;
+            for (int j = 0; j < sobel.Cols; j++)
+            {
+               actualRow += sobel[i, j].Intensity > 0 ? 1 : 0;
+            }
+            values.Add(actualRow);
+            if (maxRowSum < actualRow)
+            {
+               shadowPos = i;
+               maxRowSum = actualRow;
+            }
+         }
+
+         int width = Deffinitions.MASK_WIDTH_FROM_FRAME;
+         int height = Deffinitions.MASK_HEIGHT_FROM_FRAME;
+         int halfWidth = Deffinitions.MASK_WIDTH_FROM_FRAME / 2;
+         double minDiffSum = Int32.MaxValue;
+         int minX = 0;
+         using (Image<Gray, byte> edges = grayImage/*grayImage.Canny(new Gray(10), new Gray(60))*/)
+         {
+            for (int i = 0; i + Deffinitions.MASK_WIDTH_FROM_FRAME < edges.Width; i++)
+            {
+               if (i == 47)
+               {
+                  int g = 0;
+                  g++;
+               }
+               using (Image<Gray, byte> subFrame = CropImage(edges, i, shadowPos - height, width, height))
+               using (Image<Gray, byte> left = CropImage(subFrame, 0, 0, halfWidth, height))
+               using (Image<Gray, byte> right = CropImage(subFrame, halfWidth, 0, halfWidth, height).Flip(FLIP.HORIZONTAL))
+               using (Image<Gray, byte> difference = left.AbsDiff(right).ThresholdBinary(new Gray(60), new Gray(255)))
+               {
+                  //Console.WriteLine($"{i} - {subFrame.Rows},{subFrame.Cols} ==> {left.Rows}=={right.Rows}, {left.Cols}=={right.Cols}");
+
+                  double diffSum = 0;
+                  for (int j = 0; j < difference.Rows; j++)
+                  {
+                     for (int k = 0; k < difference.Cols; k++)
+                     {
+                        diffSum += difference[j, k].Intensity;
+                     }
+                  }
+                  if (minDiffSum > diffSum)
+                  {
+                     minX = i;
+                     minDiffSum = diffSum;
+                  }
+
+               }
+            }
+         }
+         Image<Gray, byte> retImg = CropImage(grayImage, minX, shadowPos - height, width, height);
+         //Utils.LogImage("mask", retImg);
+         return retImg;
+      }
+
+      public static Image<Bgr, byte> CropImage(Image<Bgr, byte> img, int x, int y, int width, int height)
       {
          Image<Bgr, byte> roiImage = new Image<Bgr, byte>(img.Bitmap);
          /*** EXTRACT BUTTON MIDDLE PART OF IMAGE FOR EXTACTION ***/
@@ -147,7 +290,7 @@ namespace IDS.IDS
          return roiImage;
       }
 
-      public static Image<Gray, byte> CorpImage(Image<Gray, byte> img, int x, int y, int width, int height)
+      public static Image<Gray, byte> CropImage(Image<Gray, byte> img, int x, int y, int width, int height)
       {
          Bitmap tempBitmap = new Bitmap(img.Width, img.Height);
          Image<Bgr, Byte> roiImage = new Image<Bgr, Byte>(tempBitmap);
@@ -604,6 +747,38 @@ namespace IDS.IDS
                configPath = Deffinitions.TESTING_DB_CONFIG_PATH;
                break;
 
+            case Deffinitions.DbType.TestingMask:
+               configPath = Deffinitions.TESTING_MASK_DB_CONFIG_PATH;
+               break;
+
+            case Deffinitions.DbType.Subset1:
+               configPath = Deffinitions.TRAINING_DB_NORMALIZED_CONFIG_PATH_PODSKUPINA1;
+               break;
+
+            case Deffinitions.DbType.Subset2:
+               configPath = Deffinitions.TRAINING_DB_NORMALIZED_CONFIG_PATH_PODSKUPINA2;
+               break;
+
+            case Deffinitions.DbType.TrainingBrand:
+               configPath = Deffinitions.TRAINING_DB_BRAND_CONFIG_PATH;
+               break;
+
+            case Deffinitions.DbType.TrainingAudi:
+               configPath = Deffinitions.TRAINING_DB_AUDI_CONFIG_PATH;
+               break;
+
+            case Deffinitions.DbType.TrainingBMW:
+               configPath = Deffinitions.TRAINING_DB_BMW_CONFIG_PATH;
+               break;
+
+            case Deffinitions.DbType.TrainingSkoda:
+               configPath = Deffinitions.TRAINING_DB_SKODA_CONFIG_PATH;
+               break;
+
+            case Deffinitions.DbType.TrainingVolkswagen:
+               configPath = Deffinitions.TRAINING_DB_VOLKSWAGEN_CONFIG_PATH;
+               break;
+
             default:
                configPath = Deffinitions.TRAINING_DB_CONFIG_PATH;
                break;
@@ -745,6 +920,105 @@ namespace IDS.IDS
          if (Deffinitions.DEBUG_MODE)
          {
             CvInvoke.cvShowImage(text, image);
+         }
+      }
+
+      public static void NormalizeDb()
+      {
+         Console.WriteLine("Normalizing");
+         Stopwatch watch = Stopwatch.StartNew();
+         List<CarModel> carModels = Utils.GetAllCarModels();
+         int imageId = 1;
+         Utils.ProgressBarShow(carModels.Count);
+         for (int i = 0; i < carModels.Count; i++)
+         {
+            CarModel carModel = carModels[i];
+            List<string> imagesPath = carModel.ImagesPath;
+            for (int j = 0; j < imagesPath.Count; j++)
+            {
+               string imagePath = imagesPath[j];
+               using (Image<Gray, byte> img = new Image<Gray, byte>(imagePath))
+               {
+                  string normalizedPath = Path.GetDirectoryName(imagePath)?.Replace("TrainingDb", "TrainingDbNormalized");
+                  string fileExtension = Path.GetExtension(imagePath);
+                  System.Drawing.Imaging.ImageFormat imageFormat = Utils.GetImageFormatFromFileExtension(fileExtension);
+
+                  List<Image<Gray, byte>> augumentedImages = new List<Image<Gray, byte>>();
+                  Image<Gray, byte> normalizedImage = Utils.Resize(img, Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT);
+                  augumentedImages.Add(normalizedImage);
+                  Augumentation.MakeAugumentation(ref augumentedImages);
+
+                  foreach (Image<Gray, byte> augumentedImage in augumentedImages)
+                  {
+                     string imageNameNormalized = $"{imageId++}_Normalized{fileExtension}";
+
+                     string normalizedImagePath = $"{normalizedPath}\\{imageNameNormalized}";
+
+                     if (!Directory.Exists(normalizedPath))
+                     {
+                        Directory.CreateDirectory(normalizedPath);
+                     }
+                     augumentedImage.Bitmap.Save(normalizedImagePath, imageFormat);
+                  }
+               }
+            }
+            Utils.ProgressBarIncrement();
+         }
+         Utils.ProgressBarHide();
+         watch.Stop();
+         Console.WriteLine($"Normalized finished - {watch.ElapsedMilliseconds}ms");
+      }
+
+      public static void CreateBrandMaskDb()
+      {
+         Console.WriteLine("Create brand db");
+         Stopwatch watch = Stopwatch.StartNew();
+         List<CarModel> carModels = Utils.GetAllCarModels(Deffinitions.DbType.TrainingNormalized);
+         string dbPath = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\Database\\TrainingBrand";
+         var groups = carModels.GroupBy(o => o.Maker);
+         int imageId = 1;
+         Utils.ProgressBarShow(carModels.Count);
+         foreach (var maker in groups)
+         {
+            foreach (CarModel model in maker)
+            {
+               string modelDbPath = $"{dbPath}\\{model.Maker}";
+               foreach (string imageSrc in model.ImagesPath)
+               {
+                  using (Image<Gray, byte> img = new Image<Gray, byte>(imageSrc))
+                  using (Image<Gray, byte> roi = CropImage(img, 30, 15, 70, 55))
+                  {
+                     if (!Directory.Exists(modelDbPath))
+                     {
+                        Directory.CreateDirectory(modelDbPath);
+                     }
+                     roi.Bitmap.Save($"{modelDbPath}\\{imageId++}.jpg", ImageFormat.Jpeg);
+                  }
+               }
+               ProgressBarIncrement();
+            }
+         }
+         ProgressBarHide();
+         watch.Stop();
+         Console.WriteLine($"Create brand db - {watch.ElapsedMilliseconds}ms");
+      }
+
+      public static Deffinitions.DbType GetDbTypeForMakerString(string strMaker)
+      {
+         string lowMaker = strMaker.ToUpper();
+         switch (lowMaker)
+         {
+            case "AUDI":
+               return Deffinitions.DbType.TrainingAudi;
+
+            case "BMW":
+               return Deffinitions.DbType.TrainingBMW;
+
+            case "SKODA":
+               return Deffinitions.DbType.TrainingSkoda;
+
+            default:
+               return Deffinitions.DbType.TrainingVolkswagen;
          }
       }
 

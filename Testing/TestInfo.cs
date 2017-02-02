@@ -29,7 +29,7 @@ namespace IDS.IDS.Testing
          {
             allTestingImages += modelInfo.GetMatchesCount();
             correctImages += modelInfo.GetCorrectMatchCount();
-            sb.Append($"{modelInfo.GetPercentage()}% {modelInfo.GetCorrectMatchCount()}/{modelInfo.GetMatchesCount()} ------------------ {modelInfo.CarModel.ID}{Environment.NewLine}");
+            sb.Append($"{modelInfo.GetPercentage()}% {modelInfo.GetCorrectMatchCount()}/{modelInfo.GetMatchesCount()} ------------------ {modelInfo.CarModel.ID} --- wrong matches {modelInfo.GetGroupsSorted()}{Environment.NewLine}");
          }
          sb.Append($"{Math.Round(100 * correctImages / allTestingImages, 2)}% {correctImages}/{allTestingImages}{Environment.NewLine}");
          sb.Append($"---------------------------------------------------------------{Environment.NewLine}");

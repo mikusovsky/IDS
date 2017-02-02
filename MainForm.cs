@@ -22,7 +22,8 @@ namespace IDS
 {
    public partial class MainForm : Form
    {
-      IClassificator Classificator = new SurfClassificator();
+      //IClassificator Classificator = new SurfClassificator();
+      IClassificator Classificator = new SiftClassificator();
       System.Windows.Forms.Timer _myTimer;
       Capture _capture;
 
@@ -982,7 +983,7 @@ namespace IDS
 
       private void ButtonLoadDb_Click(object sender, EventArgs e)
       {
-         Classificator.LoadDb();
+         Classificator.LoadDb(Deffinitions.DbType.TrainingNormalized);
          /*
          int noElements = 1000;
          int[] myArray = new int[noElements];
@@ -1017,69 +1018,51 @@ namespace IDS
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                Image<Bgr, byte> image = new Image<Bgr, byte>(new Bitmap(dlg.FileName));
-               Image<Gray, byte> newImage = Augumentation.GetPerspectiveTransform(
-                  Utils.ToGray(Utils.Resize(image, Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_WIDTH)),
-                  0, 10);
-               Utils.LogImage("Affined", newImage);
-               /*
-               CarModel mathecsModel = Classificator.Match(image);
+               CarModel mathecsModel = Classificator.Match(Utils.Resize(Utils.ToGray(Utils.ExtractMask3(image)), Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT));
                Console.WriteLine($"{mathecsModel.Maker} - {mathecsModel.Model} - {mathecsModel.Generation}");
-               */
             }
          }
+         /*
+         List<CarModel> allModels = Utils.GetAllCarModels(Deffinitions.DbType.Testing);
+         Utils.ProgressBarShow(allModels.Count);
+         int i = 0;
+         string path = $"D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\Output\\Images\\AllMask";
+         foreach (CarModel model in allModels)
+         {
+            foreach (string imgPath in model.ImagesPath)
+            {
+               using (Image<Bgr, byte> image = new Image<Bgr, byte>(new Bitmap(imgPath)))
+               using (Image<Bgr, byte> mask = Utils.ExtractMask3(image))
+               {
+                  if (!Directory.Exists(path))
+                  {
+                     Directory.CreateDirectory(path);
+                  }
+                  
+                  string filePath = $"{path}\\{Path.GetFileName(imgPath)}.png";
+
+                  mask.Bitmap.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
+               }
+            }
+            Console.WriteLine($"{i++} of {allModels.Count}");
+            Utils.ProgressBarIncrement();
+         }
+         Utils.ProgressBarHide();
+         */
       }
 
       private void ButtonNormalizeDb_Click(object sender, EventArgs e)
       {
-         Console.WriteLine("Normalizing");
-         Stopwatch watch = Stopwatch.StartNew();
-         List<CarModel> carModels = Utils.GetAllCarModels();
-         int imageId = 1;
-         Utils.ProgressBarShow(carModels.Count);
-         for (int i = 0; i < carModels.Count; i++)
-         {
-            CarModel carModel = carModels[i];
-            List<string> imagesPath = carModel.ImagesPath;
-            for (int j = 0; j < imagesPath.Count; j++)
-            {
-               string imagePath = imagesPath[j];
-               using (Image<Gray, byte> img = new Image<Gray, byte>(imagePath))
-               {
-                  string normalizedPath = Path.GetDirectoryName(imagePath)?.Replace("TrainingDb", "TrainingDbNormalized");
-                  string fileExtension = Path.GetExtension(imagePath);
-                  System.Drawing.Imaging.ImageFormat imageFormat = Utils.GetImageFormatFromFileExtension(fileExtension);
-
-                  List<Image<Gray, byte>> augumentedImages = new List<Image<Gray, byte>>();
-                  Image<Gray, byte> normalizedImage = Utils.Resize(img, Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT);
-                  augumentedImages.Add(normalizedImage);
-                  Augumentation.MakeAugumentation(ref augumentedImages);
-
-                  foreach (Image<Gray, byte> augumentedImage in augumentedImages)
-                  {
-                     string imageNameNormalized = $"{imageId++}_Normalized{fileExtension}";
-                     
-                     string normalizedImagePath = $"{normalizedPath}\\{imageNameNormalized}";
-
-                     if (!Directory.Exists(normalizedPath))
-                     {
-                        Directory.CreateDirectory(normalizedPath);
-                     }
-                     augumentedImage.Bitmap.Save(normalizedImagePath, imageFormat);
-                  }
-               }
-            }
-            Utils.ProgressBarIncrement();
-         }
-         Utils.ProgressBarHide();
-         watch.Stop();
-         Console.WriteLine($"Normalized finished - {watch.ElapsedMilliseconds}ms");
+         //Utils.NormalizeDb();
+         Utils.CreateBrandMaskDb();
       }
 
       private void ButtonTest_Click(object sender, EventArgs e)
       {
          IClassificator classificator;
          //classificator = new SurfClassificator();
-         classificator = new SiftClassificator();
+         //classificator = new SiftClassificator();
+         classificator = new ModelClassificator();
 
          Test test = new Test();
          test.Execute(classificator);

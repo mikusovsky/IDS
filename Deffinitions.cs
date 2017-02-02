@@ -1,4 +1,6 @@
-﻿namespace IDS.IDS
+﻿using System.ComponentModel;
+
+namespace IDS.IDS
 {
    public static class Deffinitions
    {
@@ -11,6 +13,15 @@
       public const string TRAINING_DB_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDb.xml";
       public const string TRAINING_DB_NORMALIZED_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbNormalized.xml";
       public const string TESTING_DB_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbTesting.xml";
+      public const string TESTING_MASK_DB_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbTestingMask.xml";
+      public const string TRAINING_DB_NORMALIZED_CONFIG_PATH_PODSKUPINA1 = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\Podskupina1.xml";
+      public const string TRAINING_DB_NORMALIZED_CONFIG_PATH_PODSKUPINA2 = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\Podskupina2.xml";
+
+      public const string TRAINING_DB_BRAND_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbBrand.xml";
+      public const string TRAINING_DB_AUDI_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbAudi.xml";
+      public const string TRAINING_DB_BMW_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbBMW.xml";
+      public const string TRAINING_DB_SKODA_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbSkoda.xml";
+      public const string TRAINING_DB_VOLKSWAGEN_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbVolkswagen.xml";
 
       public const int LOW_FRAME_WIDTH = 320;
 
@@ -22,11 +33,23 @@
       public const int NORMALIZE_MASK_WIDTH = 128;
       public const int NORMALIZE_MASK_HEIGHT = 128;
 
+
+      public const int MASK_WIDTH_FROM_FRAME = 170;
+      public const int MASK_HEIGHT_FROM_FRAME = 80;
+
       public enum DbType
       {
          Training = 1,
          TrainingNormalized = 2,
-         Testing = 3
+         Testing = 3,
+         TestingMask = 4,
+         Subset1 = 5,
+         Subset2 = 6,
+         TrainingBrand = 7,
+         TrainingAudi = 8,
+         TrainingBMW = 9,
+         TrainingSkoda = 10,
+         TrainingVolkswagen = 11,
       }
 
       public enum DescriptorType

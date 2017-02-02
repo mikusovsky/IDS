@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Emgu.CV;
@@ -17,11 +18,38 @@ namespace IDS.IDS.Classificator
       private Index m_index;
       private IntervalTree<CarModel, int> m_intervalTree;
       private Matrix<float> m_importanceMap;
+      private List<CarModel> m_classificationModels;
 
-      public void LoadDb()
+      private IClassificator m_subset1Classificator = new SurfClassificator();
+      private IClassificator m_subset2Classificator = new SurfClassificator();
+
+      private HashSet<CarModel> m_subset1;
+      private HashSet<CarModel> m_subset2;
+      private static Deffinitions.DbType m_dbType;
+
+      public Deffinitions.DbType DbType
       {
+         get { return m_dbType; }
+      }
+
+      public List<CarModel> ClassificationModels
+      {
+         get { return m_classificationModels; }
+      }
+
+      public void LoadDb(Deffinitions.DbType dbType = Deffinitions.DbType.TrainingNormalized)
+      {
+         m_dbType = dbType;
          m_importanceMap = null; //Utils.CreateImportanceMap();
-         m_dbDescs = _LoadDb(ref m_imap, m_importanceMap);
+         m_classificationModels = Utils.GetAllCarModels(dbType);
+         IList<Matrix<float>> dbDescsList = ComputeMultipleDescriptors(m_classificationModels, out m_imap, m_importanceMap);
+         m_dbDescs = ConcatDescriptors(dbDescsList);
+         foreach (Matrix<float> m in dbDescsList)
+         {
+            m.Dispose();
+         }
+         dbDescsList = null;
+         GC.Collect();
          // create FLANN index with 4 kd-trees and perform KNN search over it look for 2 nearest neighbours
          m_index = new Index(m_dbDescs, 4);
          if (m_imap != null)
@@ -33,20 +61,14 @@ namespace IDS.IDS.Classificator
                m_intervalTree.AddInterval(interval);
             }
          }
-      }
-
-      private Matrix<float> _LoadDb(ref IList<IndecesMapping> imap, Matrix<float> importanceMap = null)
-      {
-         List<CarModel> carModels = Utils.GetAllCarModels(Deffinitions.DbType.TrainingNormalized);
-         IList<Matrix<float>> dbDescsList = ComputeMultipleDescriptors(carModels, out imap, importanceMap);
-         Matrix<float> dbDesct = ConcatDescriptors(dbDescsList);
-         foreach (Matrix<float> m in dbDescsList)
-         {
-            m.Dispose();
-         }
-         dbDescsList = null;
-         GC.Collect();
-         return dbDesct;
+         
+         
+         m_subset1Classificator.LoadDb(Deffinitions.DbType.Subset1);
+         m_subset1 = new HashSet<CarModel>(m_subset1Classificator.ClassificationModels);
+         m_subset2Classificator.LoadDb(Deffinitions.DbType.Subset2);
+         m_subset2 = new HashSet<CarModel>(m_subset2Classificator.ClassificationModels);
+         
+         
       }
 
       /// <summary>
@@ -129,7 +151,7 @@ namespace IDS.IDS.Classificator
       /// <returns>The descriptors for the given image.</returns>
       public static Matrix<float> ComputeSingleDescriptors(string fileName, Matrix<float> importanceMap = null)
       {
-         return Cache.GetDescriptor(fileName, importanceMap, Deffinitions.DescriptorType.SIFT);
+         return Cache.GetDescriptor(fileName, importanceMap, Deffinitions.DescriptorType.SIFT, m_dbType);
       }
 
       public static VectorOfKeyPoint GetKeyPoints(Image<Gray, byte> image, Deffinitions.DescriptorType descriptorType)
@@ -149,17 +171,15 @@ namespace IDS.IDS.Classificator
 
       public CarModel Match(Image<Bgr, byte> image)
       {
-         Image<Bgr, byte> mask = Utils.ExtractMask2(image);
-         Image<Gray, byte> grayMask = Utils.ToGray(mask);
-         Utils.LogImage("grayMask mask", grayMask);
-         //grayMask._EqualizeHist();
-         //grayMask._GammaCorrect(2.5d);
-         Image<Gray, byte> normalisedGrayMask = Utils.Resize(/*Utils.ToGray(image)*/grayMask, Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT);
+         return Match(Utils.ToGray(image));
+      }
 
-         Matrix<float> queryDescriptors = ComputeSingleDescriptors(normalisedGrayMask, m_importanceMap);
-         Utils.LogImage("normalized mask", normalisedGrayMask);
-         CarModel mathecsModel = _FindMatches(m_index, queryDescriptors, ref m_imap, m_intervalTree);
-         return mathecsModel;
+      public CarModel Match(Image<Gray, byte> image)
+      {
+         Matrix<float> queryDescriptors = ComputeSingleDescriptors(image, m_importanceMap);
+         Utils.LogImage("normalized mask", image);
+         CarModel matchesModel = _FindMatches(m_index, queryDescriptors, ref m_imap, m_intervalTree);
+         return matchesModel;
       }
 
       /// <summary>
