@@ -88,7 +88,7 @@ namespace IDS
       private void _InitRoadPoints()
       {
          Point newPoint;
-
+         _isSetAllRoadParam = true;
          switch (_videoNumber)
          {
             case 1:
@@ -121,10 +121,7 @@ namespace IDS
                newPoint = new Point((int)(106 * _rate), (int)(144 * _rate));
                _roadPoints.Add(newPoint);
                break;
-            case 3:
-            case 4:
             case 5:
-            case 6:
                newPoint = new Point((int)(150 * _rate), (int)(47 * _rate));
                _roadPoints.Add(newPoint);
                newPoint = new Point((int)(203 * _rate), (int)(47 * _rate));
@@ -132,16 +129,6 @@ namespace IDS
                newPoint = new Point((int)(267 * _rate), (int)(205 * _rate));
                _roadPoints.Add(newPoint);
                newPoint = new Point((int)(87 * _rate), (int)(205 * _rate));
-               _roadPoints.Add(newPoint);
-               break;
-            case 7:
-               newPoint = new Point((int)(138 * _rate), (int)(48 * _rate));
-               _roadPoints.Add(newPoint);
-               newPoint = new Point((int)(180 * _rate), (int)(48 * _rate));
-               _roadPoints.Add(newPoint);
-               newPoint = new Point((int)(239 * _rate), (int)(205 * _rate));
-               _roadPoints.Add(newPoint);
-               newPoint = new Point((int)(81 * _rate), (int)(205 * _rate));
                _roadPoints.Add(newPoint);
                break;
             case 8:
@@ -152,16 +139,6 @@ namespace IDS
                newPoint = new Point((int)(255 * _rate), (int)(205 * _rate));
                _roadPoints.Add(newPoint);
                newPoint = new Point((int)(74 * _rate), (int)(205 * _rate));
-               _roadPoints.Add(newPoint);
-               break;
-            case 108:
-               newPoint = new Point((int)(159 * _rate), (int)(29 * _rate));
-               _roadPoints.Add(newPoint);
-               newPoint = new Point((int)(179 * _rate), (int)(29 * _rate));
-               _roadPoints.Add(newPoint);
-               newPoint = new Point((int)(223 * _rate), (int)(144 * _rate));
-               _roadPoints.Add(newPoint);
-               newPoint = new Point((int)(106 * _rate), (int)(144 * _rate));
                _roadPoints.Add(newPoint);
                break;
             case 50:
@@ -182,91 +159,6 @@ namespace IDS
                newPoint = new Point((int)(297 * _rate), (int)(220 * _rate));
                _roadPoints.Add(newPoint);
                newPoint = new Point((int)(72 * _rate), (int)(220 * _rate));
-               _roadPoints.Add(newPoint);
-               break;
-            case 9:
-               newPoint = new Point((int)(109 * _rate), (int)(122 * _rate));
-               _roadPoints.Add(newPoint);
-               newPoint = new Point((int)(163 * _rate), (int)(122 * _rate));
-               _roadPoints.Add(newPoint);
-               newPoint = new Point((int)(129 * _rate), (int)(205 * _rate));
-               _roadPoints.Add(newPoint);
-               newPoint = new Point((int)(5 * _rate), (int)(205 * _rate));
-               _roadPoints.Add(newPoint);
-               break;
-            case 90:
-               _numberOfLanesTextBox.Text = "1";
-               newPoint = new Point(159, 16);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(175, 16);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(193, 207);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(104, 207);
-               _roadPoints.Add(newPoint);
-               break;
-            case 91:
-               _numberOfLanesTextBox.Text = "1";
-               newPoint = new Point(159, 16);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(173, 16);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(196, 207);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(108, 207);
-               _roadPoints.Add(newPoint);
-               break;
-            case 92:
-               _numberOfLanesTextBox.Text = "1";
-               newPoint = new Point(178, 25);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(195, 25);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(203, 207);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(121, 207);
-               _roadPoints.Add(newPoint);
-               break;
-            case 93:
-               _numberOfLanesTextBox.Text = "1";
-               newPoint = new Point(163, 16);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(177, 16);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(198, 207);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(114, 207);
-               _roadPoints.Add(newPoint);
-               break;
-            case 94:
-               _numberOfLanesTextBox.Text = "1";
-               newPoint = new Point(159, 16);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(175, 16);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(193, 207);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(104, 207);
-               _roadPoints.Add(newPoint);
-               break;
-            case 200:
-               newPoint = new Point((int)(140 * _rate), (int)(65 * _rate));
-               _roadPoints.Add(newPoint);
-               newPoint = new Point((int)(189 * _rate), (int)(65 * _rate));
-               _roadPoints.Add(newPoint);
-               newPoint = new Point((int)(250 * _rate), (int)(206 * _rate));
-               _roadPoints.Add(newPoint);
-               newPoint = new Point((int)(85 * _rate), (int)(206 * _rate));
-               _roadPoints.Add(newPoint);
-               break;
-            case 201:
-               newPoint = new Point(120, 44);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(178, 44);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(264, 221);
-               _roadPoints.Add(newPoint);
-               newPoint = new Point(61, 221);
                _roadPoints.Add(newPoint);
                break;
             case 1047:
@@ -310,6 +202,7 @@ namespace IDS
                _roadPoints.Add(newPoint);
                newPoint = new Point((int)(0.1 * _image.Width), (int)(_image.Height - (0.1 * _image.Height)));
                _roadPoints.Add(newPoint);
+               _isSetAllRoadParam = false;
                break;
          }
       }
@@ -318,7 +211,6 @@ namespace IDS
       private void _InitRoadDistancePoints()
       {
          Point newPoint;
-
          switch (_videoNumber)
          {
             case 1:
@@ -342,20 +234,10 @@ namespace IDS
                _roadDistancePoints.Add(newPoint);
                _realDistanceTextBox.Text = "10";
                break;
-            case 3:
-            case 4:
             case 5:
-            case 6:
                newPoint = new Point((int)(171 * _rate), (int)(98 * _rate));
                _roadDistancePoints.Add(newPoint);
                newPoint = new Point((int)(170 * _rate), (int)(154 * _rate));
-               _roadDistancePoints.Add(newPoint);
-               _realDistanceTextBox.Text = "10";
-               break;
-            case 7:
-               newPoint = new Point((int)(160 * _rate), (int)(107 * _rate));
-               _roadDistancePoints.Add(newPoint);
-               newPoint = new Point((int)(161 * _rate), (int)(166 * _rate));
                _roadDistancePoints.Add(newPoint);
                _realDistanceTextBox.Text = "10";
                break;
@@ -365,20 +247,6 @@ namespace IDS
                newPoint = new Point((int)(169 * _rate), (int)(142 * _rate));
                _roadDistancePoints.Add(newPoint);
                _realDistanceTextBox.Text = "10";
-               break;
-            case 108:
-               newPoint = new Point((int)(163 * _rate), (int)(49 * _rate));
-               _roadDistancePoints.Add(newPoint);
-               newPoint = new Point((int)(164 * _rate), (int)(67 * _rate));
-               _roadDistancePoints.Add(newPoint);
-               _realDistanceTextBox.Text = "10";
-               break;
-            case 9:
-               newPoint = new Point(83, 176);
-               _roadDistancePoints.Add(newPoint);
-               newPoint = new Point(69, 194);
-               _roadDistancePoints.Add(newPoint);
-               _realDistanceTextBox.Text = "6";
                break;
             case 50:
                newPoint = new Point(128, 117);
@@ -393,55 +261,6 @@ namespace IDS
                newPoint = new Point(171, 182);
                _roadDistancePoints.Add(newPoint);
                _realDistanceTextBox.Text = "4.5";
-               break;
-            case 90:
-               newPoint = new Point(176, 103);
-               _roadDistancePoints.Add(newPoint);
-               newPoint = new Point(180, 138);
-               _roadDistancePoints.Add(newPoint);
-               _realDistanceTextBox.Text = "6.3";
-               break;
-            case 91:
-               newPoint = new Point(179, 103);
-               _roadDistancePoints.Add(newPoint);
-               newPoint = new Point(183, 137);
-               _roadDistancePoints.Add(newPoint);
-               _realDistanceTextBox.Text = "6.3";
-               break;
-            case 92:
-               newPoint = new Point(203, 132);
-               _roadDistancePoints.Add(newPoint);
-               newPoint = new Point(205, 185);
-               _roadDistancePoints.Add(newPoint);
-               _realDistanceTextBox.Text = "6.3";
-               break;
-            case 93:
-               newPoint = new Point(183, 107);
-               _roadDistancePoints.Add(newPoint);
-               newPoint = new Point(187, 140);
-               _roadDistancePoints.Add(newPoint);
-               _realDistanceTextBox.Text = "6.3";
-               break;
-            case 94:
-               newPoint = new Point(179, 103);
-               _roadDistancePoints.Add(newPoint);
-               newPoint = new Point(183, 137);
-               _roadDistancePoints.Add(newPoint);
-               _realDistanceTextBox.Text = "6.3";
-               break;
-            case 200:
-               newPoint = new Point((int)(162 * _rate), (int)(108 * _rate));
-               _roadDistancePoints.Add(newPoint);
-               newPoint = new Point((int)(161 * _rate), (int)(165 * _rate));
-               _roadDistancePoints.Add(newPoint);
-               _realDistanceTextBox.Text = "10";
-               break;
-            case 201:
-               newPoint = new Point(83, 176);
-               _roadDistancePoints.Add(newPoint);
-               newPoint = new Point(69, 194);
-               _roadDistancePoints.Add(newPoint);
-               _realDistanceTextBox.Text = "6";
                break;
             case 1047:
             case 1048:
@@ -477,6 +296,7 @@ namespace IDS
                _roadDistancePoints.Add(newPoint);
                newPoint = new Point(20, _image.Height - 20);
                _roadDistancePoints.Add(newPoint);
+               _isSetAllRoadParam = false;
                break;
          }
       }
