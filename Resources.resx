@@ -144,6 +144,9 @@
   <data name="LoadVideo" xml:space="preserve">
     <value>Load video</value>
   </data>
+  <data name="LoadVideos" xml:space="preserve">
+    <value>Load videos</value>
+  </data>
   <data name="Lorries" xml:space="preserve">
     <value>Lorries</value>
   </data>

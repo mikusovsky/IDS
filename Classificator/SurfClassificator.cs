@@ -161,12 +161,12 @@ namespace IDS.IDS.Classificator
          return Cache.GetDescriptor(image, importanceMap, Deffinitions.DescriptorType.SURF);
       }
 
-      public CarModel Match(Image<Bgr, byte> image)
+      public CarModel Match(Image<Bgr, byte> image, bool? onlyCarMaker = null)
       {
          return Match(Utils.ToGray(image));
       }
 
-      public CarModel Match(Image<Gray, byte> image)
+      public CarModel Match(Image<Gray, byte> image, bool? onlyCarMaker = null)
       {
          Matrix<float> queryDescriptors = ComputeSingleDescriptors(image, m_importanceMap);
          Utils.LogImage("tested Image", image);

@@ -13,6 +13,10 @@ namespace IDS.IDS
       public const string TRAINING_DB_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDb.xml";
       public const string TRAINING_DB_NORMALIZED_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbNormalized.xml";
       public const string TESTING_DB_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbTesting.xml";
+      public const string TESTING_DB_FOR_BRAND_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbTestingForBrand.xml";
+      public const string TESTING_DB_FOR_BRAND_NORMALIZED_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbTestingForBrandNormalized.xml";
+      public const string TESTING_DB_BRAND_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbTestingBrand.xml";
+      public const string TESTING_DB_BRAND_MASK_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbTestingBrandMask.xml";
       public const string TESTING_MASK_DB_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbTestingMask.xml";
       public const string TRAINING_DB_NORMALIZED_CONFIG_PATH_PODSKUPINA1 = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\Podskupina1.xml";
       public const string TRAINING_DB_NORMALIZED_CONFIG_PATH_PODSKUPINA2 = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\Podskupina2.xml";
@@ -50,6 +54,10 @@ namespace IDS.IDS
          TrainingBMW = 9,
          TrainingSkoda = 10,
          TrainingVolkswagen = 11,
+         TestingBrand = 12,
+         TrainingDbForBrand = 13,
+         TrainingDbForBrandNormalized = 14,
+         TestingBrandMask = 15
       }
 
       public enum DescriptorType

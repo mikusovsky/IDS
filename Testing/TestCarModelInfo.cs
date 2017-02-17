@@ -53,6 +53,16 @@ namespace IDS.IDS.Testing
          return count;
       }
 
+      public double GetCorrectMakersMatchesCount()
+      {
+         var result = from model in m_matches
+                      where model.Maker == CarModel.Maker
+                      select model;
+
+         double count = Convert.ToDouble(result.Count());
+         return count;
+      }
+
       public double GetMatchesCount()
       {
          return m_matches.Count;

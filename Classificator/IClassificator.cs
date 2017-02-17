@@ -10,7 +10,7 @@ namespace IDS.IDS.Classificator
       List<CarModel> ClassificationModels { get; }
 
       void LoadDb(Deffinitions.DbType dbType);
-      CarModel Match(Image<Bgr, byte> image);
-      CarModel Match(Image<Gray, byte> image);
+      CarModel Match(Image<Bgr, byte> image, bool? onlyCarMaker = null);
+      CarModel Match(Image<Gray, byte> image, bool? onlyCarMaker = null);
    }
 }

@@ -201,7 +201,7 @@ namespace IDS.IDS
             }
          }
          Image<Bgr, byte> retImg = CropImage(image, minX, shadowPos - height, width, height);
-         //Utils.LogImage("mask", retImg);
+         Utils.LogImage("mask", retImg);
          return retImg;
       }
 
@@ -747,6 +747,10 @@ namespace IDS.IDS
                configPath = Deffinitions.TESTING_DB_CONFIG_PATH;
                break;
 
+            case Deffinitions.DbType.TestingBrand:
+               configPath = Deffinitions.TESTING_DB_BRAND_CONFIG_PATH;
+               break;
+
             case Deffinitions.DbType.TestingMask:
                configPath = Deffinitions.TESTING_MASK_DB_CONFIG_PATH;
                break;
@@ -777,6 +781,18 @@ namespace IDS.IDS
 
             case Deffinitions.DbType.TrainingVolkswagen:
                configPath = Deffinitions.TRAINING_DB_VOLKSWAGEN_CONFIG_PATH;
+               break;
+               
+            case Deffinitions.DbType.TrainingDbForBrand:
+               configPath = Deffinitions.TESTING_DB_FOR_BRAND_CONFIG_PATH;
+               break;
+
+            case Deffinitions.DbType.TrainingDbForBrandNormalized:
+               configPath = Deffinitions.TESTING_DB_FOR_BRAND_NORMALIZED_CONFIG_PATH;
+               break;
+
+            case Deffinitions.DbType.TestingBrandMask:
+               configPath = Deffinitions.TESTING_DB_BRAND_MASK_CONFIG_PATH;
                break;
 
             default:
@@ -817,6 +833,12 @@ namespace IDS.IDS
       public static Matrix<float> GetModelAvarageMap(CarModel carModel)
       {
          return Cache.GetModelAvarageMap(carModel);
+      }
+      public static void AdaptiveBrightnes(Image<Gray, byte> image)
+      {
+         CvInvoke.cvAdaptiveThreshold(image, image, 255,
+            Emgu.CV.CvEnum.ADAPTIVE_THRESHOLD_TYPE.CV_ADAPTIVE_THRESH_MEAN_C,
+            Emgu.CV.CvEnum.THRESH.CV_THRESH_BINARY_INV, 5, 5);
       }
 
       public static Matrix<float> CreateImportanceMap()
@@ -923,11 +945,11 @@ namespace IDS.IDS
          }
       }
 
-      public static void NormalizeDb()
+      public static void NormalizeDb(Deffinitions.DbType dbType)
       {
          Console.WriteLine("Normalizing");
          Stopwatch watch = Stopwatch.StartNew();
-         List<CarModel> carModels = Utils.GetAllCarModels();
+         List<CarModel> carModels = Utils.GetAllCarModels(dbType);
          int imageId = 1;
          Utils.ProgressBarShow(carModels.Count);
          for (int i = 0; i < carModels.Count; i++)
@@ -939,12 +961,12 @@ namespace IDS.IDS
                string imagePath = imagesPath[j];
                using (Image<Gray, byte> img = new Image<Gray, byte>(imagePath))
                {
-                  string normalizedPath = Path.GetDirectoryName(imagePath)?.Replace("TrainingDb", "TrainingDbNormalized");
+                  string normalizedPath = Path.GetDirectoryName(imagePath)?.Replace("TrainingDbForBrand", "TrainingDbForBrandNormalized");
                   string fileExtension = Path.GetExtension(imagePath);
-                  System.Drawing.Imaging.ImageFormat imageFormat = Utils.GetImageFormatFromFileExtension(fileExtension);
+                  ImageFormat imageFormat = GetImageFormatFromFileExtension(fileExtension);
 
                   List<Image<Gray, byte>> augumentedImages = new List<Image<Gray, byte>>();
-                  Image<Gray, byte> normalizedImage = Utils.Resize(img, Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT);
+                  Image<Gray, byte> normalizedImage = Resize(img, Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT);
                   augumentedImages.Add(normalizedImage);
                   Augumentation.MakeAugumentation(ref augumentedImages);
 
@@ -958,13 +980,13 @@ namespace IDS.IDS
                      {
                         Directory.CreateDirectory(normalizedPath);
                      }
-                     augumentedImage.Bitmap.Save(normalizedImagePath, imageFormat);
+                     SaveImage(augumentedImage, normalizedImagePath, imageFormat);
                   }
                }
             }
-            Utils.ProgressBarIncrement();
+            ProgressBarIncrement();
          }
-         Utils.ProgressBarHide();
+         ProgressBarHide();
          watch.Stop();
          Console.WriteLine($"Normalized finished - {watch.ElapsedMilliseconds}ms");
       }
@@ -973,8 +995,8 @@ namespace IDS.IDS
       {
          Console.WriteLine("Create brand db");
          Stopwatch watch = Stopwatch.StartNew();
-         List<CarModel> carModels = Utils.GetAllCarModels(Deffinitions.DbType.TrainingNormalized);
-         string dbPath = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\Database\\TrainingBrand";
+         List<CarModel> carModels = Utils.GetAllCarModels(Deffinitions.DbType.TrainingDbForBrandNormalized);
+         string dbPath = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\Database\\TrainingDbBrand";
          var groups = carModels.GroupBy(o => o.Maker);
          int imageId = 1;
          Utils.ProgressBarShow(carModels.Count);
@@ -982,17 +1004,19 @@ namespace IDS.IDS
          {
             foreach (CarModel model in maker)
             {
-               string modelDbPath = $"{dbPath}\\{model.Maker}";
+               string modelDbPath = $"{dbPath}\\{model.Maker}\\1\\1";
                foreach (string imageSrc in model.ImagesPath)
                {
                   using (Image<Gray, byte> img = new Image<Gray, byte>(imageSrc))
-                  using (Image<Gray, byte> roi = CropImage(img, 30, 15, 70, 55))
+                  using (Image<Gray, byte> roi1 = CropImage(img, 30, 15, 70, 55))
+                  using (Image<Gray, byte> roi2 = CropImage(img, 30, 20, 70, 55))
                   {
                      if (!Directory.Exists(modelDbPath))
                      {
                         Directory.CreateDirectory(modelDbPath);
                      }
-                     roi.Bitmap.Save($"{modelDbPath}\\{imageId++}.jpg", ImageFormat.Jpeg);
+                     roi1.Bitmap.Save($"{modelDbPath}\\{imageId++}.jpg", ImageFormat.Jpeg);
+                     roi2.Bitmap.Save($"{modelDbPath}\\{imageId++}.jpg", ImageFormat.Jpeg);
                   }
                }
                ProgressBarIncrement();
@@ -1001,6 +1025,20 @@ namespace IDS.IDS
          ProgressBarHide();
          watch.Stop();
          Console.WriteLine($"Create brand db - {watch.ElapsedMilliseconds}ms");
+      }
+
+      public static void SaveImage(Image<Gray, byte> img, string imgName, ImageFormat format)
+      {
+         if (img == null || img.Bitmap == null)
+         {
+            return;
+         }
+         string directory = Path.GetDirectoryName(imgName);
+         if (!Directory.Exists(directory))
+         {
+            Directory.CreateDirectory(directory);
+         }
+         img.Bitmap.Save(imgName, format);
       }
 
       public static Deffinitions.DbType GetDbTypeForMakerString(string strMaker)

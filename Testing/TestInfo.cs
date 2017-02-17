@@ -7,6 +7,13 @@ namespace IDS.IDS.Testing
 {
    public class TestInfo
    {
+      private bool m_onlyMakersCheck;
+
+      public TestInfo(bool onlyMakers)
+      {
+         m_onlyMakersCheck = onlyMakers;
+      }
+
       Dictionary<string, TestCarModelInfo> m_testInfo = new Dictionary<string, TestCarModelInfo>(); 
 
       public void AddCouple(CarModel model, CarModel findModel)
@@ -27,9 +34,12 @@ namespace IDS.IDS.Testing
          sb.Append($"-------------------- {localDate.ToString(new CultureInfo("ru-RU"))} --------------------{Environment.NewLine}");
          foreach (TestCarModelInfo modelInfo in m_testInfo.Values)
          {
-            allTestingImages += modelInfo.GetMatchesCount();
-            correctImages += modelInfo.GetCorrectMatchCount();
-            sb.Append($"{modelInfo.GetPercentage()}% {modelInfo.GetCorrectMatchCount()}/{modelInfo.GetMatchesCount()} ------------------ {modelInfo.CarModel.ID} --- wrong matches {modelInfo.GetGroupsSorted()}{Environment.NewLine}");
+            double allTesting = modelInfo.GetMatchesCount();
+            double correctMatches = m_onlyMakersCheck ? modelInfo.GetCorrectMakersMatchesCount() : modelInfo.GetCorrectMatchCount();
+            string carDescription = m_onlyMakersCheck ? modelInfo.CarModel.Maker : modelInfo.CarModel.ID;
+            allTestingImages += allTesting;
+            correctImages += correctMatches;
+            sb.Append($"{100 * correctMatches / allTesting}% {correctMatches}/{allTesting} ------------------ {carDescription} --- wrong matches {modelInfo.GetGroupsSorted()}{Environment.NewLine}");
          }
          sb.Append($"{Math.Round(100 * correctImages / allTestingImages, 2)}% {correctImages}/{allTestingImages}{Environment.NewLine}");
          sb.Append($"---------------------------------------------------------------{Environment.NewLine}");

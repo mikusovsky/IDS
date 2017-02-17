@@ -106,8 +106,10 @@ namespace IDS
          Matrix<float> tmp = PerspectiveTransform.PerspectiveTransformPoint(CountBB.X, CountBB.Y, matrix);
          Point tmpLT = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
 
+         /*
          tmp = PerspectiveTransform.PerspectiveTransformPoint(CountBB.X + CountBB.Width, CountBB.Y, matrix);
          Point tmpRT = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
+         */
 
          tmp = PerspectiveTransform.PerspectiveTransformPoint(CountBB.X, CountBB.Y + CountBB.Height, matrix);
          Point tmpLB = new Point((int)Math.Round(tmp[0, 0]), (int)Math.Round(tmp[0, 1]));
@@ -160,24 +162,23 @@ namespace IDS
       {
          _carPhoto = new Image<Bgr, byte>(frame.Size);
          CvInvoke.cvCopy(frame, _carPhoto, IntPtr.Zero);
-         int minX = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P1.X) - (5 * hdRatio))); // +10 pixels
+         int minX = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P1.X) - hdRatio)); 
          int minY = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P1.Y) - (hdRatio)));
          int width = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P2.X - P1.X) + (hdRatio)));
-         int height = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P2.Y - P1.Y) + (5 * hdRatio)));
+         int height = Convert.ToInt32(Math.Round(hdRatio * Convert.ToDouble(P2.Y - P1.Y) + hdRatio));
          Rectangle rect = new Rectangle(minX, minY, width, height);
          _carPhoto.ROI = rect;
          //CvInvoke.cvShowImage("carPhoto", _carPhoto);
       }
 
-      public void GetCarType()
+      public void ClassifiCar()
       {
-         _carMask = Utils.ExtractMask3(_carPhoto);
-         CvInvoke.cvShowImage("carPhoto", _carMask);
+         //_carMask = Utils.ExtractMask3(_carPhoto);
+         //CvInvoke.cvShowImage("carPhoto", _carMask);
       }
 
       public Image<Bgr, Byte> GetCarPhoto()
       {
-         /*
          string path = $"D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\Output\\Images\\{Path.GetFileName(Utils.CurentVideoPath).Split('.')[0]}";
          if (!Directory.Exists(path))
          {
@@ -186,7 +187,6 @@ namespace IDS
          string filePath = $"{path}\\{DateTime.Now.ToString(@"MMddyyyy_h_mm_tt_")}{Utils.RandomString(3)}.png";
 
          _carPhoto.Bitmap.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
-         */
          return _carPhoto;
       }
    }

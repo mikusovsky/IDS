@@ -8,6 +8,7 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.VideoSurveillance;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using CppWrapper;
 using Emgu.CV.Flann;
 using Emgu.CV.Util;
@@ -55,19 +56,19 @@ namespace IDS
       MCvGaussBGStatModelParams _mogParams;
       BGStatModel<Bgr> _bgModel;
 
-      bool _startFrameCapture;
-      bool _initializedVariables = false;
-      bool _createBackgroundImage;
-      bool _showTmpImages;
-      bool _isDayScene;
-      bool _firstFrame;
-      bool _paused;
+      private bool _startFrameCapture;
+      private bool _initializedVariables = false;
+      private bool _createBackgroundImage;
+      private bool _showTmpImages;
+      private bool _isDayScene;
+      private bool _firstFrame;
+      private bool _paused;
 
-      int _frameNumber;
-      int _minYTracking;
-      int _maxYTracking;
-      int _learningTime;
-      int _mergeDistance;
+      private int _frameNumber;
+      private int _minYTracking;
+      private int _maxYTracking;
+      private int _learningTime;
+      private int _mergeDistance;
 
       List<Rectangle> _boundingBoxes;
       BackgroundSubstractorMOG2 _mogDetector;
@@ -110,7 +111,7 @@ namespace IDS
       }
 
       //inicializacia premennych
-      private void _SetStartInitVariables()
+      private void _SetStartInitVariables(bool notifyEndVideo, bool realTimeSpeed)
       {
          if (!_initializedVariables)
          {
@@ -119,10 +120,10 @@ namespace IDS
          }
 
          //ConsoleText.Text = "sirka pruhu: " + maxWidthOfRoadLane.ToString();
-         _myTimer.Interval = 1000 / FPS;
+         _myTimer.Interval = realTimeSpeed ? 1000 / FPS : 1;
          //My_Timer.Interval = 1;
-
-         _myTimer.Tick += new EventHandler(_MyTimerTick);
+         _myTimer.Tag = notifyEndVideo;
+         _myTimer.Tick += _MyTimerTick;
          _myTimer.Start();
 
          _paused = false;
@@ -258,6 +259,7 @@ namespace IDS
       //hlavna metoda na spracovanie kazdeho framu
       private void _MyTimerTick(object sender, EventArgs e)
       {
+         bool notifyEndVideos = (bool) ((Timer)sender).Tag;
          _sw = Stopwatch.StartNew();
 
          _frameHD = _capture.QueryFrame();
@@ -266,9 +268,9 @@ namespace IDS
          {
             //_frame = _frameHD;
 
+            Utils.HdToLow(_frameHD, ref _frameLow);
             if (_startFrameCapture)
             {
-               Utils.HdToLow(_frameHD, ref _frameLow);
                _hdRatio = Convert.ToDouble(_frameHD.Height) / Convert.ToDouble(_frameLow.Height);
                //_GetRoadHdFromFrame(_frameHD, ref _frameRoadHD, _roadRange);
                //_HdToLow(_frameRoadHD, ref _frameRoadLow, Enums.TypeOfRatio.Road);
@@ -276,7 +278,6 @@ namespace IDS
                return;
             }
 
-            Utils.HdToLow(_frameHD, ref _frameLow);
             //_GetRoadHdFromFrame(_frameHD, ref _frameRoadHD, _roadRange);
             //_HdToLow(_frameRoadHD, ref _frameRoadLow, Enums.TypeOfRatio.None);
             if (_isDayScene)
@@ -305,8 +306,12 @@ namespace IDS
          else
          {
             _myTimer.Stop();
-            MessageBox.Show("Koniec videa");
-            OpenFileButton.Enabled = true;
+            if (notifyEndVideos)
+            {
+               MessageBox.Show("Koniec videa");
+               OpenFileButton.Enabled = true;
+            }
+            _myTimer = null;
          }
       }
 
@@ -410,7 +415,7 @@ namespace IDS
                   infoVehicleList.Add(v.Speed.ToString());
                   infoVehicleList.Add(string.Empty);
 
-                  v.GetCarType();
+                  v.ClassifiCar();
                   CarInfoViewImageList.Images.Add(v.GetCarPhoto().Bitmap);
                   CarInfoView.Items.Add(new ListViewItem(infoVehicleList.ToArray(), CarInfoViewImageList.Images.Count - 1));
                   CarInfoView.Items[CarInfoView.Items.Count - 1].EnsureVisible();
@@ -809,30 +814,19 @@ namespace IDS
          //return BB;
       }
 
-      //otvorenie a nacitanie videa 
-      private void _LoadVideoButton_Click(object sender, EventArgs e)
+      private void _PlayLoadVideo(string path, bool notifyEndVideo = true, bool realTimeSpeed = true)
       {
-         OpenFileDialog.Filter = "Media Files|*.avi;*.mp4;*.MOV";
-         OpenFileDialog.FileName = "";
-         //initializedVariables = false;
-         if (OpenFileDialog.ShowDialog() == DialogResult.OK)
+         try
          {
-            try
-            {
-               Utils.CurentVideoPath = OpenFileDialog.FileName;
-               _capture = null;
-               _capture = new Capture(OpenFileDialog.FileName);
-               FPS = (int)_capture.GetCaptureProperty(Emgu.CV.CvEnum.CAP_PROP.CV_CAP_PROP_FPS);
-               _initializedVariables = false;
-            }
-            catch (NullReferenceException excpt)
-            {
-               MessageBox.Show(excpt.Message);
-            }
+            Utils.CurentVideoPath = path;
+            _capture = null;
+            _capture = new Capture(path);
+            FPS = (int)_capture.GetCaptureProperty(Emgu.CV.CvEnum.CAP_PROP.CV_CAP_PROP_FPS);
+            _initializedVariables = false;
          }
-         else
+         catch (NullReferenceException excpt)
          {
-            return;
+            MessageBox.Show(excpt.Message);
          }
 
 
@@ -861,9 +855,10 @@ namespace IDS
             Utils.HdToLow(_frameHD, ref _frameLow);
             _hdRatio = Convert.ToDouble(_frameHD.Height) / Convert.ToDouble(_frameLow.Height);
 
-            string onlyfilename = OpenFileDialog.SafeFileName;
+            string onlyfilename = Path.GetFileName(path);
             RoadParamForm roadParam = new RoadParamForm(_frameLow, onlyfilename);
 
+            roadParam.CloseIfIsSetAllParameters();
             roadParam.ShowDialog();
 
             if (roadParam.IsSetAllRoadParam)
@@ -874,14 +869,51 @@ namespace IDS
                RealDistance = roadParam.GetRealDistance();
                _roadLanes = roadParam.CreateRoadLanes();
 
+               Console.Write($"newPoint = new Point({_roadPoints[0].X}, {_roadPoints[0].Y});{Environment.NewLine}_roadPoints.Add(newPoint);{Environment.NewLine}newPoint = new Point({_roadPoints[1].X}, {_roadPoints[1].Y});{Environment.NewLine}_roadPoints.Add(newPoint);{Environment.NewLine}newPoint = new Point({_roadPoints[2].X}, {_roadPoints[2].Y});{Environment.NewLine}_roadPoints.Add(newPoint);{Environment.NewLine}newPoint = new Point({_roadPoints[3].X}, {_roadPoints[3].Y});{Environment.NewLine}_roadPoints.Add(newPoint);{Environment.NewLine}_numberOfRoadLanes = 2; ");
+               Console.WriteLine();
+               Console.WriteLine();
+               Console.WriteLine($"newPoint = new Point({_roadDistancePoints[0].X}, {_roadDistancePoints[0].Y});{Environment.NewLine}_roadDistancePoints.Add(newPoint);{Environment.NewLine}newPoint = new Point({_roadDistancePoints[1].X}, {_roadDistancePoints[1].Y});{Environment.NewLine}_roadDistancePoints.Add(newPoint);{Environment.NewLine}_realDistanceTextBox.Text = \"{RealDistance}\";");
                _roadRange.Clear();
                _roadRange.AddToRange(_roadPoints);
                //_GetRoadHdFromFrame(_frameHD, ref _frameRoadHD, _roadRange);
                //_HdToLow(_frameRoadHD, ref _frameRoadLow, Enums.TypeOfRatio.Road);
 
-               _SetStartInitVariables();
+               _SetStartInitVariables(notifyEndVideo, realTimeSpeed);
                _CreateStatisticLabels();
             }
+         }
+      }
+
+      //otvorenie a nacitanie videa 
+      private void _LoadVideoButton_Click(object sender, EventArgs e)
+      {
+         OpenFileDialog.Multiselect = false;
+         OpenFileDialog.Filter = "Media Files|*.avi;*.mp4;*.MOV";
+         OpenFileDialog.FileName = "";
+         //initializedVariables = false;
+         if (OpenFileDialog.ShowDialog() != DialogResult.OK)
+         {
+            return;
+         }
+         _PlayLoadVideo(OpenFileDialog.FileName);
+      }
+      private async void _LoadVideosButtonClick(object sender, EventArgs e)
+      {
+         OpenFileDialog.Multiselect = true;
+         OpenFileDialog.Filter = "Media Files|*.avi;*.mp4;*.MOV";
+         OpenFileDialog.FileName = "";
+         if (OpenFileDialog.ShowDialog() != DialogResult.OK)
+         {
+            return;
+         }
+         foreach (string path in OpenFileDialog.FileNames)
+         {
+            _PlayLoadVideo(path, false);
+            while (_myTimer != null)
+            {
+               await Task.Delay(100);
+            }
+            _initializedVariables = false;
          }
       }
 
@@ -1022,38 +1054,11 @@ namespace IDS
                Console.WriteLine($"{mathecsModel.Maker} - {mathecsModel.Model} - {mathecsModel.Generation}");
             }
          }
-         /*
-         List<CarModel> allModels = Utils.GetAllCarModels(Deffinitions.DbType.Testing);
-         Utils.ProgressBarShow(allModels.Count);
-         int i = 0;
-         string path = $"D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\Output\\Images\\AllMask";
-         foreach (CarModel model in allModels)
-         {
-            foreach (string imgPath in model.ImagesPath)
-            {
-               using (Image<Bgr, byte> image = new Image<Bgr, byte>(new Bitmap(imgPath)))
-               using (Image<Bgr, byte> mask = Utils.ExtractMask3(image))
-               {
-                  if (!Directory.Exists(path))
-                  {
-                     Directory.CreateDirectory(path);
-                  }
-                  
-                  string filePath = $"{path}\\{Path.GetFileName(imgPath)}.png";
-
-                  mask.Bitmap.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
-               }
-            }
-            Console.WriteLine($"{i++} of {allModels.Count}");
-            Utils.ProgressBarIncrement();
-         }
-         Utils.ProgressBarHide();
-         */
       }
 
       private void ButtonNormalizeDb_Click(object sender, EventArgs e)
       {
-         //Utils.NormalizeDb();
+         Utils.NormalizeDb(Deffinitions.DbType.TrainingDbForBrand);
          Utils.CreateBrandMaskDb();
       }
 
@@ -1065,7 +1070,7 @@ namespace IDS
          classificator = new ModelClassificator();
 
          Test test = new Test();
-         test.Execute(classificator);
+         test.Execute(classificator, Deffinitions.DbType.Testing, false);
       }
    }
 }

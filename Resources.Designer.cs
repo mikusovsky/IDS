@@ -142,6 +142,15 @@ namespace IDS.IDS {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Load videos.
+        /// </summary>
+        internal static string LoadVideos {
+            get {
+                return ResourceManager.GetString("LoadVideos", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Lorries.
         /// </summary>
         internal static string Lorries {

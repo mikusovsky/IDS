@@ -62,12 +62,12 @@ namespace IDS.IDS.Classificator
             }
          }
          
-         
+         /*
          m_subset1Classificator.LoadDb(Deffinitions.DbType.Subset1);
          m_subset1 = new HashSet<CarModel>(m_subset1Classificator.ClassificationModels);
          m_subset2Classificator.LoadDb(Deffinitions.DbType.Subset2);
          m_subset2 = new HashSet<CarModel>(m_subset2Classificator.ClassificationModels);
-         
+         */
          
       }
 
@@ -169,12 +169,12 @@ namespace IDS.IDS.Classificator
          return Cache.GetDescriptor(image, importanceMap, Deffinitions.DescriptorType.SIFT);
       }
 
-      public CarModel Match(Image<Bgr, byte> image)
+      public CarModel Match(Image<Bgr, byte> image, bool? onlyCarMaker = null)
       {
          return Match(Utils.ToGray(image));
       }
 
-      public CarModel Match(Image<Gray, byte> image)
+      public CarModel Match(Image<Gray, byte> image, bool? onlyCarMaker = null)
       {
          Matrix<float> queryDescriptors = ComputeSingleDescriptors(image, m_importanceMap);
          Utils.LogImage("normalized mask", image);
@@ -191,6 +191,10 @@ namespace IDS.IDS.Classificator
       private CarModel _FindMatches(Index index, Matrix<float> queryDescriptors, ref IList<IndecesMapping> imap,
          IntervalTree<CarModel, int> carModelsInMatrix)
       {
+         if (queryDescriptors == null)
+         {
+            return null;
+         }
          Matrix<int> indices = new Matrix<int>(queryDescriptors.Rows, 2); // matrix that will contain indices of the 2-nearest neighbors found
          Matrix<float> dists = new Matrix<float>(queryDescriptors.Rows, 2); // matrix that will contain distances to the 2-nearest neighbors found
 

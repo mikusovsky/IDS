@@ -59,6 +59,7 @@ namespace IDS.IDS.DataAugmentation
             //images.Add(img.SmoothGaussian(1, 3, 34.3, 45.3));
             images.Add(img.SmoothGaussian(1, 5, 34.3, 45.3));
             images.Add(img.SmoothGaussian(1, 7, 34.3, 45.3));
+            images.Add(img.SmoothGaussian(1, 9, 34.3, 45.3)); // TODO for brand recognition
             /*
             images.Add(ImageBlur(img, 7, 7));
             images.Add(ImageBlur(img, 11, 11));
