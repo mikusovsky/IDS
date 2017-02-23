@@ -1,16 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Emgu.CV;
-using Emgu.CV.Structure;
+using IDS.IDS.IntervalTree;
 
 namespace IDS.IDS.Classificator
 {
    public interface IClassificator
    {
-      List<CarModel> ClassificationModels { get; }
-
-      void LoadDb(Deffinitions.DbType dbType);
-      CarModel Match(Image<Bgr, byte> image, bool? onlyCarMaker = null);
-      CarModel Match(Image<Gray, byte> image, bool? onlyCarMaker = null);
+      bool Train(Matrix<float> trainData, IList<IndecesMapping> imap);
+      CarModel GetClass(Matrix<float> data);
    }
 }

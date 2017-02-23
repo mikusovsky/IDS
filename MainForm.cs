@@ -24,7 +24,7 @@ namespace IDS
    public partial class MainForm : Form
    {
       //IClassificator Classificator = new SurfClassificator();
-      IClassificator Classificator = new SiftClassificator();
+      IRecogniser Recogniser = new ModelRecogniser();
       System.Windows.Forms.Timer _myTimer;
       Capture _capture;
 
@@ -857,9 +857,8 @@ namespace IDS
 
             string onlyfilename = Path.GetFileName(path);
             RoadParamForm roadParam = new RoadParamForm(_frameLow, onlyfilename);
-
-            roadParam.CloseIfIsSetAllParameters();
-            roadParam.ShowDialog();
+            
+            roadParam.ShowAndClose();
 
             if (roadParam.IsSetAllRoadParam)
             {
@@ -869,7 +868,7 @@ namespace IDS
                RealDistance = roadParam.GetRealDistance();
                _roadLanes = roadParam.CreateRoadLanes();
 
-               Console.Write($"newPoint = new Point({_roadPoints[0].X}, {_roadPoints[0].Y});{Environment.NewLine}_roadPoints.Add(newPoint);{Environment.NewLine}newPoint = new Point({_roadPoints[1].X}, {_roadPoints[1].Y});{Environment.NewLine}_roadPoints.Add(newPoint);{Environment.NewLine}newPoint = new Point({_roadPoints[2].X}, {_roadPoints[2].Y});{Environment.NewLine}_roadPoints.Add(newPoint);{Environment.NewLine}newPoint = new Point({_roadPoints[3].X}, {_roadPoints[3].Y});{Environment.NewLine}_roadPoints.Add(newPoint);{Environment.NewLine}_numberOfRoadLanes = 2; ");
+               Console.Write($"newPoint = new Point({_roadPoints[0].X}, {_roadPoints[0].Y});{Environment.NewLine}_roadPoints.Add(newPoint);{Environment.NewLine}newPoint = new Point({_roadPoints[1].X}, {_roadPoints[1].Y});{Environment.NewLine}_roadPoints.Add(newPoint);{Environment.NewLine}newPoint = new Point({_roadPoints[3].X}, {_roadPoints[3].Y});{Environment.NewLine}_roadPoints.Add(newPoint);{Environment.NewLine}newPoint = new Point({_roadPoints[2].X}, {_roadPoints[2].Y});{Environment.NewLine}_roadPoints.Add(newPoint);{Environment.NewLine}_numberOfRoadLanes = 2; ");
                Console.WriteLine();
                Console.WriteLine();
                Console.WriteLine($"newPoint = new Point({_roadDistancePoints[0].X}, {_roadDistancePoints[0].Y});{Environment.NewLine}_roadDistancePoints.Add(newPoint);{Environment.NewLine}newPoint = new Point({_roadDistancePoints[1].X}, {_roadDistancePoints[1].Y});{Environment.NewLine}_roadDistancePoints.Add(newPoint);{Environment.NewLine}_realDistanceTextBox.Text = \"{RealDistance}\";");
@@ -908,10 +907,10 @@ namespace IDS
          }
          foreach (string path in OpenFileDialog.FileNames)
          {
-            _PlayLoadVideo(path, false);
+            _PlayLoadVideo(path, false, false);
             while (_myTimer != null)
             {
-               await Task.Delay(100);
+               await Task.Delay(1000);
             }
             _initializedVariables = false;
          }
@@ -1015,7 +1014,7 @@ namespace IDS
 
       private void ButtonLoadDb_Click(object sender, EventArgs e)
       {
-         Classificator.LoadDb(Deffinitions.DbType.TrainingNormalized);
+         Recogniser.LoadDb(Deffinitions.DbType.TrainingNormalized, Deffinitions.DescriptorType.SIFT, Deffinitions.ClassificatorType.KMeans);
          /*
          int noElements = 1000;
          int[] myArray = new int[noElements];
@@ -1050,7 +1049,7 @@ namespace IDS
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                Image<Bgr, byte> image = new Image<Bgr, byte>(new Bitmap(dlg.FileName));
-               CarModel mathecsModel = Classificator.Match(Utils.Resize(Utils.ToGray(Utils.ExtractMask3(image)), Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT));
+               CarModel mathecsModel = Recogniser.Match(Utils.Resize(Utils.ToGray(Utils.ExtractMask3(image)), Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT));
                Console.WriteLine($"{mathecsModel.Maker} - {mathecsModel.Model} - {mathecsModel.Generation}");
             }
          }
@@ -1064,13 +1063,13 @@ namespace IDS
 
       private void ButtonTest_Click(object sender, EventArgs e)
       {
-         IClassificator classificator;
+         IRecogniser recogniser;
          //classificator = new SurfClassificator();
          //classificator = new SiftClassificator();
-         classificator = new ModelClassificator();
+         recogniser = new ModelRecogniser();
 
          Test test = new Test();
-         test.Execute(classificator, Deffinitions.DbType.Testing, false);
+         test.Execute(recogniser, Deffinitions.DbType.Testing, false);
       }
    }
 }

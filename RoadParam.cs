@@ -61,13 +61,19 @@ namespace IDS
          _InitPoints();
       }
 
-      public async Task CloseIfIsSetAllParameters()
+      private async void _CloseIfIsSetAllParameters()
       {
          await Task.Delay(100); //0.1 sec
          if (IsSetAllRoadParam)
          {
             Close();
          }
+      }
+
+      public void ShowAndClose()
+      {
+         _CloseIfIsSetAllParameters();
+         ShowDialog();
       }
 
       //kontrola na meno suboru, ci je to vlastne video alebo nejake nezname
@@ -231,9 +237,9 @@ namespace IDS
                _roadPoints.Add(newPoint);
                newPoint = new Point(182, 7);
                _roadPoints.Add(newPoint);
-               newPoint = new Point(101, 98);
+               newPoint = new Point(255, 98);
                _roadPoints.Add(newPoint);
-               newPoint = new Point(255, 83);
+               newPoint = new Point(101, 83);
                _roadPoints.Add(newPoint);
                NumberOfRoadLanes = 2;
                break;
@@ -242,9 +248,9 @@ namespace IDS
                _roadPoints.Add(newPoint);
                newPoint = new Point(231, 4);
                _roadPoints.Add(newPoint);
-               newPoint = new Point(115, 97);
-               _roadPoints.Add(newPoint);
                newPoint = new Point(276, 97);
+               _roadPoints.Add(newPoint);
+               newPoint = new Point(115, 97);
                _roadPoints.Add(newPoint);
                NumberOfRoadLanes = 2;
                break;
@@ -253,9 +259,9 @@ namespace IDS
                _roadPoints.Add(newPoint);
                newPoint = new Point(190, 8);
                _roadPoints.Add(newPoint);
-               newPoint = new Point(115, 101);
+               newPoint = new Point(262, 101);
                _roadPoints.Add(newPoint);
-               newPoint = new Point(262, 97);
+               newPoint = new Point(115, 97);
                _roadPoints.Add(newPoint);
                NumberOfRoadLanes = 2;
                break;
@@ -264,22 +270,22 @@ namespace IDS
                _roadPoints.Add(newPoint);
                newPoint = new Point(215, 6);
                _roadPoints.Add(newPoint);
-               newPoint = new Point(109, 93);
-               _roadPoints.Add(newPoint);
                newPoint = new Point(249, 93);
+               _roadPoints.Add(newPoint);
+               newPoint = new Point(109, 93);
                _roadPoints.Add(newPoint);
                NumberOfRoadLanes = 2;
                break;
             case 1206:
-               newPoint = new Point(207, 13);
+               newPoint = new Point(210, 10);
                _roadPoints.Add(newPoint);
-               newPoint = new Point(298, 14);
+               newPoint = new Point(301, 11);
                _roadPoints.Add(newPoint);
-               newPoint = new Point(122, 69);
+               newPoint = new Point(290, 86);
                _roadPoints.Add(newPoint);
-               newPoint = new Point(286, 89);
+               newPoint = new Point(117, 74);
                _roadPoints.Add(newPoint);
-               NumberOfRoadLanes = 3;
+               _numberOfRoadLanes = 3;
                break;
             default:
                newPoint = new Point((int)(0.1 * _image.Width), (int)(0.1 * _image.Height));

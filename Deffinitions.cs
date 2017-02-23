@@ -41,6 +41,8 @@ namespace IDS.IDS
       public const int MASK_WIDTH_FROM_FRAME = 170;
       public const int MASK_HEIGHT_FROM_FRAME = 80;
 
+      public const int MODELS_COUNT = 25;
+
       public enum DbType
       {
          Training = 1,
@@ -64,6 +66,12 @@ namespace IDS.IDS
       {
          SURF = 1,
          SIFT = 2
+      }
+
+      public enum ClassificatorType
+      {
+         KMeans = 1,
+         SVM = 2
       }
    }
 }

@@ -9,9 +9,9 @@ namespace IDS.IDS.Testing
 {
    public class Test
    {
-      public void Execute(IClassificator classificator, Deffinitions.DbType testingDb, bool? onlyCarMaker = null)
+      public void Execute(IRecogniser recogniser, Deffinitions.DbType testingDb, bool? onlyCarMaker = null)
       {
-         classificator.LoadDb(Deffinitions.DbType.TrainingNormalized);
+         recogniser.LoadDb(Deffinitions.DbType.TrainingNormalized, Deffinitions.DescriptorType.SIFT, Deffinitions.ClassificatorType.KMeans);
          List<CarModel> testingModels = Utils.GetAllCarModels(testingDb);
          bool onlyMakers = onlyCarMaker ?? false;
          TestInfo testInfo = new TestInfo(onlyMakers);
@@ -24,7 +24,7 @@ namespace IDS.IDS.Testing
                using (Image<Bgr, byte> image = new Image<Bgr, byte>(imagePath))
                using (Image<Gray, byte> grayNormalizedMask = onlyMakers ? Utils.ToGray(image) :Utils.Resize(Utils.ToGray(Utils.ExtractMask3(image)), Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT))
                {
-                  CarModel findModel = classificator.Match(grayNormalizedMask, onlyCarMaker);
+                  CarModel findModel = recogniser.Match(grayNormalizedMask, onlyCarMaker);
                   if (findModel != null)
                   {
                      testInfo.AddCouple(model, findModel);
