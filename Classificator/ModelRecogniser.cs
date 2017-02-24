@@ -16,10 +16,10 @@ namespace IDS.IDS.Classificator
 
       public List<CarModel> ClassificationModels { get; }
 
-      public void LoadDb(Deffinitions.DbType dbType, Deffinitions.DescriptorType descriptorType, Deffinitions.ClassificatorType classificatorType)
+      public void LoadDb(Enums.DbType dbType, Enums.DescriptorType descriptorType, Enums.ClassificatorType classificatorType)
       {
          _mBrandRecogniser = new Recogniser();
-         _mBrandRecogniser.LoadDb(Deffinitions.DbType.TrainingBrand, Deffinitions.DescriptorType.SIFT, Deffinitions.ClassificatorType.KMeans);
+         _mBrandRecogniser.LoadDb(Enums.DbType.TrainingBrand, Enums.DescriptorType.SIFT, Enums.ClassificatorType.KMeans);
          var makers = _mBrandRecogniser.ClassificationModels.GroupBy(o => o.Maker);
          
          foreach (var g in makers)
@@ -27,7 +27,7 @@ namespace IDS.IDS.Classificator
             foreach (CarModel maker in g)
             {
                IRecogniser recogniser = new Recogniser();
-               recogniser.LoadDb(Utils.GetDbTypeForMakerString(maker.Maker), Deffinitions.DescriptorType.SURF, Deffinitions.ClassificatorType.KMeans);
+               recogniser.LoadDb(Utils.GetDbTypeForMakerString(maker.Maker), Enums.DescriptorType.SURF, Enums.ClassificatorType.KMeans);
                m_modelClassificators[maker.Maker] = recogniser;
             }
          }

@@ -9,9 +9,9 @@ namespace IDS.IDS.Testing
 {
    public class Test
    {
-      public void Execute(IRecogniser recogniser, Deffinitions.DbType testingDb, bool? onlyCarMaker = null)
+      public void Execute(IRecogniser recogniser, Enums.DbType testingDb, bool? onlyCarMaker = null)
       {
-         recogniser.LoadDb(Deffinitions.DbType.TrainingNormalized, Deffinitions.DescriptorType.SIFT, Deffinitions.ClassificatorType.KMeans);
+         recogniser.LoadDb(Enums.DbType.TrainingNormalized, Enums.DescriptorType.SIFT, Enums.ClassificatorType.KMeans);
          List<CarModel> testingModels = Utils.GetAllCarModels(testingDb);
          bool onlyMakers = onlyCarMaker ?? false;
          TestInfo testInfo = new TestInfo(onlyMakers);

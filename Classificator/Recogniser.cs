@@ -16,15 +16,15 @@ namespace IDS.IDS.Classificator
          get { return m_classificationModels; }
       }
 
-      private Deffinitions.DescriptorType m_descriptorType;
+      private Enums.DescriptorType m_descriptorType;
       private Descriptor m_descriptor;
-      private Deffinitions.ClassificatorType m_classificatorType;
+      private Enums.ClassificatorType m_classificatorType;
       private IClassificator m_classificator;
 
       private Matrix<float> m_importanceMap;
       private IList<IndecesMapping> m_imap;
 
-      public void LoadDb(Deffinitions.DbType dbType, Deffinitions.DescriptorType descriptorType, Deffinitions.ClassificatorType classificatorType)
+      public void LoadDb(Enums.DbType dbType, Enums.DescriptorType descriptorType, Enums.ClassificatorType classificatorType)
       {
          m_descriptorType = descriptorType;
          m_classificatorType = classificatorType;
@@ -41,7 +41,7 @@ namespace IDS.IDS.Classificator
          dbDescsList = null;
          GC.Collect();
 
-         if (Deffinitions.ClassificatorType.KMeans == m_classificatorType)
+         if (Enums.ClassificatorType.KMeans == m_classificatorType)
          {
             m_classificator = new KMeansClassificator();
          }

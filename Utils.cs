@@ -730,68 +730,68 @@ namespace IDS.IDS
          m_progressBar.PerformStep();
       }
 
-      public static List<CarModel> GetAllCarModels(Deffinitions.DbType type = Deffinitions.DbType.Training)
+      public static List<CarModel> GetAllCarModels(Enums.DbType type = Enums.DbType.Training)
       {
          string configPath;
          switch (type)
          {
-            case Deffinitions.DbType.Training:
+            case Enums.DbType.Training:
                configPath = Deffinitions.TRAINING_DB_CONFIG_PATH;
                break;
 
-            case Deffinitions.DbType.TrainingNormalized:
+            case Enums.DbType.TrainingNormalized:
                configPath = Deffinitions.TRAINING_DB_NORMALIZED_CONFIG_PATH;
                break;
 
-            case Deffinitions.DbType.Testing:
+            case Enums.DbType.Testing:
                configPath = Deffinitions.TESTING_DB_CONFIG_PATH;
                break;
 
-            case Deffinitions.DbType.TestingBrand:
+            case Enums.DbType.TestingBrand:
                configPath = Deffinitions.TESTING_DB_BRAND_CONFIG_PATH;
                break;
 
-            case Deffinitions.DbType.TestingMask:
+            case Enums.DbType.TestingMask:
                configPath = Deffinitions.TESTING_MASK_DB_CONFIG_PATH;
                break;
 
-            case Deffinitions.DbType.Subset1:
+            case Enums.DbType.Subset1:
                configPath = Deffinitions.TRAINING_DB_NORMALIZED_CONFIG_PATH_PODSKUPINA1;
                break;
 
-            case Deffinitions.DbType.Subset2:
+            case Enums.DbType.Subset2:
                configPath = Deffinitions.TRAINING_DB_NORMALIZED_CONFIG_PATH_PODSKUPINA2;
                break;
 
-            case Deffinitions.DbType.TrainingBrand:
+            case Enums.DbType.TrainingBrand:
                configPath = Deffinitions.TRAINING_DB_BRAND_CONFIG_PATH;
                break;
 
-            case Deffinitions.DbType.TrainingAudi:
+            case Enums.DbType.TrainingAudi:
                configPath = Deffinitions.TRAINING_DB_AUDI_CONFIG_PATH;
                break;
 
-            case Deffinitions.DbType.TrainingBMW:
+            case Enums.DbType.TrainingBMW:
                configPath = Deffinitions.TRAINING_DB_BMW_CONFIG_PATH;
                break;
 
-            case Deffinitions.DbType.TrainingSkoda:
+            case Enums.DbType.TrainingSkoda:
                configPath = Deffinitions.TRAINING_DB_SKODA_CONFIG_PATH;
                break;
 
-            case Deffinitions.DbType.TrainingVolkswagen:
+            case Enums.DbType.TrainingVolkswagen:
                configPath = Deffinitions.TRAINING_DB_VOLKSWAGEN_CONFIG_PATH;
                break;
                
-            case Deffinitions.DbType.TrainingDbForBrand:
+            case Enums.DbType.TrainingDbForBrand:
                configPath = Deffinitions.TESTING_DB_FOR_BRAND_CONFIG_PATH;
                break;
 
-            case Deffinitions.DbType.TrainingDbForBrandNormalized:
+            case Enums.DbType.TrainingDbForBrandNormalized:
                configPath = Deffinitions.TESTING_DB_FOR_BRAND_NORMALIZED_CONFIG_PATH;
                break;
 
-            case Deffinitions.DbType.TestingBrandMask:
+            case Enums.DbType.TestingBrandMask:
                configPath = Deffinitions.TESTING_DB_BRAND_MASK_CONFIG_PATH;
                break;
 
@@ -843,7 +843,7 @@ namespace IDS.IDS
 
       public static Matrix<float> CreateImportanceMap()
       {
-         List<CarModel> carModels = GetAllCarModels(Deffinitions.DbType.TrainingNormalized);
+         List<CarModel> carModels = GetAllCarModels(Enums.DbType.TrainingNormalized);
          double minValue, maxValue;
          Point minLoc, maxLoc;
          int rows = Deffinitions.NORMALIZE_MASK_WIDTH;
@@ -945,7 +945,7 @@ namespace IDS.IDS
          }
       }
 
-      public static void NormalizeDb(Deffinitions.DbType dbType)
+      public static void NormalizeDb(Enums.DbType dbType)
       {
          Console.WriteLine("Normalizing");
          Stopwatch watch = Stopwatch.StartNew();
@@ -995,7 +995,7 @@ namespace IDS.IDS
       {
          Console.WriteLine("Create brand db");
          Stopwatch watch = Stopwatch.StartNew();
-         List<CarModel> carModels = Utils.GetAllCarModels(Deffinitions.DbType.TrainingDbForBrandNormalized);
+         List<CarModel> carModels = Utils.GetAllCarModels(Enums.DbType.TrainingDbForBrandNormalized);
          string dbPath = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\Database\\TrainingDbBrand";
          var groups = carModels.GroupBy(o => o.Maker);
          int imageId = 1;
@@ -1041,22 +1041,22 @@ namespace IDS.IDS
          img.Bitmap.Save(imgName, format);
       }
 
-      public static Deffinitions.DbType GetDbTypeForMakerString(string strMaker)
+      public static Enums.DbType GetDbTypeForMakerString(string strMaker)
       {
          string lowMaker = strMaker.ToUpper();
          switch (lowMaker)
          {
             case "AUDI":
-               return Deffinitions.DbType.TrainingAudi;
+               return Enums.DbType.TrainingAudi;
 
             case "BMW":
-               return Deffinitions.DbType.TrainingBMW;
+               return Enums.DbType.TrainingBMW;
 
             case "SKODA":
-               return Deffinitions.DbType.TrainingSkoda;
+               return Enums.DbType.TrainingSkoda;
 
             default:
-               return Deffinitions.DbType.TrainingVolkswagen;
+               return Enums.DbType.TrainingVolkswagen;
          }
       }
 

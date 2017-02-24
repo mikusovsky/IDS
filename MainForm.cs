@@ -1014,7 +1014,8 @@ namespace IDS
 
       private void ButtonLoadDb_Click(object sender, EventArgs e)
       {
-         Recogniser.LoadDb(Deffinitions.DbType.TrainingNormalized, Deffinitions.DescriptorType.SIFT, Deffinitions.ClassificatorType.KMeans);
+         SVMClassificator svm = new SVMClassificator();
+         //Recogniser.LoadDb(Deffinitions.DbType.TrainingNormalized, Deffinitions.DescriptorType.SIFT, Deffinitions.ClassificatorType.KMeans);
          /*
          int noElements = 1000;
          int[] myArray = new int[noElements];
@@ -1057,7 +1058,7 @@ namespace IDS
 
       private void ButtonNormalizeDb_Click(object sender, EventArgs e)
       {
-         Utils.NormalizeDb(Deffinitions.DbType.TrainingDbForBrand);
+         Utils.NormalizeDb(Enums.DbType.TrainingDbForBrand);
          Utils.CreateBrandMaskDb();
       }
 
@@ -1069,7 +1070,7 @@ namespace IDS
          recogniser = new ModelRecogniser();
 
          Test test = new Test();
-         test.Execute(recogniser, Deffinitions.DbType.Testing, false);
+         test.Execute(recogniser, Enums.DbType.Testing, false);
       }
    }
 }

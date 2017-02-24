@@ -8,10 +8,10 @@ namespace IDS.IDS.Classificator
 {
    public class Descriptor
    {
-      private Deffinitions.DbType m_dbType;
-      private Deffinitions.DescriptorType m_type;
+      private Enums.DbType m_dbType;
+      private Enums.DescriptorType m_type;
 
-      public Descriptor(Deffinitions.DbType dbType, Deffinitions.DescriptorType type)
+      public Descriptor(Enums.DbType dbType, Enums.DescriptorType type)
       {
          m_dbType = dbType;
          m_type = type;
@@ -22,7 +22,7 @@ namespace IDS.IDS.Classificator
          return Cache.GetDescriptor(image, importanceMap, m_type);
       }
 
-      public Matrix<float> ComputeSingleDescriptors(string fileName, Matrix<float> importanceMap, Deffinitions.DescriptorType descriptorType)
+      public Matrix<float> ComputeSingleDescriptors(string fileName, Matrix<float> importanceMap, Enums.DescriptorType descriptorType)
       {
          return Cache.GetDescriptor(fileName, importanceMap, descriptorType, m_dbType);
       }

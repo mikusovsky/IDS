@@ -85,22 +85,22 @@ namespace IDS.IDS
          return map;
       }
 
-      public static Matrix<float> GetDescriptor(Image<Gray, byte> image, Matrix<float> importanceMap, Deffinitions.DescriptorType descriptor)
+      public static Matrix<float> GetDescriptor(Image<Gray, byte> image, Matrix<float> importanceMap, Enums.DescriptorType descriptor)
       {
          Matrix<float> descs = null;
          switch (descriptor)
          {
-            case Deffinitions.DescriptorType.SURF:
+            case Enums.DescriptorType.SURF:
                descs = _GetSurfDescriptor(image, importanceMap);
                break;
-            case Deffinitions.DescriptorType.SIFT:
+            case Enums.DescriptorType.SIFT:
                descs = _GetSiftDescriptor(image, importanceMap);
                break;
          }
          return descs;
       }
 
-      public static Matrix<float> GetDescriptor(string imagePath, Matrix<float> importanceMap, Deffinitions.DescriptorType descriptor, Deffinitions.DbType dbType)
+      public static Matrix<float> GetDescriptor(string imagePath, Matrix<float> importanceMap, Enums.DescriptorType descriptor, Enums.DbType dbType)
       {
          string imagePathDesriptor = imagePath + descriptor + dbType;
          /*
@@ -127,10 +127,10 @@ namespace IDS.IDS
          {
             switch (descriptor)
             {
-               case Deffinitions.DescriptorType.SURF:
+               case Enums.DescriptorType.SURF:
                   descs = _GetSurfDescriptor(img, importanceMap);
                   break;
-               case Deffinitions.DescriptorType.SIFT:
+               case Enums.DescriptorType.SIFT:
                   descs = _GetSiftDescriptor(img, importanceMap);
                   break;
             }
@@ -140,9 +140,9 @@ namespace IDS.IDS
          return descs;
       }
 
-      public static VectorOfKeyPoint GetKeyPoints(Image<Gray, byte> image, Deffinitions.DescriptorType descriptorType)
+      public static VectorOfKeyPoint GetKeyPoints(Image<Gray, byte> image, Enums.DescriptorType descriptorType)
       {
-         if (descriptorType == Deffinitions.DescriptorType.SIFT)
+         if (descriptorType == Enums.DescriptorType.SIFT)
          {
             return SiftDetector.DetectKeyPointsRaw(image, null);
          }
@@ -167,7 +167,7 @@ namespace IDS.IDS
                Utils.LogImage("image after mask aplication", testImage);
             }
             Image<Gray, byte> edges = testImage; //Utils.ExtractEdges(image);
-            VectorOfKeyPoint keyPoints = GetKeyPoints(edges, Deffinitions.DescriptorType.SURF);
+            VectorOfKeyPoint keyPoints = GetKeyPoints(edges, Enums.DescriptorType.SURF);
             return SurfDetector.ComputeDescriptorsRaw(edges, null, keyPoints);
          }
       }
@@ -190,7 +190,7 @@ namespace IDS.IDS
                Utils.LogImage("image after mask aplication", testImage);
             }
             Image<Gray, byte> edges = testImage; //Utils.ExtractEdges(image);
-            VectorOfKeyPoint keyPoints = GetKeyPoints(edges, Deffinitions.DescriptorType.SIFT);
+            VectorOfKeyPoint keyPoints = GetKeyPoints(edges, Enums.DescriptorType.SIFT);
             return SiftDetector.ComputeDescriptorsRaw(edges, null, keyPoints);
          }
       }
