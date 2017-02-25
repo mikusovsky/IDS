@@ -6,7 +6,7 @@ namespace IDS.IDS.Classificator
 {
    public interface IClassificator
    {
-      bool Train(Matrix<float> trainData, IList<IndecesMapping> imap);
+      bool Train(Enums.DbType dbType, Enums.DescriptorType descriptorType, Matrix<float> trainData, IList<IndecesMapping> imap);
       CarModel GetClass(Matrix<float> data);
    }
 }

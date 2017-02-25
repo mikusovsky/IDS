@@ -13,7 +13,7 @@ namespace IDS.IDS.Classificator
       private Matrix<float> m_dbDescs;
       private IntervalTree<CarModel, int> m_intervalTree;
 
-      public bool Train(Matrix<float> trainData, IList<IndecesMapping> imap)
+      public bool Train(Enums.DbType dbType, Enums.DescriptorType descriptorType, Matrix<float> trainData, IList<IndecesMapping> imap)
       {
          // create FLANN index with 4 kd-trees and perform KNN search over it look for 2 nearest neighbours
          m_dbDescs = trainData;

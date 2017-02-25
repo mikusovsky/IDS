@@ -39,7 +39,8 @@
       public enum DescriptorType
       {
          SURF = 1,
-         SIFT = 2
+         SIFT = 2,
+         ORB = 3
       }
 
       public enum ClassificatorType

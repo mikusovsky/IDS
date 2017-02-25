@@ -14,6 +14,7 @@ namespace IDS.IDS
    {
       private static SURFDetector SurfDetector = new SURFDetector(300, true, 4, 5);
       private static SIFTDetector SiftDetector = new SIFTDetector(75, 6, 0.04, 10, 1.6); // pridate parametre
+      private static ORBDetector OrbDetector = new ORBDetector(500, (float) 1.2, 8, 31, 0, 2, ORBDetector.ScoreType.Harris, 31);
       private static HOGDescriptor HogDescriptor = new HOGDescriptor(); // TODO 
       private static Dictionary<string, Matrix<float>> Descriptors = new Dictionary<string, Matrix<float>>();
       private static HashSet<string> Was = new HashSet<string>();
@@ -37,7 +38,7 @@ namespace IDS.IDS
          int cols = Deffinitions.NORMALIZE_MASK_HEIGHT;
          Matrix<float> map = new Matrix<float>(rows, cols);
          string carModelName = $"{carModel.Maker}-{carModel.Model}-{carModel.Generation}-AvarageMap.cache";
-         string cachePath = $"{Deffinitions.CACHE_PATH}\\{carModelName}";
+         string cachePath = $"{Deffinitions.CACHE_PATH_DESCRIPTOR}\\{carModelName}";
          if (AvarageModelMaps.ContainsKey(carModelName))
          {
             return AvarageModelMaps[carModelName];
@@ -116,7 +117,7 @@ namespace IDS.IDS
 
          Matrix<float> descs = null;
          string imageName = Path.GetFileName(imagePath);
-         string cachePath = $"{Deffinitions.CACHE_PATH}\\{imageName}_descriptor{descriptor}_dbType{dbType}.cache";
+         string cachePath = $"{Deffinitions.CACHE_PATH_DESCRIPTOR}\\{imageName}_descriptor{descriptor}_dbType{dbType}.cache";
          if (File.Exists(cachePath))
          {
             descs = LoadMatrix(cachePath);
@@ -133,6 +134,9 @@ namespace IDS.IDS
                case Enums.DescriptorType.SIFT:
                   descs = _GetSiftDescriptor(img, importanceMap);
                   break;
+               case Enums.DescriptorType.ORB:
+                  descs = _GetOrbDescriptor(img, importanceMap);
+                  break;
             }
          }
          SaveMatrix(cachePath, descs);
@@ -145,6 +149,10 @@ namespace IDS.IDS
          if (descriptorType == Enums.DescriptorType.SIFT)
          {
             return SiftDetector.DetectKeyPointsRaw(image, null);
+         }
+         else if (descriptorType == Enums.DescriptorType.ORB)
+         {
+            return OrbDetector.DetectKeyPointsRaw(image, null);
          }
          return SurfDetector.DetectKeyPointsRaw(image, null);
       }
@@ -192,6 +200,30 @@ namespace IDS.IDS
             Image<Gray, byte> edges = testImage; //Utils.ExtractEdges(image);
             VectorOfKeyPoint keyPoints = GetKeyPoints(edges, Enums.DescriptorType.SIFT);
             return SiftDetector.ComputeDescriptorsRaw(edges, null, keyPoints);
+         }
+      }
+
+      private static Matrix<float> _GetOrbDescriptor(Image<Gray, byte> image, Matrix<float> importanceMap = null)
+      {
+         Image<Gray, byte> testImage = image;
+         using (Matrix<float> map = Utils.ImageToMap(image))
+         {
+            if (importanceMap != null)
+            {
+               for (int i = 0; i < map.Rows; i++)
+               {
+                  for (int j = 0; j < map.Cols; j++)
+                  {
+                     map[i, j] *= (importanceMap[i, j] / 255);
+                  }
+               }
+               testImage = Utils.MapToImage(map);
+               Utils.LogImage("image after mask aplication", testImage);
+            }
+            Image<Gray, byte> edges = testImage; //Utils.ExtractEdges(image);
+            VectorOfKeyPoint keyPoints = GetKeyPoints(edges, Enums.DescriptorType.ORB);
+            Matrix<byte> ret = OrbDetector.ComputeDescriptorsRaw(edges, null, keyPoints);
+            return null;
          }
       }
 

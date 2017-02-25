@@ -29,6 +29,7 @@ namespace IDS.IDS.Classificator
          m_descriptorType = descriptorType;
          m_classificatorType = classificatorType;
          m_importanceMap = null; //Utils.CreateImportanceMap();
+         
          m_descriptor = new Descriptor(dbType, m_descriptorType);
 
          m_classificationModels = Utils.GetAllCarModels(dbType);
@@ -49,7 +50,8 @@ namespace IDS.IDS.Classificator
          {
             m_classificator = new SVMClassificator();
          }
-         m_classificator.Train(dbDescs, m_imap);
+         m_classificator.Train(dbType, descriptorType, dbDescs, m_imap);
+
       }
 
       public CarModel Match(Image<Bgr, byte> image, bool? onlyCarMaker = null)

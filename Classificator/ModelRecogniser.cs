@@ -12,23 +12,23 @@ namespace IDS.IDS.Classificator
       private int m_classificatorType = 2;
 
       IRecogniser _mBrandRecogniser;
-      readonly Dictionary<string, IRecogniser> m_modelClassificators = new Dictionary<string, IRecogniser>();
+      readonly Dictionary<string, IRecogniser> m_modelRecogniser = new Dictionary<string, IRecogniser>();
 
       public List<CarModel> ClassificationModels { get; }
 
       public void LoadDb(Enums.DbType dbType, Enums.DescriptorType descriptorType, Enums.ClassificatorType classificatorType)
       {
          _mBrandRecogniser = new Recogniser();
-         _mBrandRecogniser.LoadDb(Enums.DbType.TrainingBrand, Enums.DescriptorType.SIFT, Enums.ClassificatorType.KMeans);
+         _mBrandRecogniser.LoadDb(Enums.DbType.TrainingBrand, Enums.DescriptorType.SIFT, Enums.ClassificatorType.SVM);
          var makers = _mBrandRecogniser.ClassificationModels.GroupBy(o => o.Maker);
-         
+         int i = 0;
          foreach (var g in makers)
          {
             foreach (CarModel maker in g)
             {
                IRecogniser recogniser = new Recogniser();
-               recogniser.LoadDb(Utils.GetDbTypeForMakerString(maker.Maker), Enums.DescriptorType.SURF, Enums.ClassificatorType.KMeans);
-               m_modelClassificators[maker.Maker] = recogniser;
+               recogniser.LoadDb(Utils.GetDbTypeForMakerString(maker.Maker), Enums.DescriptorType.SURF, Enums.ClassificatorType.SVM);
+               m_modelRecogniser[maker.Maker] = recogniser;
             }
          }
       }
@@ -54,7 +54,7 @@ namespace IDS.IDS.Classificator
          CarModel findedModel = null;
          if (findedBrand != null)
          {
-            findedModel = m_modelClassificators[findedBrand.Maker].Match(mask);
+            findedModel = m_modelRecogniser[findedBrand.Maker].Match(mask);
          }
          return findedModel;
       }

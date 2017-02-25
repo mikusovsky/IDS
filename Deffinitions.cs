@@ -9,23 +9,28 @@ namespace IDS.IDS
       public const string SUM_TRUCKS = "sumTrucks";
       public const string TOTAL_SUM = "totalSum";
 
-      public const string CACHE_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\Cache";
-      public const string TRAINING_DB_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDb.xml";
-      public const string TRAINING_DB_NORMALIZED_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbNormalized.xml";
-      public const string TESTING_DB_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbTesting.xml";
-      public const string TESTING_DB_FOR_BRAND_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbTestingForBrand.xml";
-      public const string TESTING_DB_FOR_BRAND_NORMALIZED_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbTestingForBrandNormalized.xml";
-      public const string TESTING_DB_BRAND_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbTestingBrand.xml";
-      public const string TESTING_DB_BRAND_MASK_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbTestingBrandMask.xml";
-      public const string TESTING_MASK_DB_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbTestingMask.xml";
-      public const string TRAINING_DB_NORMALIZED_CONFIG_PATH_PODSKUPINA1 = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\Podskupina1.xml";
-      public const string TRAINING_DB_NORMALIZED_CONFIG_PATH_PODSKUPINA2 = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\Podskupina2.xml";
+      public const string SOLUTION_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy";
 
-      public const string TRAINING_DB_BRAND_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbBrand.xml";
-      public const string TRAINING_DB_AUDI_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbAudi.xml";
-      public const string TRAINING_DB_BMW_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbBMW.xml";
-      public const string TRAINING_DB_SKODA_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbSkoda.xml";
-      public const string TRAINING_DB_VOLKSWAGEN_CONFIG_PATH = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\CarModelRecognition\\configuration\\LoadDbVolkswagen.xml";
+      public const string CACHE_PATH = SOLUTION_PATH + "\\Cache";
+      public const string CACHE_PATH_DESCRIPTOR = CACHE_PATH + "\\Descriptor";
+      public const string CACHE_PATH_CLASSIFIER = CACHE_PATH + "\\Classifier";
+
+      public const string CONFIGURATION_PATH = SOLUTION_PATH + "\\CarModelRecognition\\configuration";
+      public const string TRAINING_DB_CONFIG_PATH = CONFIGURATION_PATH + "\\LoadDb.xml";
+      public const string TRAINING_DB_NORMALIZED_CONFIG_PATH = CONFIGURATION_PATH + "\\LoadDbNormalized.xml";
+      public const string TESTING_DB_CONFIG_PATH = CONFIGURATION_PATH + "\\LoadDbTesting.xml";
+      public const string TESTING_DB_FOR_BRAND_CONFIG_PATH = CONFIGURATION_PATH + "\\LoadDbTestingForBrand.xml";
+      public const string TESTING_DB_FOR_BRAND_NORMALIZED_CONFIG_PATH = CONFIGURATION_PATH + "\\LoadDbTestingForBrandNormalized.xml";
+      public const string TESTING_DB_BRAND_CONFIG_PATH = CONFIGURATION_PATH + "\\LoadDbTestingBrand.xml";
+      public const string TESTING_DB_BRAND_MASK_CONFIG_PATH = CONFIGURATION_PATH + "\\LoadDbTestingBrandMask.xml";
+      public const string TESTING_MASK_DB_CONFIG_PATH = CONFIGURATION_PATH + "\\LoadDbTestingMask.xml";
+      public const string TRAINING_DB_NORMALIZED_CONFIG_PATH_PODSKUPINA1 = CONFIGURATION_PATH + "\\Podskupina1.xml";
+      public const string TRAINING_DB_NORMALIZED_CONFIG_PATH_PODSKUPINA2 = CONFIGURATION_PATH + "\\Podskupina2.xml";
+      public const string TRAINING_DB_BRAND_CONFIG_PATH = CONFIGURATION_PATH + "\\LoadDbBrand.xml";
+      public const string TRAINING_DB_AUDI_CONFIG_PATH = CONFIGURATION_PATH + "\\LoadDbAudi.xml";
+      public const string TRAINING_DB_BMW_CONFIG_PATH = CONFIGURATION_PATH + "\\LoadDbBMW.xml";
+      public const string TRAINING_DB_SKODA_CONFIG_PATH = CONFIGURATION_PATH + "\\LoadDbSkoda.xml";
+      public const string TRAINING_DB_VOLKSWAGEN_CONFIG_PATH = CONFIGURATION_PATH + "\\LoadDbVolkswagen.xml";
 
       public const int LOW_FRAME_WIDTH = 320;
 

@@ -1014,7 +1014,7 @@ namespace IDS
 
       private void ButtonLoadDb_Click(object sender, EventArgs e)
       {
-         SVMClassificator svm = new SVMClassificator();
+         //SVMClassificator svm = new SVMClassificator();
          //Recogniser.LoadDb(Deffinitions.DbType.TrainingNormalized, Deffinitions.DescriptorType.SIFT, Deffinitions.ClassificatorType.KMeans);
          /*
          int noElements = 1000;

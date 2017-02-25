@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using IDS.IDS.IntervalTree;
