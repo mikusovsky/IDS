@@ -236,15 +236,11 @@ namespace IDS.IDS
          int halfWidth = Deffinitions.MASK_WIDTH_FROM_FRAME / 2;
          double minDiffSum = Int32.MaxValue;
          int minX = 0;
-         using (Image<Gray, byte> edges = grayImage/*grayImage.Canny(new Gray(10), new Gray(60))*/)
+         Image<Gray, byte> edges = grayImage;
+         //using (Image<Gray, byte> edges = grayImage/*grayImage.Canny(new Gray(10), new Gray(60))*/)
          {
             for (int i = 0; i + Deffinitions.MASK_WIDTH_FROM_FRAME < edges.Width; i++)
             {
-               if (i == 47)
-               {
-                  int g = 0;
-                  g++;
-               }
                using (Image<Gray, byte> subFrame = CropImage(edges, i, shadowPos - height, width, height))
                using (Image<Gray, byte> left = CropImage(subFrame, 0, 0, halfWidth, height))
                using (Image<Gray, byte> right = CropImage(subFrame, halfWidth, 0, halfWidth, height).Flip(FLIP.HORIZONTAL))
@@ -730,7 +726,7 @@ namespace IDS.IDS
          m_progressBar.PerformStep();
       }
 
-      public static List<CarModel> GetAllCarModels(Enums.DbType type = Enums.DbType.Training)
+      public static List<CarModel> GetCarModelsForDb(Enums.DbType type = Enums.DbType.Training)
       {
          string configPath;
          switch (type)
@@ -843,7 +839,7 @@ namespace IDS.IDS
 
       public static Matrix<float> CreateImportanceMap()
       {
-         List<CarModel> carModels = GetAllCarModels(Enums.DbType.TrainingNormalized);
+         List<CarModel> carModels = GetCarModelsForDb(Enums.DbType.TrainingNormalized);
          double minValue, maxValue;
          Point minLoc, maxLoc;
          int rows = Deffinitions.NORMALIZE_MASK_WIDTH;
@@ -949,7 +945,7 @@ namespace IDS.IDS
       {
          Console.WriteLine("Normalizing");
          Stopwatch watch = Stopwatch.StartNew();
-         List<CarModel> carModels = Utils.GetAllCarModels(dbType);
+         List<CarModel> carModels = Utils.GetCarModelsForDb(dbType);
          int imageId = 1;
          Utils.ProgressBarShow(carModels.Count);
          for (int i = 0; i < carModels.Count; i++)
@@ -961,7 +957,7 @@ namespace IDS.IDS
                string imagePath = imagesPath[j];
                using (Image<Gray, byte> img = new Image<Gray, byte>(imagePath))
                {
-                  string normalizedPath = Path.GetDirectoryName(imagePath)?.Replace("TrainingDbForBrand", "TrainingDbForBrandNormalized");
+                  string normalizedPath = Path.GetDirectoryName(imagePath)?.Replace("TrainingDb", "TrainingDbNormalized");
                   string fileExtension = Path.GetExtension(imagePath);
                   ImageFormat imageFormat = GetImageFormatFromFileExtension(fileExtension);
 
@@ -995,7 +991,7 @@ namespace IDS.IDS
       {
          Console.WriteLine("Create brand db");
          Stopwatch watch = Stopwatch.StartNew();
-         List<CarModel> carModels = Utils.GetAllCarModels(Enums.DbType.TrainingDbForBrandNormalized);
+         List<CarModel> carModels = Utils.GetCarModelsForDb(Enums.DbType.TrainingNormalized);
          string dbPath = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\Database\\TrainingDbBrand";
          var groups = carModels.GroupBy(o => o.Maker);
          int imageId = 1;
@@ -1055,9 +1051,10 @@ namespace IDS.IDS
             case "SKODA":
                return Enums.DbType.TrainingSkoda;
 
-            default:
+            case "VOLKSWAGEN":
                return Enums.DbType.TrainingVolkswagen;
          }
+         return Enums.DbType.None;
       }
 
       public static ImageFormat GetImageFormatFromFileExtension(string extension)

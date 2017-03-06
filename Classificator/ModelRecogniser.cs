@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Emgu.CV;
 using Emgu.CV.Structure;
@@ -19,16 +17,16 @@ namespace IDS.IDS.Classificator
       public void LoadDb(Enums.DbType dbType, Enums.DescriptorType descriptorType, Enums.ClassificatorType classificatorType)
       {
          _mBrandRecogniser = new Recogniser();
-         _mBrandRecogniser.LoadDb(Enums.DbType.TrainingBrand, Enums.DescriptorType.SIFT, Enums.ClassificatorType.SVM);
+         _mBrandRecogniser.LoadDb(Enums.DbType.TrainingBrand, Enums.DescriptorType.SIFT, Enums.ClassificatorType.KNearest);
+         
          var makers = _mBrandRecogniser.ClassificationModels.GroupBy(o => o.Maker);
-         int i = 0;
          foreach (var g in makers)
          {
             foreach (CarModel maker in g)
             {
-               IRecogniser recogniser = new Recogniser();
-               recogniser.LoadDb(Utils.GetDbTypeForMakerString(maker.Maker), Enums.DescriptorType.SURF, Enums.ClassificatorType.SVM);
-               m_modelRecogniser[maker.Maker] = recogniser;
+                  IRecogniser recogniser = new Recogniser();
+                  recogniser.LoadDb(Utils.GetDbTypeForMakerString(maker.Maker), Enums.DescriptorType.SURF, Enums.ClassificatorType.KNearest);
+                  m_modelRecogniser[maker.Maker] = recogniser;
             }
          }
       }

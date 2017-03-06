@@ -19,6 +19,7 @@
 
       public enum DbType
       {
+         None = 0,
          Training = 1,
          TrainingNormalized = 2,
          Testing = 3,
@@ -45,7 +46,7 @@
 
       public enum ClassificatorType
       {
-         KMeans = 1,
+         KNearest = 1,
          SVM = 2
       }
    }

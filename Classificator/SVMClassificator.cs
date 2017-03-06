@@ -35,6 +35,119 @@ namespace IDS.IDS.Classificator
 
          m_model = new SVM();
 
+         /*
+         int trainSampleCount = 10000;
+         int sigma = 60;
+
+         #region Generate the training data and classes
+
+         Matrix<float> trainData = new Matrix<float>(trainSampleCount, 2);
+         Matrix<float> trainClasses = new Matrix<float>(trainSampleCount, 1);
+
+         Image<Bgr, Byte> img1 = new Image<Bgr, byte>(500, 500);
+         Image<Bgr, Byte> img2 = new Image<Bgr, byte>(500, 500);
+
+         Matrix<float> sample = new Matrix<float>(1, 2);
+
+         Matrix<float> trainData1 = trainData.GetRows(0, trainSampleCount / 3, 1);
+         trainData1.GetCols(0, 1).SetRandNormal(new MCvScalar(100), new MCvScalar(sigma));
+         trainData1.GetCols(1, 2).SetRandNormal(new MCvScalar(300), new MCvScalar(sigma));
+
+         Matrix<float> trainData2 = trainData.GetRows(trainSampleCount / 3, 2 * trainSampleCount / 3, 1);
+         trainData2.SetRandNormal(new MCvScalar(400), new MCvScalar(sigma));
+
+         Matrix<float> trainData3 = trainData.GetRows(2 * trainSampleCount / 3, trainSampleCount, 1);
+         trainData3.GetCols(0, 1).SetRandNormal(new MCvScalar(300), new MCvScalar(sigma));
+         trainData3.GetCols(1, 2).SetRandNormal(new MCvScalar(100), new MCvScalar(sigma));
+
+         Matrix<float> trainClasses1 = trainClasses.GetRows(0, trainSampleCount / 3, 1);
+         trainClasses1.SetValue(1);
+         Matrix<float> trainClasses2 = trainClasses.GetRows(trainSampleCount / 3, 2 * trainSampleCount / 3, 1);
+         trainClasses2.SetValue(2);
+         Matrix<float> trainClasses3 = trainClasses.GetRows(2 * trainSampleCount / 3, trainSampleCount, 1);
+         trainClasses3.SetValue(3);
+
+         #endregion
+
+         using (SVM model = new SVM())
+         {
+            SVMParams p = new SVMParams();
+            p = new SVMParams();
+            p.SVMType = Emgu.CV.ML.MlEnum.SVM_TYPE.C_SVC;
+            p.KernelType = Emgu.CV.ML.MlEnum.SVM_KERNEL_TYPE.RBF;
+            p.TermCrit = new MCvTermCriteria(50, 0.01);
+            p.Gamma = 64;
+            p.C = 8;
+            p.Nu = 0.5;
+            p.Degree = 10;
+
+            Stopwatch watch = Stopwatch.StartNew();
+            bool trained = model.TrainAuto(trainData, trainClasses, null, null, p.MCvSVMParams, 5);
+            watch.Stop();
+            Console.WriteLine($"Swm learn - {watch.ElapsedMilliseconds}ms");
+            
+            watch.Restart();
+            model.Save("SVM_Model.xml");
+            Console.WriteLine($"Swm save - {watch.ElapsedMilliseconds}ms");
+            
+            watch.Restart();
+            Emgu.CV.ML.SVM model_loaded = new Emgu.CV.ML.SVM();
+            model_loaded.Load("SVM_Model.xml");
+            Console.WriteLine($"Swm load - {watch.ElapsedMilliseconds}ms");
+
+            for (int i = 0; i < img1.Height; i++)
+            {
+               for (int j = 0; j < img1.Width; j++)
+               {
+                  sample.Data[0, 0] = j;
+                  sample.Data[0, 1] = i;
+
+                  float response = model.Predict(sample);
+
+                  img1[i, j] =
+                     response == 1 ? new Bgr(90, 0, 0) :
+                     response == 2 ? new Bgr(0, 90, 0) :
+                     new Bgr(0, 0, 90);
+
+                  img2[i, j] =
+                     response == 1 ? new Bgr(90, 0, 0) :
+                     response == 2 ? new Bgr(0, 90, 0) :
+                     new Bgr(0, 0, 90);
+               }
+            }
+
+            int c = model.GetSupportVectorCount();
+            for (int i = 0; i < c; i++)
+            {
+               float[] v1 = model.GetSupportVector(i);
+               PointF p1 = new PointF(v1[0], v1[1]);
+               img1.Draw(new CircleF(p1, 4), new Bgr(128, 128, 128), 2);
+
+               float[] v2 = model_loaded.GetSupportVector(i);
+               PointF p2 = new PointF(v2[0], v2[1]);
+               img2.Draw(new CircleF(p2, 4), new Bgr(128, 128, 128), 2);
+            }
+         }
+         // display the original training samples
+         for (int i = 0; i < (trainSampleCount / 3); i++)
+         {
+            PointF p3 = new PointF(trainData1[i, 0], trainData1[i, 1]);
+            img1.Draw(new CircleF(p3, 2.0f), new Bgr(255, 100, 100), -1);
+            PointF p4 = new PointF(trainData2[i, 0], trainData2[i, 1]);
+            img1.Draw(new CircleF(p4, 2.0f), new Bgr(100, 255, 100), -1);
+            PointF p5 = new PointF(trainData3[i, 0], trainData3[i, 1]);
+            img1.Draw(new CircleF(p5, 2.0f), new Bgr(100, 100, 255), -1);
+
+            PointF p6 = new PointF(trainData1[i, 0], trainData1[i, 1]);
+            img2.Draw(new CircleF(p6, 2.0f), new Bgr(255, 100, 100), -1);
+            PointF p7 = new PointF(trainData2[i, 0], trainData2[i, 1]);
+            img2.Draw(new CircleF(p7, 2.0f), new Bgr(100, 255, 100), -1);
+            PointF p8 = new PointF(trainData3[i, 0], trainData3[i, 1]);
+            img2.Draw(new CircleF(p8, 2.0f), new Bgr(100, 100, 255), -1);
+         }
+
+         Utils.LogImage("model", img1);
+         Utils.LogImage("loaded", img2);
          */
       }
       
@@ -42,11 +155,7 @@ namespace IDS.IDS.Classificator
       {
          m_dbType = dbType;
          m_descriptorType = descriptorType;
-         if (_TryLoad())
-         {
-            return true;
-         }
-
+         
          Dictionary<string, Range> ranges = new Dictionary<string, Range>();
          var modelG = imap.GroupBy(x => x.CarModel.ID);
          foreach (var g in modelG)
@@ -75,6 +184,10 @@ namespace IDS.IDS.Classificator
             category++;
          }
          Stopwatch watch = Stopwatch.StartNew();
+         if (_TryLoad())
+         {
+            return true;
+         }
          bool ret = m_model.TrainAuto(trainData, trainClasses, null, null, m_parameters.MCvSVMParams, 5);
          watch.Stop();
          Console.WriteLine($"Swm learn - {watch.ElapsedMilliseconds}ms");
@@ -89,8 +202,17 @@ namespace IDS.IDS.Classificator
          {
             return null;
          }
-         int predictedId = Convert.ToInt32(Math.Round(m_model.Predict(data)));
-         return IdToModel[predictedId];
+         List<int> predictions = new List<int>();
+         for (int i = 0; i < data.Rows; i++)
+         {
+            predictions.Add(Convert.ToInt32(Math.Round(m_model.Predict(data.GetRow(i)))));
+         }
+         int most = (from i in predictions
+                     group i by i into grp
+                     orderby grp.Count() descending
+                     select grp.Key).First();
+         
+         return IdToModel[most];
       }
 
       private void _Save()

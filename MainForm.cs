@@ -8,10 +8,12 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.VideoSurveillance;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using CppWrapper;
 using Emgu.CV.Flann;
 using Emgu.CV.Util;
+using Accord.MachineLearning;
 using IDS.IDS;
 using IDS.IDS.Classificator;
 using IDS.IDS.DataAugmentation;
@@ -1058,8 +1060,36 @@ namespace IDS
 
       private void ButtonNormalizeDb_Click(object sender, EventArgs e)
       {
+         /*
          Utils.NormalizeDb(Enums.DbType.TrainingDbForBrand);
          Utils.CreateBrandMaskDb();
+         */
+
+         /*
+         List<CarModel> carModels = Utils.GetCarModelsForDb(Enums.DbType.TestingMask);
+         Utils.ProgressBarShow(carModels.Count);
+         string outPath = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\Output\\Images\\AllMask3";
+         Directory.CreateDirectory(outPath);
+         Random rnd = new Random();
+         for (int i = 0; i < carModels.Count; i++)
+         {
+            CarModel carModel = carModels[i];
+            List<string> imagesPath = carModel.ImagesPath;
+            List<string> randImagesPath = imagesPath.OrderBy(x => rnd.Next()).Take((int) Math.Round(imagesPath.Count * 0.6)).ToList();
+            for (int j = 0; j < randImagesPath.Count; j++)
+            {
+               using (Image<Gray, byte> img = new Image<Gray, byte>(imagePath))
+               //using (Image<Gray, byte> mask = Utils.ExtractMask3(img))
+               {
+                  string fileExtension = Path.GetExtension(imagePath);
+                  string maskPath = $"{randImagesPath}\\{Path.GetFileNameWithoutExtension(imagePath)}{fileExtension}";
+                  Utils.SaveImage(img, maskPath, Utils.GetImageFormatFromFileExtension(fileExtension));
+               }
+            }
+            Utils.ProgressBarIncrement();
+         }
+         Utils.ProgressBarHide();
+         */
       }
 
       private void ButtonTest_Click(object sender, EventArgs e)
@@ -1070,7 +1100,7 @@ namespace IDS
          recogniser = new ModelRecogniser();
 
          Test test = new Test();
-         test.Execute(recogniser, Enums.DbType.Testing, false);
+         test.Execute(recogniser, Enums.DbType.TestingMask, false);
       }
    }
 }

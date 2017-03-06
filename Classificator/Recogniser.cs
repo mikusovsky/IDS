@@ -32,27 +32,49 @@ namespace IDS.IDS.Classificator
          
          m_descriptor = new Descriptor(dbType, m_descriptorType);
 
-         m_classificationModels = Utils.GetAllCarModels(dbType);
-         IList<Matrix<float>> dbDescsList = m_descriptor.ComputeMultipleDescriptors(m_classificationModels, out m_imap, m_importanceMap);
-         Matrix<float> dbDescs = ConcatDescriptors(dbDescsList);
-         foreach (Matrix<float> m in dbDescsList)
+         m_classificationModels = Utils.GetCarModelsForDb(dbType);
+         if (dbType != Enums.DbType.TrainingBrand || true)
          {
-            m.Dispose();
+            ReduceCollection(m_classificationModels);
          }
-         dbDescsList = null;
-         GC.Collect();
 
-         if (Enums.ClassificatorType.KMeans == m_classificatorType)
+         Matrix<float> dbDescs = null;
+         if (!Cache.TryGetFullDescriptor(descriptorType, dbType, ref dbDescs, ref m_imap))
          {
-            m_classificator = new KMeansClassificator();
+            IList<Matrix<float>> dbDescsList = m_descriptor.ComputeMultipleDescriptors(m_classificationModels, out m_imap, m_importanceMap);
+            dbDescs = ConcatDescriptors(dbDescsList);
+            foreach (Matrix<float> m in dbDescsList)
+            {
+               m.Dispose();
+            }
+            dbDescsList = null;
+            GC.Collect();
+            Cache.SaveFullDescriptor(descriptorType, dbType, dbDescs, m_imap);
+         }
+
+         if (Enums.ClassificatorType.KNearest == m_classificatorType)
+         {
+            m_classificator = new KNearestClassificator();
          }
          else
          {
             m_classificator = new SVMClassificator();
          }
          m_classificator.Train(dbType, descriptorType, dbDescs, m_imap);
-
       }
+
+      public void ReduceCollection(List<CarModel> carModels)
+      {
+         Random rnd = new Random();
+         var categories = carModels.GroupBy(x => x.ID);
+         foreach (var category in categories)
+         {
+            foreach (CarModel carModel in category)
+            {
+               carModel.ImagesPath = carModel.ImagesPath.OrderBy(x => rnd.Next()).Take(700).ToList();
+            }
+         }
+      } 
 
       public CarModel Match(Image<Bgr, byte> image, bool? onlyCarMaker = null)
       {

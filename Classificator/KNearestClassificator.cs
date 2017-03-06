@@ -7,7 +7,7 @@ using IntervalTree;
 
 namespace IDS.IDS.Classificator
 {
-   class KMeansClassificator : IClassificator
+   class KNearestClassificator : IClassificator
    {
       private Index m_index;
       private Matrix<float> m_dbDescs;
@@ -40,7 +40,7 @@ namespace IDS.IDS.Classificator
          Matrix<int> indices = new Matrix<int>(data.Rows, 2); // matrix that will contain indices of the 2-nearest neighbors found
          Matrix<float> dists = new Matrix<float>(data.Rows, 2); // matrix that will contain distances to the 2-nearest neighbors found
 
-         m_index.KnnSearch(data, indices, dists, 2, 64);//24
+         m_index.KnnSearch(data, indices, dists, 2, 64);//24,64
          //index.RadiusSearch(queryDescriptors, indices, dists, 2, 64);
          Dictionary<CarModel, int> carModelCount = new Dictionary<CarModel, int>();
 
@@ -61,6 +61,10 @@ namespace IDS.IDS.Classificator
                }
                carModelCount[model]++;
             }
+         }
+         if (carModelCount.Count == 0)
+         {
+            return null;
          }
          List<KeyValuePair<CarModel, int>> keyValues = carModelCount.Keys.Select(carModel => new KeyValuePair<CarModel, int>(carModel, carModelCount[carModel])).ToList();
          CarModel resutl = keyValues.OrderByDescending(o => o.Value).ToList()[0].Key;

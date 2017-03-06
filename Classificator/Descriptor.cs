@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using IDS.IDS.IntervalTree;
@@ -11,7 +10,7 @@ namespace IDS.IDS.Classificator
    {
       private Enums.DbType m_dbType;
       private Enums.DescriptorType m_type;
-
+      
       public Descriptor(Enums.DbType dbType, Enums.DescriptorType type)
       {
          m_dbType = dbType;
@@ -31,7 +30,7 @@ namespace IDS.IDS.Classificator
       public IList<Matrix<float>> ComputeMultipleDescriptors(List<CarModel> carModels, out IList<IndecesMapping> imap, Matrix<float> importanceMap)
       {
          imap = new List<IndecesMapping>();
-
+         
          IList<Matrix<float>> descs = new List<Matrix<float>>();
          int imagesCount = 0;
          for (int i = 0; i < carModels.Count; i++)
@@ -69,6 +68,5 @@ namespace IDS.IDS.Classificator
          Utils.ProgressBarHide();
          return descs;
       }
-
    }
 }
