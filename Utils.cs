@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -11,24 +9,26 @@ using System.Linq;
 using System.Xml;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
-using Emgu.CV.Features2D;
-using Emgu.CV.Flann;
 using Emgu.CV.Structure;
-using Emgu.CV.Util;
-using IDS.IDS.Classificator;
 using IDS.IDS.DataAugmentation;
-using IDS.IDS.IntervalTree;
 
 namespace IDS.IDS
 {
    public static class Utils
    {
+      private static DateTime m_startDateTime = DateTime.Now;
+
       private static System.Windows.Forms.ProgressBar m_progressBar;
 
       //private static readonly LicensePlateDetector m_licencePlateDetector = new LicensePlateDetector();
 
       public static string CurentVideoPath { get; set; }
       public static Dictionary<CarModel, Matrix<float>> ImportanceMaps = new Dictionary<CarModel, Matrix<float>>();
+
+      public static string GetLogFilePath(Enums.DbType testedDbType, Enums.DescriptorType makerDescriptorType, Enums.DescriptorType modelDescriptorType)
+      {
+         return $"{Deffinitions.OUTPUT_PATH_LOG}\\{testedDbType} {makerDescriptorType} {modelDescriptorType} {m_startDateTime.ToString("dd_mm_yy_H_mm_ss")}.txt";
+      }
 
       public static void HdToLow(Image<Bgr, Byte> hdFrame, ref Image<Bgr, Byte> lowFrame)
       {
@@ -89,6 +89,7 @@ namespace IDS.IDS
          {
             return null;
          }
+         Utils.LogImage("original", image);
          Image<Gray, byte> grayImage = ToGray(image);
          Image<Gray, float> sobel = grayImage.Sobel(0, 1, 5);
 
@@ -113,20 +114,22 @@ namespace IDS.IDS
          Image<Gray, byte> cannyGray = grayImage.Canny(new Gray(10), new Gray(60));
          //CvInvoke.cvShowImage("cannyGray", cannyGray);
          SetStrongestEdges(cannyGray, 7);
-         List<int> histogram = GetHistogramY(cannyGray);
+         List<int> histogram = GetHistogramY(cannyGray, true);
+         GetHistogramY(sobel, true);
          int windowStartPost = _GetMaxDif(histogram, 20, shadowPos);
-         histogram = GetHistogramX(cannyGray);
+         histogram = GetHistogramX(cannyGray, true);
          int leftPos = _GetMinFromLeft(histogram);
          int rigntPos = _GetMinFromRight(histogram);
 
          if (Deffinitions.DEBUG_MODE)
          {
-            _DrawLineY(sobel, shadowPos);
-            _DrawLineY(sobel, windowStartPost);
-            _DrawLineX(sobel, leftPos);
-            _DrawLineX(sobel, rigntPos);
+            _DrawLineY(image, shadowPos, new Bgr(0,0,255));
+            //_DrawLineY(image, windowStartPost, new Bgr(0, 0, 255));
+            //_DrawLineX(image, leftPos, new Bgr(0, 0, 255));
+            //_DrawLineX(image, rigntPos, new Bgr(0, 0, 255));
             Utils.LogImage("sobel", sobel);
             Utils.LogImage("cannyGray", cannyGray);
+            Utils.LogImage("original1", image);
          }
          int width = rigntPos - leftPos;
          int height = shadowPos - windowStartPost;
@@ -166,16 +169,12 @@ namespace IDS.IDS
          int height = Deffinitions.MASK_HEIGHT_FROM_FRAME;
          int halfWidth = Deffinitions.MASK_WIDTH_FROM_FRAME / 2;
          double minDiffSum = Int32.MaxValue;
+         List<int> difs = new List<int>();
          int minX = 0;
          using (Image<Gray, byte> edges = grayImage/*grayImage.Canny(new Gray(10), new Gray(60))*/)
          {
             for (int i = 0; i + Deffinitions.MASK_WIDTH_FROM_FRAME < edges.Width; i++)
             {
-               if (i == 47)
-               {
-                  int g = 0;
-                  g++;
-               }
                using (Image<Gray, byte> subFrame = CropImage(edges, i, shadowPos - height, width, height))
                using (Image<Gray, byte> left = CropImage(subFrame, 0, 0, halfWidth, height))
                using (Image<Gray, byte> right = CropImage(subFrame, halfWidth, 0, halfWidth, height).Flip(FLIP.HORIZONTAL))
@@ -196,12 +195,16 @@ namespace IDS.IDS
                      minX = i;
                      minDiffSum = diffSum;
                   }
-
+                  difs.Add(Convert.ToInt32(diffSum));
                }
             }
          }
          Image<Bgr, byte> retImg = CropImage(image, minX, shadowPos - height, width, height);
+         _DrawLineY(image, shadowPos, new Bgr(0,0,255));
+         Utils.LogImage("original", image);
          Utils.LogImage("mask", retImg);
+         difs = difs.Select(x => 100*x/difs.Max()).ToList();
+         Plot(difs, "difs");
          return retImg;
       }
 
@@ -247,7 +250,6 @@ namespace IDS.IDS
                using (Image<Gray, byte> difference = left.AbsDiff(right).ThresholdBinary(new Gray(60), new Gray(255)))
                {
                   //Console.WriteLine($"{i} - {subFrame.Rows},{subFrame.Cols} ==> {left.Rows}=={right.Rows}, {left.Cols}=={right.Cols}");
-
                   double diffSum = 0;
                   for (int j = 0; j < difference.Rows; j++)
                   {
@@ -261,7 +263,6 @@ namespace IDS.IDS
                      minX = i;
                      minDiffSum = diffSum;
                   }
-
                }
             }
          }
@@ -343,6 +344,16 @@ namespace IDS.IDS
          }
          return values.Count - 1;
       }
+      private static void _DrawLineX(Image<Bgr, byte> img, int x, Bgr color)
+      {
+         for (int i = 0; i < 5; i++)
+         {
+            for (int j = 0; j < img.Rows && x - i >= 0 && x - i < img.Cols; j++)
+            {
+               img[j, x - i] = color;
+            }
+         }
+      }
 
       private static void _DrawLineX(Image<Gray, float> img, int x)
       {
@@ -351,6 +362,17 @@ namespace IDS.IDS
             for (int j = 0; j < img.Rows && x - i >= 0 && x - i < img.Cols; j++)
             {
                img[j, x - i] = new Gray(-255);
+            }
+         }
+      }
+
+      private static void _DrawLineY(Image<Bgr, byte> img, int y, Bgr color)
+      {
+         for (int i = 0; i < 5; i++)
+         {
+            for (int j = 0; j < img.Cols && y - i >= 0 && y - i <= img.Rows; j++)
+            {
+               img[y - i, j] = color;
             }
          }
       }
@@ -436,6 +458,7 @@ namespace IDS.IDS
             gr.DrawImage(image.Bitmap, rc);
             roiImage.ROI = new Rectangle(roiX, roiY, roiWidth, roiHight);
          }
+         Image<Bgr, byte> color = new Image<Bgr, byte>(roiImage.Bitmap);
          //roiImage._EqualizeHist();
          roiImage._GammaCorrect(1.5d);
          //roiImage._ThresholdBinary(new Bgr(150,150,150), new Bgr(255,255,255));
@@ -470,11 +493,34 @@ namespace IDS.IDS
             return null;
          }
 
-         int maskX = GetMaskMinXFromLP(finalContour.BoundingRectangle.X, finalContour.BoundingRectangle.Width);
-         int maskY = roiY - GetMaskMinYFromLP(finalContour.BoundingRectangle.Y, finalContour.BoundingRectangle.Width);
+
+         /*** REMOVE START ***/
+         CvInvoke.cvDrawContours(color, finalContour, new MCvScalar(255), new MCvScalar(255), -1, 1, Emgu.CV.CvEnum.LINE_TYPE.EIGHT_CONNECTED, new Point(0, 0));
+         color.Draw(finalContour.BoundingRectangle, new Bgr(0, 255, 0), 1);
+         /*** REMOVE END ***/
+
+
+         int maskX = roiX + GetMaskMinXFromLP(finalContour.BoundingRectangle.X, finalContour.BoundingRectangle.Width);
+         int maskY = roiY + GetMaskMinYFromLP(finalContour.BoundingRectangle.Y, finalContour.BoundingRectangle.Width);
          int maskWidth = GetMaskWidthFromLP(finalContour.BoundingRectangle.Width);
          int maskHeight = GetMaskHeightFromLP(finalContour.BoundingRectangle.Width);
          //Image<Bgr, Byte> imageMask = new Image<Bgr, byte>(new Bitmap(imageWidth, imageHeight));
+
+         Point p1 = new Point(maskX, maskY);
+         Point p2 = new Point(maskX + maskWidth, maskY);
+         Point p3 = new Point(maskX + maskWidth, maskY + maskHeight);
+         Point p4 = new Point(maskX, maskY + maskHeight);
+
+         LineSegment2D line1 = new LineSegment2D(p1, p2);
+         LineSegment2D line2 = new LineSegment2D(p2, p3);
+         LineSegment2D line3 = new LineSegment2D(p3, p4);
+         LineSegment2D line4 = new LineSegment2D(p4, p1);
+         image.Draw(line1, new Bgr(Color.Red), 1);
+         image.Draw(line2, new Bgr(Color.Red), 1);
+         image.Draw(line3, new Bgr(Color.Red), 1);
+         image.Draw(line4, new Bgr(Color.Red), 1);
+         LogImage("lines", image);
+
          Image<Bgr, Byte> imageMask = new Image<Bgr, byte>(bitmap);
 
          /*** EXTRACT MASK ***/
@@ -487,12 +533,12 @@ namespace IDS.IDS
             gr.DrawImage(image.Bitmap, rc);
             imageMask.ROI = new Rectangle(maskX, maskY, maskWidth, maskHeight);
          }
-
+         Utils.LogImage("mask conturs", color);
          Utils.LogImage("car mask", imageMask);
          return imageMask;
       }
 
-      public static void Plot(List<int> values)
+      public static void Plot(List<int> values, string name)
       {
          // add 5 so the bars fit properly
          int x = values.Count; // the position of the X axis
@@ -512,7 +558,7 @@ namespace IDS.IDS
          // let's draw a coordinate equivalent to (20,30) (20 up, 30 across)
          g.DrawString("X", new Font("Calibri", 12), new SolidBrush(Color.Black), y + 30, x - 20);
 
-         Utils.LogImage("Plot", new Image<Rgb, byte>(bmp));
+         Utils.LogImage(name, new Image<Rgb, byte>(bmp));
       }
 
       private static int _GetMaxDif(List<int> histogram, int gap, int maxY)
@@ -545,7 +591,26 @@ namespace IDS.IDS
          }
          if (show)
          {
-            Plot(values);
+            Plot(values, Resources.HistogramY);
+         }
+         return values;
+      }
+
+      public static List<int> GetHistogramY(Image<Gray, float> img, bool show = false)
+      {
+         List<int> values = new List<int>();
+         for (int i = 0; i < img.Rows; i++)
+         {
+            int actualRow = 0;
+            for (int j = 0; j < img.Cols; j++)
+            {
+               actualRow += img[i, j].Intensity > 0 ? 1 : 0;
+            }
+            values.Add(actualRow);
+         }
+         if (show)
+         {
+            Plot(values, Resources.HistogramY);
          }
          return values;
       }
@@ -564,7 +629,7 @@ namespace IDS.IDS
          }
          if (show)
          {
-            Plot(values);
+            Plot(values, Resources.HistogramX);
          }
          return values;
       }
@@ -666,7 +731,7 @@ namespace IDS.IDS
 
       public static double GetMaskHeightFromLP(double width)
       {
-         return width * Deffinitions.MASK_HEIGHT_FACTOR;
+         return width * Deffinitions.MASK_HEIGHT_FACTOR / 2;
       }
 
       public static int GetMaskMinXFromLP(int x, int width)
@@ -678,7 +743,7 @@ namespace IDS.IDS
 
       public static double GetMaskMinXFromLP(double x, double width)
       {
-         return (2 * x + width - Deffinitions.MASK_WIDTH_FACTOR) / 2;
+         return ((x + width / 2) - width / 2 * Deffinitions.MASK_WIDTH_FACTOR);
       }
 
       public static int GetMaskMinYFromLP(int y, int width)
@@ -690,7 +755,8 @@ namespace IDS.IDS
 
       public static double GetMaskMinYFromLP(double y, double width)
       {
-         return (2 * y - width + Deffinitions.MASK_WIDTH_FACTOR) / 2;
+         return (y + width / 2) - width / 2 * Deffinitions.MASK_HEIGHT_FACTOR;
+         //return (2 * y - width + Deffinitions.MASK_WIDTH_FACTOR) / 2;
       }
 
       public static Image<Gray, byte> ExtractEdges(Image<Gray, byte> img)
@@ -751,6 +817,26 @@ namespace IDS.IDS
                configPath = Deffinitions.TESTING_MASK_DB_CONFIG_PATH;
                break;
 
+            case Enums.DbType.TestingMask360:
+               configPath = Deffinitions.TESTING_MASK_DB360_CONFIG_PATH;
+               break;
+
+            case Enums.DbType.TestingMask540:
+               configPath = Deffinitions.TESTING_MASK_DB540_CONFIG_PATH;
+               break;
+
+            case Enums.DbType.TestingMask576:
+               configPath = Deffinitions.TESTING_MASK_DB576_CONFIG_PATH;
+               break;
+
+            case Enums.DbType.TestingMask720:
+               configPath = Deffinitions.TESTING_MASK_DB720_CONFIG_PATH;
+               break;
+
+            case Enums.DbType.TestingMask900:
+               configPath = Deffinitions.TESTING_MASK_DB900_CONFIG_PATH;
+               break;
+
             case Enums.DbType.Subset1:
                configPath = Deffinitions.TRAINING_DB_NORMALIZED_CONFIG_PATH_PODSKUPINA1;
                break;
@@ -778,7 +864,7 @@ namespace IDS.IDS
             case Enums.DbType.TrainingVolkswagen:
                configPath = Deffinitions.TRAINING_DB_VOLKSWAGEN_CONFIG_PATH;
                break;
-               
+
             case Enums.DbType.TrainingDbForBrand:
                configPath = Deffinitions.TESTING_DB_FOR_BRAND_CONFIG_PATH;
                break;
@@ -789,6 +875,26 @@ namespace IDS.IDS
 
             case Enums.DbType.TestingBrandMask:
                configPath = Deffinitions.TESTING_DB_BRAND_MASK_CONFIG_PATH;
+               break;
+
+            case Enums.DbType.TestingBrandMask360:
+               configPath = Deffinitions.TESTING_DB_BRAND_MASK360_CONFIG_PATH;
+               break;
+
+            case Enums.DbType.TestingBrandMask540:
+               configPath = Deffinitions.TESTING_DB_BRAND_MASK540_CONFIG_PATH;
+               break;
+
+            case Enums.DbType.TestingBrandMask576:
+               configPath = Deffinitions.TESTING_DB_BRAND_MASK576_CONFIG_PATH;
+               break;
+
+            case Enums.DbType.TestingBrandMask720:
+               configPath = Deffinitions.TESTING_DB_BRAND_MASK720_CONFIG_PATH;
+               break;
+
+            case Enums.DbType.TestingBrandMask900:
+               configPath = Deffinitions.TESTING_DB_BRAND_MASK900_CONFIG_PATH;
                break;
 
             default:
@@ -1087,6 +1193,55 @@ namespace IDS.IDS
             default:
                throw new NotImplementedException();
          }
+      }
+
+      public static void GenerateTestingDb()
+      {
+         int oldHeight = 1080;
+         int[] newHeights = { 360, 540, 576, 720, 900 };
+         string oldDbName = "TestingDbBrandMask";
+         string[] newDbNames = newHeights.Select(x => $"{oldDbName}{x}").ToArray();
+         for (int i = 0; i < newHeights.Length; i++)
+         {
+            ResizeDb(Enums.DbType.TestingBrandMask, oldDbName, newDbNames[i], oldHeight, newHeights[i]);
+            Console.WriteLine(i);
+         }
+      }
+
+      //frame resolution is 16:9
+      public static void ResizeDb(Enums.DbType dbType, string oldDbName, string newDbName, int oldHeight, int newHeight)
+      {
+         float foldHeigyh = (float)oldHeight;
+         float fnewHeight = (float)newHeight;
+         float ratio = fnewHeight / foldHeigyh;
+         List<CarModel> dbModels = GetCarModelsForDb(dbType);
+         foreach (CarModel model in dbModels)
+         {
+            string modelImgPath = model.ImagePath;
+            string newModelImagePath = modelImgPath.Replace(oldDbName, newDbName);
+            Directory.CreateDirectory(newModelImagePath);
+            foreach (string imagePath in model.ImagesPath)
+            {
+               using (Image<Gray, byte> img = new Image<Gray, byte>(imagePath))
+               using (Image<Gray, byte> resizedImg = Resize(img, Convert.ToInt32(Math.Round(img.Width * ratio)), Convert.ToInt32(Math.Round(img.Height * ratio))))
+               {
+                  string imageName = Path.GetFileName(imagePath);
+                  string extension = Path.GetExtension(imagePath);
+                  string newImagePath = $"{newModelImagePath}\\{imageName}";
+                  SaveImage(resizedImg, newImagePath, GetImageFormatFromFileExtension(extension));
+               }
+            }
+         }
+      }
+
+      public static Bitmap ChangePixelFormat(Bitmap img, PixelFormat newFormat)
+      {
+         var bmp = new Bitmap(img.Width, img.Height, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+         using (var gr = Graphics.FromImage(bmp))
+         {
+            gr.DrawImage(img, new Rectangle(0, 0, img.Width, img.Height));
+         }
+         return bmp;
       }
    }
 }

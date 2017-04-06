@@ -177,9 +177,9 @@ namespace IDS
          //CvInvoke.cvShowImage("carPhoto", _carMask);
       }
 
-      public Image<Bgr, Byte> GetCarPhoto()
+      public Image<Bgr, byte> GetCarPhoto()
       {
-         string path = $"D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\Output\\Images\\{Path.GetFileName(Utils.CurentVideoPath).Split('.')[0]}";
+         string path = $"{Deffinitions.OUTPUT_PATH_IMAGES}\\{Path.GetFileName(Utils.CurentVideoPath).Split('.')[0]}";
          if (!Directory.Exists(path))
          {
             Directory.CreateDirectory(path);

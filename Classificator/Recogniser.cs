@@ -7,7 +7,7 @@ using IDS.IDS.IntervalTree;
 
 namespace IDS.IDS.Classificator
 {
-   public class Recogniser : IRecogniser
+   public class Recogniser
    {
       private List<CarModel> m_classificationModels;
 
@@ -33,15 +33,24 @@ namespace IDS.IDS.Classificator
          m_descriptor = new Descriptor(dbType, m_descriptorType);
 
          m_classificationModels = Utils.GetCarModelsForDb(dbType);
-         if (dbType != Enums.DbType.TrainingBrand || true)
-         {
-            ReduceCollection(m_classificationModels);
-         }
+         ReduceCollection(m_classificationModels, dbType);
 
          Matrix<float> dbDescs = null;
          if (!Cache.TryGetFullDescriptor(descriptorType, dbType, ref dbDescs, ref m_imap))
          {
             IList<Matrix<float>> dbDescsList = m_descriptor.ComputeMultipleDescriptors(m_classificationModels, out m_imap, m_importanceMap);
+            string line1 = "";
+            string line2 = "";
+            List<int> keys = Cache.KeyPointsCount.Keys.ToList();
+            keys.Sort();
+            foreach (int key in keys)
+            {
+               line1 += key + "\t";
+               line2 += Cache.KeyPointsCount[key] + "\t";
+            }
+            Console.WriteLine($"{dbType}_{descriptorType}");
+            Console.WriteLine(line1);
+            Console.WriteLine(line2);
             dbDescs = ConcatDescriptors(dbDescsList);
             foreach (Matrix<float> m in dbDescsList)
             {
@@ -49,6 +58,7 @@ namespace IDS.IDS.Classificator
             }
             dbDescsList = null;
             GC.Collect();
+
             Cache.SaveFullDescriptor(descriptorType, dbType, dbDescs, m_imap);
          }
 
@@ -63,7 +73,7 @@ namespace IDS.IDS.Classificator
          m_classificator.Train(dbType, descriptorType, dbDescs, m_imap);
       }
 
-      public void ReduceCollection(List<CarModel> carModels)
+      public void ReduceCollection(List<CarModel> carModels, Enums.DbType dbType)
       {
          Random rnd = new Random();
          var categories = carModels.GroupBy(x => x.ID);
@@ -71,7 +81,14 @@ namespace IDS.IDS.Classificator
          {
             foreach (CarModel carModel in category)
             {
-               carModel.ImagesPath = carModel.ImagesPath.OrderBy(x => rnd.Next()).Take(700).ToList();
+               if (dbType == Enums.DbType.TrainingBrand)
+               {
+                  carModel.ImagesPath = carModel.ImagesPath.OrderBy(x => rnd.Next()).Take(10000).ToList();
+               }
+               else
+               {
+                  carModel.ImagesPath = carModel.ImagesPath.OrderBy(x => rnd.Next()).Take(700).ToList();
+               }
             }
          }
       } 

@@ -23,7 +23,16 @@
          Training = 1,
          TrainingNormalized = 2,
          Testing = 3,
-         TestingMask = 4,
+
+
+         TestingMask = 21,
+         TestingMask360 = 22,
+         TestingMask540 = 23,
+         TestingMask576 = 24,
+         TestingMask720 = 25,
+         TestingMask900 = 26,
+
+
          Subset1 = 5,
          Subset2 = 6,
          TrainingBrand = 7,
@@ -34,7 +43,15 @@
          TestingBrand = 12,
          TrainingDbForBrand = 13,
          TrainingDbForBrandNormalized = 14,
-         TestingBrandMask = 15
+
+
+         TestingBrandMask = 15,
+         TestingBrandMask360 = 16,
+         TestingBrandMask540 = 17,
+         TestingBrandMask576 = 18,
+         TestingBrandMask720 = 19,
+         TestingBrandMask900 = 20
+
       }
 
       public enum DescriptorType

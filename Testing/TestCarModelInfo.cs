@@ -21,6 +21,11 @@ namespace IDS.IDS.Testing
          m_matches.Add(model);
       }
 
+      public List<CarModel> GetMatches()
+      {
+         return m_matches;
+      }
+
       public string GetGroupsSorted()
       {
          StringBuilder sb = new StringBuilder();

@@ -7,6 +7,7 @@ using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using Emgu.CV.VideoSurveillance;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -261,7 +262,7 @@ namespace IDS
       //hlavna metoda na spracovanie kazdeho framu
       private void _MyTimerTick(object sender, EventArgs e)
       {
-         bool notifyEndVideos = (bool) ((Timer)sender).Tag;
+         bool notifyEndVideos = (bool)((Timer)sender).Tag;
          _sw = Stopwatch.StartNew();
 
          _frameHD = _capture.QueryFrame();
@@ -859,7 +860,7 @@ namespace IDS
 
             string onlyfilename = Path.GetFileName(path);
             RoadParamForm roadParam = new RoadParamForm(_frameLow, onlyfilename);
-            
+
             roadParam.ShowAndClose();
 
             if (roadParam.IsSetAllRoadParam)
@@ -1052,8 +1053,9 @@ namespace IDS
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                Image<Bgr, byte> image = new Image<Bgr, byte>(new Bitmap(dlg.FileName));
-               CarModel mathecsModel = Recogniser.Match(Utils.Resize(Utils.ToGray(Utils.ExtractMask3(image)), Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT));
-               Console.WriteLine($"{mathecsModel.Maker} - {mathecsModel.Model} - {mathecsModel.Generation}");
+               Utils.ExtractMask3(image);
+               //CarModel mathecsModel = Recogniser.Match(Utils.Resize(Utils.ToGray(Utils.ExtractMask3(image)), Deffinitions.NORMALIZE_MASK_WIDTH, Deffinitions.NORMALIZE_MASK_HEIGHT));
+               //Console.WriteLine($"{mathecsModel.Maker} - {mathecsModel.Model} - {mathecsModel.Generation}");
             }
          }
       }
@@ -1064,43 +1066,83 @@ namespace IDS
          Utils.NormalizeDb(Enums.DbType.TrainingDbForBrand);
          Utils.CreateBrandMaskDb();
          */
-
+         //Utils.GenerateTestingDb();
          /*
-         List<CarModel> carModels = Utils.GetCarModelsForDb(Enums.DbType.TestingMask);
-         Utils.ProgressBarShow(carModels.Count);
-         string outPath = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\Output\\Images\\AllMask3";
-         Directory.CreateDirectory(outPath);
-         Random rnd = new Random();
-         for (int i = 0; i < carModels.Count; i++)
-         {
-            CarModel carModel = carModels[i];
-            List<string> imagesPath = carModel.ImagesPath;
-            List<string> randImagesPath = imagesPath.OrderBy(x => rnd.Next()).Take((int) Math.Round(imagesPath.Count * 0.6)).ToList();
-            for (int j = 0; j < randImagesPath.Count; j++)
+            List<CarModel> carModels = Utils.GetCarModelsForDb(Enums.DbType.TrainingNormalized);
+            Utils.ProgressBarShow(carModels.Count);
+            string outPath = "D:\\Skola\\UK\\DiplomovaPraca\\PokracovaniePoPredchodcovi\\zdrojové kódy\\Output\\Images\\AllMask3";
+            Directory.CreateDirectory(outPath);
+            Random rnd = new Random();
+            for (int i = 0; i < carModels.Count; i++)
             {
-               using (Image<Gray, byte> img = new Image<Gray, byte>(imagePath))
-               //using (Image<Gray, byte> mask = Utils.ExtractMask3(img))
+               CarModel carModel = carModels[i];
+               List<string> imagesPath = carModel.ImagesPath;
+               List<string> randImagesPath = imagesPath.OrderBy(x => rnd.Next()).Take((int) Math.Round(imagesPath.Count * 0.6)).ToList();
+               for (int j = 0; j < randImagesPath.Count; j++)
                {
-                  string fileExtension = Path.GetExtension(imagePath);
-                  string maskPath = $"{randImagesPath}\\{Path.GetFileNameWithoutExtension(imagePath)}{fileExtension}";
-                  Utils.SaveImage(img, maskPath, Utils.GetImageFormatFromFileExtension(fileExtension));
+                  using (Image<Gray, byte> img = new Image<Gray, byte>(imagePath))
+                  //using (Image<Gray, byte> mask = Utils.ExtractMask3(img))
+                  {
+                     string fileExtension = Path.GetExtension(imagePath);
+                     string maskPath = $"{randImagesPath}\\{Path.GetFileNameWithoutExtension(imagePath)}{fileExtension}";
+                     Utils.SaveImage(img, maskPath, Utils.GetImageFormatFromFileExtension(fileExtension));
+                  }
+               }
+               Utils.ProgressBarIncrement();
+            }
+            Utils.ProgressBarHide();
+         */
+
+
+         int i = 0;
+         List<CarModel> carModels = Utils.GetCarModelsForDb(Enums.DbType.TestingMask);
+         foreach (CarModel carModel in carModels)
+         {
+            string imgPath = carModel.ImagePath;
+            string newImgPath = imgPath.Replace("TestingDbMask", "NeuroTestingDb");
+            Directory.CreateDirectory(newImgPath);
+            foreach (string imgSrc in carModel.ImagesPath)
+            {
+               ImageFormat imageFormat = Utils.GetImageFormatFromFileExtension(Path.GetExtension(imgSrc));
+               string imageName = Path.GetFileNameWithoutExtension(imgSrc);
+               string newImageSrc = $"{newImgPath}\\{imageName}.jpg";
+               using (Image<Gray, byte> image = new Image<Gray, byte>(imgSrc))
+               using (Bitmap normallized = (Utils.ChangePixelFormat(image.Bitmap, PixelFormat.Format32bppArgb)))
+               {
+                  normallized.Save(newImageSrc, ImageFormat.Jpeg);
                }
             }
-            Utils.ProgressBarIncrement();
+            Console.WriteLine($"{++i} of {carModels.Count}");
          }
-         Utils.ProgressBarHide();
-         */
+         Console.WriteLine("Normalization finished");
       }
+
+      private static List<Enums.DbType> TestingDbsBrandMask = new List<Enums.DbType>
+      {
+         Enums.DbType.TestingBrandMask,
+         Enums.DbType.TestingBrandMask360,
+         Enums.DbType.TestingBrandMask540,
+         Enums.DbType.TestingBrandMask576,
+         Enums.DbType.TestingBrandMask720,
+         Enums.DbType.TestingBrandMask900
+      };
+
+      private static List<Enums.DbType> TestingDbsModelMask = new List<Enums.DbType>
+      {
+         Enums.DbType.TestingMask,
+         Enums.DbType.TestingMask360,
+         Enums.DbType.TestingMask540,
+         Enums.DbType.TestingMask576,
+         Enums.DbType.TestingMask720,
+         Enums.DbType.TestingMask900
+      };
 
       private void ButtonTest_Click(object sender, EventArgs e)
       {
-         IRecogniser recogniser;
-         //classificator = new SurfClassificator();
-         //classificator = new SiftClassificator();
-         recogniser = new ModelRecogniser();
+         IRecogniser recogniser = new ModelRecogniser();
 
          Test test = new Test();
-         test.Execute(recogniser, Enums.DbType.TestingMask, false);
+         test.Execute(recogniser, TestingDbsModelMask, false);
       }
    }
 }

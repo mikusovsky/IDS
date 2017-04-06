@@ -124,6 +124,24 @@ namespace IDS.IDS {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Histogram X.
+        /// </summary>
+        internal static string HistogramX {
+            get {
+                return ResourceManager.GetString("HistogramX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Histogram Y.
+        /// </summary>
+        internal static string HistogramY {
+            get {
+                return ResourceManager.GetString("HistogramY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to LoadDb.
         /// </summary>
         internal static string LoadDb {

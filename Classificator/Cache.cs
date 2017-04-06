@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Json;
-using System.Text;
 using System.Xml;
 using Emgu.CV;
 using Emgu.CV.Features2D;
@@ -24,6 +22,8 @@ namespace IDS.IDS
       private static Dictionary<string, XmlDocument> XmlDocuments = new Dictionary<string, XmlDocument>();
       private static Dictionary<string, Matrix<float>> AvarageModelMaps = new Dictionary<string, Matrix<float>>();
       private static Dictionary<string, CarModel> CachedCarModels = new Dictionary<string, CarModel>();  //string - savet path
+
+      public static Dictionary<int, int> KeyPointsCount = new Dictionary<int, int>(); 
 
       private const int CODE_INDEX_MAPING = 1;
       private const int CODE_END = 2;
@@ -151,17 +151,95 @@ namespace IDS.IDS
          return descs;
       }
 
-      public static VectorOfKeyPoint GetKeyPoints(Image<Gray, byte> image, Enums.DescriptorType descriptorType)
+      private static void ShowKeyPoints(VectorOfKeyPoint keyPoints, Image<Gray, byte> img)
       {
+         if (keyPoints == null)
+         {
+            return;
+         }
+         Image<Bgr, byte> colorImage = new Image<Bgr, byte>(new Bitmap(img.Bitmap.Width, img.Bitmap.Height));
+         for (int i = 0; i < img.Bitmap.Width; i++)
+         {
+            for (int j = 0; j < img.Bitmap.Height; j++)
+            {
+               colorImage.Bitmap.SetPixel(i, j, img.Bitmap.GetPixel(i, j));
+            }
+         }
+         Emgu.CV.Structure.Bgr KeyPointColor = new Bgr(0, 0, 255);
+         MKeyPoint[] usedKeyP = keyPoints.ToArray();
+         for (int i = 0; i < usedKeyP.Length; i++)
+         {
+            int x = Convert.ToInt32(usedKeyP[i].Point.Y);
+            int y = Convert.ToInt32(usedKeyP[i].Point.X);
+            colorImage[x, y] = KeyPointColor;
+         }
+         Utils.LogImage(Utils.RandomString(3), colorImage);
+      }
+
+      public static VectorOfKeyPoint _GetKeyPoints(Image<Gray, byte> image, Enums.DescriptorType descriptorType)
+      {
+         VectorOfKeyPoint keyPoints = null;
+         VectorOfKeyPoint keyPoints1;
+         Image<Gray, byte> cannyGray = image.Canny(new Gray(10), new Gray(60));
+
          if (descriptorType == Enums.DescriptorType.SIFT)
          {
-            return SiftDetector.DetectKeyPointsRaw(image, null);
+            keyPoints = SiftDetector.DetectKeyPointsRaw(image, null);
+            //ShowKeyPoints(keyPoints, image);
+            if (keyPoints == null || keyPoints.Size < 14)
+            {
+               keyPoints1 = SiftDetector.DetectKeyPointsRaw(cannyGray, null);
+               //ShowKeyPoints(keyPoints1, image);
+               foreach (MKeyPoint keyPoint in keyPoints1.ToArray())
+               {
+                  keyPoints.Push(new[] { keyPoint });
+                  if (keyPoints.Size >= 14)
+                  {
+                     break;
+                  }
+               }
+            }
+            //ShowKeyPoints(keyPoints, image);
          }
          else if (descriptorType == Enums.DescriptorType.ORB)
          {
-            return OrbDetector.DetectKeyPointsRaw(image, null);
+            keyPoints = OrbDetector.DetectKeyPointsRaw(image, null);
+            if (keyPoints == null || keyPoints.Size < 14)
+            {
+               keyPoints1 = OrbDetector.DetectKeyPointsRaw(cannyGray, null);
+               foreach (MKeyPoint keyPoint in keyPoints1.ToArray())
+               {
+                  keyPoints.Push(new[] { keyPoint });
+                  if (keyPoints.Size >= 14)
+                  {
+                     break;
+                  }
+               }
+            }
          }
-         return SurfDetector.DetectKeyPointsRaw(image, null);
+         else if (descriptorType == Enums.DescriptorType.SURF)
+         {
+            keyPoints = SurfDetector.DetectKeyPointsRaw(image, null);
+            if (keyPoints == null || keyPoints.Size < 14)
+            {
+               keyPoints1 = SurfDetector.DetectKeyPointsRaw(cannyGray, null);
+               foreach (MKeyPoint keyPoint in keyPoints1.ToArray())
+               {
+                  keyPoints.Push(new[] { keyPoint });
+                  if (keyPoints.Size >= 14)
+                  {
+                     break;
+                  }
+               }
+            }
+         }
+         int count = keyPoints?.Size ?? 0;
+         if (!KeyPointsCount.ContainsKey(count))
+         {
+            KeyPointsCount[count] = 0;
+         }
+         KeyPointsCount[count] += 1;
+         return keyPoints;
       }
 
       private static Matrix<float> _GetSurfDescriptor(Image<Gray, byte> image, Matrix<float> importanceMap = null)
@@ -182,7 +260,7 @@ namespace IDS.IDS
                Utils.LogImage("image after mask aplication", testImage);
             }
             Image<Gray, byte> edges = testImage; //Utils.ExtractEdges(image);
-            VectorOfKeyPoint keyPoints = GetKeyPoints(edges, Enums.DescriptorType.SURF);
+            VectorOfKeyPoint keyPoints = _GetKeyPoints(edges, Enums.DescriptorType.SURF);
             return SurfDetector.ComputeDescriptorsRaw(edges, null, keyPoints);
          }
       }
@@ -205,7 +283,7 @@ namespace IDS.IDS
                Utils.LogImage("image after mask aplication", testImage);
             }
             Image<Gray, byte> edges = testImage; //Utils.ExtractEdges(image);
-            VectorOfKeyPoint keyPoints = GetKeyPoints(edges, Enums.DescriptorType.SIFT);
+            VectorOfKeyPoint keyPoints = _GetKeyPoints(edges, Enums.DescriptorType.SIFT);
             return SiftDetector.ComputeDescriptorsRaw(edges, null, keyPoints);
          }
       }
@@ -228,7 +306,7 @@ namespace IDS.IDS
                Utils.LogImage("image after mask aplication", testImage);
             }
             Image<Gray, byte> edges = testImage; //Utils.ExtractEdges(image);
-            VectorOfKeyPoint keyPoints = GetKeyPoints(edges, Enums.DescriptorType.ORB);
+            VectorOfKeyPoint keyPoints = _GetKeyPoints(edges, Enums.DescriptorType.ORB);
             Matrix<byte> ret = OrbDetector.ComputeDescriptorsRaw(edges, null, keyPoints);
             return null;
          }
@@ -353,23 +431,6 @@ namespace IDS.IDS
             }
          }
          return matrix;
-         /*
-         string[] lines = File.ReadAllLines(path);
-         Matrix<float> map = null;
-         for (int i = 0; i < lines.Length; i++)
-         {
-            float[] values = lines[i].Split(' ').ToList().Select(x => (float)Convert.ToDouble(x)).ToArray();
-            if (map == null)
-            {
-               map = new Matrix<float>(lines.Length, values.Length);
-            }
-            for (int j = 0; j < values.Length; j++)
-            {
-               map[i, j] = values[j];
-            }
-         }
-         return map;
-         */
       }
 
       private static void _SaveMatrix(string path, Matrix<float> matrix)
@@ -392,20 +453,6 @@ namespace IDS.IDS
             writer.Flush();
             writer.Close();
          }
-         /*
-            using (TextWriter tw = new StreamWriter(path))
-            {
-               for (int i = 0; i < matrix.Rows; i++)
-               {
-                  for (int j = 0; j < matrix.Cols; j++)
-                  {
-                     tw.Write($"{(j != 0 ? " " : "")}{matrix[i, j]}");
-                  }
-                  tw.WriteLine();
-               }
-               tw.Flush();
-            }
-            */
       }
 
       public static bool IsCachet(string path)

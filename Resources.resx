@@ -138,6 +138,12 @@
   <data name="DayScene" xml:space="preserve">
     <value>Day Scene</value>
   </data>
+  <data name="HistogramX" xml:space="preserve">
+    <value>Histogram X</value>
+  </data>
+  <data name="HistogramY" xml:space="preserve">
+    <value>Histogram Y</value>
+  </data>
   <data name="LoadDb" xml:space="preserve">
     <value>LoadDb</value>
   </data>

@@ -9,24 +9,24 @@ namespace IDS.IDS.Classificator
    {
       private int m_classificatorType = 2;
 
-      IRecogniser _mBrandRecogniser;
-      readonly Dictionary<string, IRecogniser> m_modelRecogniser = new Dictionary<string, IRecogniser>();
+      Recogniser _mBrandRecogniser;
+      readonly Dictionary<string, Recogniser> m_modelRecogniser = new Dictionary<string, Recogniser>();
 
       public List<CarModel> ClassificationModels { get; }
 
-      public void LoadDb(Enums.DbType dbType, Enums.DescriptorType descriptorType, Enums.ClassificatorType classificatorType)
+      public void LoadDb(Enums.DbType dbType, Enums.DescriptorType makerDescriptorType, Enums.DescriptorType modelDescriptorType, Enums.ClassificatorType classificatorType)
       {
          _mBrandRecogniser = new Recogniser();
-         _mBrandRecogniser.LoadDb(Enums.DbType.TrainingBrand, Enums.DescriptorType.SIFT, Enums.ClassificatorType.KNearest);
-         
+         _mBrandRecogniser.LoadDb(Enums.DbType.TrainingBrand, makerDescriptorType, Enums.ClassificatorType.KNearest);
+
          var makers = _mBrandRecogniser.ClassificationModels.GroupBy(o => o.Maker);
          foreach (var g in makers)
          {
             foreach (CarModel maker in g)
             {
-                  IRecogniser recogniser = new Recogniser();
-                  recogniser.LoadDb(Utils.GetDbTypeForMakerString(maker.Maker), Enums.DescriptorType.SURF, Enums.ClassificatorType.KNearest);
-                  m_modelRecogniser[maker.Maker] = recogniser;
+               Recogniser recogniser = new Recogniser();
+               recogniser.LoadDb(Utils.GetDbTypeForMakerString(maker.Maker), modelDescriptorType, Enums.ClassificatorType.KNearest);
+               m_modelRecogniser[maker.Maker] = recogniser;
             }
          }
       }

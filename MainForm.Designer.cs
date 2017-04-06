@@ -64,19 +64,21 @@ namespace IDS
          // 
          // OpenFileButton
          // 
-         this.OpenFileButton.Location = new System.Drawing.Point(17, 145);
+         this.OpenFileButton.Location = new System.Drawing.Point(23, 178);
+         this.OpenFileButton.Margin = new System.Windows.Forms.Padding(4);
          this.OpenFileButton.Name = "OpenFileButton";
-         this.OpenFileButton.Size = new System.Drawing.Size(94, 28);
+         this.OpenFileButton.Size = new System.Drawing.Size(125, 34);
          this.OpenFileButton.TabIndex = 0;
          this.OpenFileButton.Text = global::IDS.IDS.Resources.LoadVideo;
          this.OpenFileButton.UseVisualStyleBackColor = true;
          this.OpenFileButton.Click += new System.EventHandler(this._LoadVideoButton_Click);
          // 
-         // OpenFilesButton
+         // OpenFilesButon
          // 
-         this.OpenFilesButon.Location = new System.Drawing.Point(17, 180);
+         this.OpenFilesButon.Location = new System.Drawing.Point(23, 222);
+         this.OpenFilesButon.Margin = new System.Windows.Forms.Padding(4);
          this.OpenFilesButon.Name = "OpenFilesButon";
-         this.OpenFilesButon.Size = new System.Drawing.Size(92, 26);
+         this.OpenFilesButon.Size = new System.Drawing.Size(123, 32);
          this.OpenFilesButon.TabIndex = 20;
          this.OpenFilesButon.Text = global::IDS.IDS.Resources.LoadVideos;
          this.OpenFilesButon.UseVisualStyleBackColor = true;
@@ -85,9 +87,10 @@ namespace IDS
          // TypeOfSceneLabel
          // 
          this.TypeOfSceneLabel.AutoSize = true;
-         this.TypeOfSceneLabel.Location = new System.Drawing.Point(14, 34);
+         this.TypeOfSceneLabel.Location = new System.Drawing.Point(19, 42);
+         this.TypeOfSceneLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
          this.TypeOfSceneLabel.Name = "TypeOfSceneLabel";
-         this.TypeOfSceneLabel.Size = new System.Drawing.Size(75, 13);
+         this.TypeOfSceneLabel.Size = new System.Drawing.Size(98, 17);
          this.TypeOfSceneLabel.TabIndex = 2;
          this.TypeOfSceneLabel.Text = "Type of scene";
          // 
@@ -95,9 +98,10 @@ namespace IDS
          // 
          this.DaySceneRadioButton.AutoSize = true;
          this.DaySceneRadioButton.Checked = true;
-         this.DaySceneRadioButton.Location = new System.Drawing.Point(15, 50);
+         this.DaySceneRadioButton.Location = new System.Drawing.Point(20, 62);
+         this.DaySceneRadioButton.Margin = new System.Windows.Forms.Padding(4);
          this.DaySceneRadioButton.Name = "DaySceneRadioButton";
-         this.DaySceneRadioButton.Size = new System.Drawing.Size(78, 17);
+         this.DaySceneRadioButton.Size = new System.Drawing.Size(98, 21);
          this.DaySceneRadioButton.TabIndex = 3;
          this.DaySceneRadioButton.TabStop = true;
          this.DaySceneRadioButton.Text = global::IDS.IDS.Resources.DayScene;
@@ -106,9 +110,10 @@ namespace IDS
          // NightSceneRadioButton
          // 
          this.NightSceneRadioButton.AutoSize = true;
-         this.NightSceneRadioButton.Location = new System.Drawing.Point(16, 75);
+         this.NightSceneRadioButton.Location = new System.Drawing.Point(21, 92);
+         this.NightSceneRadioButton.Margin = new System.Windows.Forms.Padding(4);
          this.NightSceneRadioButton.Name = "NightSceneRadioButton";
-         this.NightSceneRadioButton.Size = new System.Drawing.Size(84, 17);
+         this.NightSceneRadioButton.Size = new System.Drawing.Size(106, 21);
          this.NightSceneRadioButton.TabIndex = 4;
          this.NightSceneRadioButton.Text = global::IDS.IDS.Resources.NightScene;
          this.NightSceneRadioButton.UseVisualStyleBackColor = true;
@@ -116,18 +121,20 @@ namespace IDS
          // ShowTmpImageCheckBox
          // 
          this.ShowTmpImageCheckBox.AutoSize = true;
-         this.ShowTmpImageCheckBox.Location = new System.Drawing.Point(17, 120);
+         this.ShowTmpImageCheckBox.Location = new System.Drawing.Point(23, 148);
+         this.ShowTmpImageCheckBox.Margin = new System.Windows.Forms.Padding(4);
          this.ShowTmpImageCheckBox.Name = "ShowTmpImageCheckBox";
-         this.ShowTmpImageCheckBox.Size = new System.Drawing.Size(86, 17);
+         this.ShowTmpImageCheckBox.Size = new System.Drawing.Size(109, 21);
          this.ShowTmpImageCheckBox.TabIndex = 6;
          this.ShowTmpImageCheckBox.Text = global::IDS.IDS.Resources.ShowDetails;
          this.ShowTmpImageCheckBox.UseVisualStyleBackColor = true;
          // 
          // StopButton
          // 
-         this.StopButton.Location = new System.Drawing.Point(15, 212);
+         this.StopButton.Location = new System.Drawing.Point(20, 261);
+         this.StopButton.Margin = new System.Windows.Forms.Padding(4);
          this.StopButton.Name = "StopButton";
-         this.StopButton.Size = new System.Drawing.Size(94, 28);
+         this.StopButton.Size = new System.Drawing.Size(125, 34);
          this.StopButton.TabIndex = 7;
          this.StopButton.Text = global::IDS.IDS.Resources.ButtonStop_Stop;
          this.StopButton.UseVisualStyleBackColor = true;
@@ -136,9 +143,10 @@ namespace IDS
          // FpsLabel
          // 
          this.FpsLabel.AutoSize = true;
-         this.FpsLabel.Location = new System.Drawing.Point(1076, 9);
+         this.FpsLabel.Location = new System.Drawing.Point(1435, 11);
+         this.FpsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
          this.FpsLabel.Name = "FpsLabel";
-         this.FpsLabel.Size = new System.Drawing.Size(30, 13);
+         this.FpsLabel.Size = new System.Drawing.Size(39, 17);
          this.FpsLabel.TabIndex = 12;
          this.FpsLabel.Text = "0 fps";
          // 
@@ -157,10 +165,10 @@ namespace IDS
          this.CarInfoView.ForeColor = System.Drawing.SystemColors.HotTrack;
          this.CarInfoView.FullRowSelect = true;
          this.CarInfoView.LargeImageList = this.CarInfoViewImageList;
-         this.CarInfoView.Location = new System.Drawing.Point(128, 34);
-         this.CarInfoView.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+         this.CarInfoView.Location = new System.Drawing.Point(171, 42);
+         this.CarInfoView.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
          this.CarInfoView.Name = "CarInfoView";
-         this.CarInfoView.Size = new System.Drawing.Size(709, 457);
+         this.CarInfoView.Size = new System.Drawing.Size(944, 562);
          this.CarInfoView.SmallImageList = this.CarInfoViewImageList;
          this.CarInfoView.TabIndex = 0;
          this.CarInfoView.UseCompatibleStateImageBehavior = false;
@@ -204,19 +212,19 @@ namespace IDS
          // 
          // mainFrameViewer
          // 
-         this.mainFrameViewer.Location = new System.Drawing.Point(841, 34);
-         this.mainFrameViewer.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+         this.mainFrameViewer.Location = new System.Drawing.Point(1121, 42);
+         this.mainFrameViewer.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
          this.mainFrameViewer.Name = "mainFrameViewer";
-         this.mainFrameViewer.Size = new System.Drawing.Size(268, 184);
+         this.mainFrameViewer.Size = new System.Drawing.Size(357, 226);
          this.mainFrameViewer.TabIndex = 13;
          this.mainFrameViewer.TabStop = false;
          // 
          // ButtonLoadDb
          // 
-         this.ButtonLoadDb.Location = new System.Drawing.Point(17, 462);
-         this.ButtonLoadDb.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+         this.ButtonLoadDb.Location = new System.Drawing.Point(23, 569);
+         this.ButtonLoadDb.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
          this.ButtonLoadDb.Name = "ButtonLoadDb";
-         this.ButtonLoadDb.Size = new System.Drawing.Size(94, 27);
+         this.ButtonLoadDb.Size = new System.Drawing.Size(125, 33);
          this.ButtonLoadDb.TabIndex = 14;
          this.ButtonLoadDb.Text = global::IDS.IDS.Resources.LoadDb;
          this.ButtonLoadDb.UseVisualStyleBackColor = true;
@@ -224,17 +232,19 @@ namespace IDS
          // 
          // ProgresBarThis
          // 
-         this.ProgresBarThis.Location = new System.Drawing.Point(841, 467);
+         this.ProgresBarThis.Location = new System.Drawing.Point(1121, 575);
+         this.ProgresBarThis.Margin = new System.Windows.Forms.Padding(4);
          this.ProgresBarThis.Name = "ProgresBarThis";
-         this.ProgresBarThis.Size = new System.Drawing.Size(268, 23);
+         this.ProgresBarThis.Size = new System.Drawing.Size(357, 28);
          this.ProgresBarThis.TabIndex = 15;
          this.ProgresBarThis.Visible = false;
          // 
          // ButtonMatch
          // 
-         this.ButtonMatch.Location = new System.Drawing.Point(17, 401);
+         this.ButtonMatch.Location = new System.Drawing.Point(23, 494);
+         this.ButtonMatch.Margin = new System.Windows.Forms.Padding(4);
          this.ButtonMatch.Name = "ButtonMatch";
-         this.ButtonMatch.Size = new System.Drawing.Size(94, 27);
+         this.ButtonMatch.Size = new System.Drawing.Size(125, 33);
          this.ButtonMatch.TabIndex = 16;
          this.ButtonMatch.Text = global::IDS.IDS.Resources.Match;
          this.ButtonMatch.UseVisualStyleBackColor = true;
@@ -242,10 +252,10 @@ namespace IDS
          // 
          // ButtonNormalizeDb
          // 
-         this.ButtonNormalizeDb.Location = new System.Drawing.Point(17, 316);
-         this.ButtonNormalizeDb.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+         this.ButtonNormalizeDb.Location = new System.Drawing.Point(23, 389);
+         this.ButtonNormalizeDb.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
          this.ButtonNormalizeDb.Name = "ButtonNormalizeDb";
-         this.ButtonNormalizeDb.Size = new System.Drawing.Size(94, 28);
+         this.ButtonNormalizeDb.Size = new System.Drawing.Size(125, 34);
          this.ButtonNormalizeDb.TabIndex = 17;
          this.ButtonNormalizeDb.Text = global::IDS.IDS.Resources.NormalizeDb;
          this.ButtonNormalizeDb.UseVisualStyleBackColor = true;
@@ -253,9 +263,10 @@ namespace IDS
          // 
          // button2
          // 
-         this.button2.Location = new System.Drawing.Point(17, 434);
+         this.button2.Location = new System.Drawing.Point(23, 534);
+         this.button2.Margin = new System.Windows.Forms.Padding(4);
          this.button2.Name = "button2";
-         this.button2.Size = new System.Drawing.Size(92, 23);
+         this.button2.Size = new System.Drawing.Size(123, 28);
          this.button2.TabIndex = 19;
          this.button2.Text = global::IDS.IDS.Resources.Test;
          this.button2.UseVisualStyleBackColor = true;
@@ -263,9 +274,9 @@ namespace IDS
          // 
          // MainForm
          // 
-         this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+         this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-         this.ClientSize = new System.Drawing.Size(1116, 498);
+         this.ClientSize = new System.Drawing.Size(1488, 613);
          this.Controls.Add(this.OpenFilesButon);
          this.Controls.Add(this.button2);
          this.Controls.Add(this.ButtonNormalizeDb);
@@ -281,6 +292,7 @@ namespace IDS
          this.Controls.Add(this.DaySceneRadioButton);
          this.Controls.Add(this.TypeOfSceneLabel);
          this.Controls.Add(this.OpenFileButton);
+         this.Margin = new System.Windows.Forms.Padding(4);
          this.Name = "MainForm";
          this.Text = "IDS";
          this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
