@@ -26,7 +26,7 @@ namespace IDS.IDS.Classificator
       {
          m_parameters = new SVMParams();
          m_parameters.SVMType = Emgu.CV.ML.MlEnum.SVM_TYPE.C_SVC;
-         m_parameters.KernelType = Emgu.CV.ML.MlEnum.SVM_KERNEL_TYPE.RBF;
+         m_parameters.KernelType = Emgu.CV.ML.MlEnum.SVM_KERNEL_TYPE.LINEAR;
          m_parameters.TermCrit = new MCvTermCriteria(50, 0.01);
          m_parameters.Gamma = 64;
          m_parameters.C = 8;

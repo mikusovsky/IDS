@@ -2,6 +2,7 @@
 using Emgu.CV;
 using System.Drawing;
 using System.IO;
+using System.Threading;
 using Emgu.CV.Structure;
 using IDS.IDS;
 
@@ -32,6 +33,8 @@ namespace IDS
       private int _numberOfFrameStartCountedArea;
       private Image<Bgr, Byte> _carPhoto;
       private Image<Bgr, Byte> _carMask;
+
+      public CarModel CarModel { get; set; }
 
       public bool WasHandled { get; set; }
 
@@ -171,10 +174,11 @@ namespace IDS
          //CvInvoke.cvShowImage("carPhoto", _carPhoto);
       }
 
-      public void ClassifiCar()
+      public Image<Bgr, byte> GetMask()
       {
-         //_carMask = Utils.ExtractMask3(_carPhoto);
-         //CvInvoke.cvShowImage("carPhoto", _carMask);
+         _carMask = Utils.ExtractMask3(_carPhoto);
+         CvInvoke.cvShowImage("carPhoto", _carMask);
+         return _carMask;
       }
 
       public Image<Bgr, byte> GetCarPhoto()

@@ -88,11 +88,38 @@ namespace IDS.IDS {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Generation.
+        /// </summary>
+        internal static string CarGeneration {
+            get {
+                return ResourceManager.GetString("CarGeneration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Car id.
         /// </summary>
         internal static string CarId {
             get {
                 return ResourceManager.GetString("CarId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Years.
+        /// </summary>
+        internal static string CarIntervalBuild {
+            get {
+                return ResourceManager.GetString("CarIntervalBuild", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Model.
+        /// </summary>
+        internal static string CarModel {
+            get {
+                return ResourceManager.GetString("CarModel", resourceCulture);
             }
         }
         
@@ -210,6 +237,15 @@ namespace IDS.IDS {
         internal static string NormalizeDb {
             get {
                 return ResourceManager.GetString("NormalizeDb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ok.
+        /// </summary>
+        internal static string Ok {
+            get {
+                return ResourceManager.GetString("Ok", resourceCulture);
             }
         }
         

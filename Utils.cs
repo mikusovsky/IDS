@@ -10,6 +10,7 @@ using System.Xml;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using IDS.IDS.Classificator;
 using IDS.IDS.DataAugmentation;
 
 namespace IDS.IDS
@@ -24,6 +25,8 @@ namespace IDS.IDS
 
       public static string CurentVideoPath { get; set; }
       public static Dictionary<CarModel, Matrix<float>> ImportanceMaps = new Dictionary<CarModel, Matrix<float>>();
+
+      private static ModelRecogniser m_modelRecogniser;
 
       public static string GetLogFilePath(Enums.DbType testedDbType, Enums.DescriptorType makerDescriptorType, Enums.DescriptorType modelDescriptorType)
       {
@@ -140,6 +143,12 @@ namespace IDS.IDS
 
       public static Image<Bgr, byte> ExtractMask3(Image<Bgr, byte> image)
       {
+         if (Deffinitions.USER_MASK_SIZE == null)
+         {
+            MaskParamFrom maskParamFrom = new MaskParamFrom(image);
+            maskParamFrom.ShowDialog();
+            Deffinitions.USER_MASK_SIZE = maskParamFrom.GetMaskSize();
+         } 
          if (image == null)
          {
             return null;
@@ -164,16 +173,21 @@ namespace IDS.IDS
                maxRowSum = actualRow;
             }
          }
-
+         /*
          int width = Deffinitions.MASK_WIDTH_FROM_FRAME;
          int height = Deffinitions.MASK_HEIGHT_FROM_FRAME;
          int halfWidth = Deffinitions.MASK_WIDTH_FROM_FRAME / 2;
+         */
+         int width = Deffinitions.USER_MASK_SIZE[0];
+         int height = Deffinitions.USER_MASK_SIZE[1];
+         int halfWidth = Deffinitions.USER_MASK_SIZE[0] / 2;
+
          double minDiffSum = Int32.MaxValue;
          List<int> difs = new List<int>();
          int minX = 0;
          using (Image<Gray, byte> edges = grayImage/*grayImage.Canny(new Gray(10), new Gray(60))*/)
          {
-            for (int i = 0; i + Deffinitions.MASK_WIDTH_FROM_FRAME < edges.Width; i++)
+            for (int i = 0; i + width < edges.Width; i++)
             {
                using (Image<Gray, byte> subFrame = CropImage(edges, i, shadowPos - height, width, height))
                using (Image<Gray, byte> left = CropImage(subFrame, 0, 0, halfWidth, height))
@@ -210,6 +224,12 @@ namespace IDS.IDS
 
       public static Image<Gray, byte> ExtractMask3(Image<Gray, byte> grayImage)
       {
+         if (Deffinitions.USER_MASK_SIZE == null)
+         {
+            MaskParamFrom maskParamFrom = new MaskParamFrom(grayImage);
+            maskParamFrom.ShowDialog();
+            Deffinitions.USER_MASK_SIZE = maskParamFrom.GetMaskSize();
+         }
          if (grayImage == null)
          {
             return null;
@@ -233,16 +253,22 @@ namespace IDS.IDS
                maxRowSum = actualRow;
             }
          }
-
+         /*
          int width = Deffinitions.MASK_WIDTH_FROM_FRAME;
          int height = Deffinitions.MASK_HEIGHT_FROM_FRAME;
          int halfWidth = Deffinitions.MASK_WIDTH_FROM_FRAME / 2;
+         */
+
+         int width = Deffinitions.USER_MASK_SIZE[0];
+         int height = Deffinitions.USER_MASK_SIZE[1];
+         int halfWidth = Deffinitions.USER_MASK_SIZE[0] / 2;
+
          double minDiffSum = Int32.MaxValue;
          int minX = 0;
          Image<Gray, byte> edges = grayImage;
          //using (Image<Gray, byte> edges = grayImage/*grayImage.Canny(new Gray(10), new Gray(60))*/)
          {
-            for (int i = 0; i + Deffinitions.MASK_WIDTH_FROM_FRAME < edges.Width; i++)
+            for (int i = 0; i + width < edges.Width; i++)
             {
                using (Image<Gray, byte> subFrame = CropImage(edges, i, shadowPos - height, width, height))
                using (Image<Gray, byte> left = CropImage(subFrame, 0, 0, halfWidth, height))
@@ -1242,6 +1268,16 @@ namespace IDS.IDS
             gr.DrawImage(img, new Rectangle(0, 0, img.Width, img.Height));
          }
          return bmp;
+      }
+
+      public static ModelRecogniser LoadDb()
+      {
+         m_modelRecogniser = new ModelRecogniser();
+
+         Enums.DescriptorType makerDescriptorType = Enums.DescriptorType.SIFT;
+         Enums.DescriptorType modelDescriptorType = Enums.DescriptorType.SURF;
+         m_modelRecogniser.LoadDb(Enums.DbType.TrainingNormalized, makerDescriptorType, modelDescriptorType, Enums.ClassificatorType.KNearest);
+         return m_modelRecogniser;
       }
    }
 }

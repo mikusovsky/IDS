@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using AForge;
 
 namespace IDS.IDS
 {
@@ -67,5 +68,7 @@ namespace IDS.IDS
       public const int MASK_HEIGHT_FROM_FRAME = 80;
 
       public const int MODELS_COUNT = 25;
+
+      public static int[] USER_MASK_SIZE;
    }
 }

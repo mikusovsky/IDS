@@ -179,30 +179,30 @@ namespace IDS
          this.CarBrandOfVehicleHeader.Text = global::IDS.IDS.Resources.Photo;
          this.CarBrandOfVehicleHeader.Width = 150;
          // 
-         // CarTypeOfVehicleHeader
+         // CarBrandOfVehicel
          // 
-         this.CarTypeOfVehicleHeader.Text = global::IDS.IDS.Resources.CarType;
+         this.CarTypeOfVehicleHeader.Text = global::IDS.IDS.Resources.CarBrand;
          this.CarTypeOfVehicleHeader.Width = 100;
          // 
-         // CarIdOfVehicleHeader
+         // CarModelOfVehicel
          // 
-         this.CarIdOfVehicleHeader.Text = global::IDS.IDS.Resources.CarId;
+         this.CarIdOfVehicleHeader.Text = global::IDS.IDS.Resources.CarModel;
          this.CarIdOfVehicleHeader.Width = 70;
          // 
-         // TypeOfVehicleHeader
+         // TypeGenerationHeader
          // 
-         this.TypeOfVehicleHeader.Text = global::IDS.IDS.Resources.TypeOf;
+         this.TypeOfVehicleHeader.Text = global::IDS.IDS.Resources.CarGeneration;
          this.TypeOfVehicleHeader.Width = 100;
+         // 
+         // CarCarYears
+         // 
+         this.CarImageOfVehicleHeader.Text = global::IDS.IDS.Resources.CarIntervalBuild;
+         this.CarImageOfVehicleHeader.Width = 100;
          // 
          // SpeedOfVehicleHeader
          // 
          this.SpeedOfVehicleHeader.Text = global::IDS.IDS.Resources.Speed;
          this.SpeedOfVehicleHeader.Width = 70;
-         // 
-         // CarImageOfVehicleHeader
-         // 
-         this.CarImageOfVehicleHeader.Text = global::IDS.IDS.Resources.CarBrand;
-         this.CarImageOfVehicleHeader.Width = 100;
          // 
          // CarInfoViewImageList
          // 
