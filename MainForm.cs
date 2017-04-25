@@ -31,6 +31,8 @@ namespace IDS
       System.Windows.Forms.Timer _myTimer;
       Capture _capture;
 
+      private ModelRecogniser m_modelRecogniser;
+
       Image<Bgr, Byte> _frameLow;
       Image<Bgr, Byte> _frameHD;
       Image<Bgr, Byte> _frameRoadLow;
@@ -314,6 +316,7 @@ namespace IDS
                MessageBox.Show("Koniec videa");
                OpenFileButton.Enabled = true;
             }
+            Deffinitions.USER_MASK_SIZE = null;
             _myTimer = null;
          }
       }
@@ -411,14 +414,16 @@ namespace IDS
             {
                if (centerPoint < lane.LanePoints[2].X && !v.WasHandled)
                {
-                  infoVehicleList.Add("---");
-                  infoVehicleList.Add("---");
-                  infoVehicleList.Add("---");
-                  infoVehicleList.Add("---");
-                  infoVehicleList.Add(v.Speed.ToString());
+                  _myTimer.Stop();
+                  v.CarModel = m_modelRecogniser.Match(v.GetMask()); //TODO Add que
+                  _myTimer.Start();
                   infoVehicleList.Add(string.Empty);
+                  infoVehicleList.Add(v.CarModel.Maker);
+                  infoVehicleList.Add(v.CarModel.Model);
+                  infoVehicleList.Add(v.CarModel.Generation);
+                  infoVehicleList.Add($"{v.CarModel.From}-{v.CarModel.To}");
+                  infoVehicleList.Add(v.Speed.ToString());
 
-                  v.ClassifiCar();
                   CarInfoViewImageList.Images.Add(v.GetCarPhoto().Bitmap);
                   CarInfoView.Items.Add(new ListViewItem(infoVehicleList.ToArray(), CarInfoViewImageList.Images.Count - 1));
                   CarInfoView.Items[CarInfoView.Items.Count - 1].EnsureVisible();
@@ -910,7 +915,7 @@ namespace IDS
          }
          foreach (string path in OpenFileDialog.FileNames)
          {
-            _PlayLoadVideo(path, false, false);
+            _PlayLoadVideo(path, false, false); // was use to extraction car images from video
             while (_myTimer != null)
             {
                await Task.Delay(1000);
@@ -1017,6 +1022,7 @@ namespace IDS
 
       private void ButtonLoadDb_Click(object sender, EventArgs e)
       {
+         m_modelRecogniser = Utils.LoadDb();
          //SVMClassificator svm = new SVMClassificator();
          //Recogniser.LoadDb(Deffinitions.DbType.TrainingNormalized, Deffinitions.DescriptorType.SIFT, Deffinitions.ClassificatorType.KMeans);
          /*
@@ -1094,26 +1100,7 @@ namespace IDS
          */
 
 
-         int i = 0;
-         List<CarModel> carModels = Utils.GetCarModelsForDb(Enums.DbType.TestingMask);
-         foreach (CarModel carModel in carModels)
-         {
-            string imgPath = carModel.ImagePath;
-            string newImgPath = imgPath.Replace("TestingDbMask", "NeuroTestingDb");
-            Directory.CreateDirectory(newImgPath);
-            foreach (string imgSrc in carModel.ImagesPath)
-            {
-               ImageFormat imageFormat = Utils.GetImageFormatFromFileExtension(Path.GetExtension(imgSrc));
-               string imageName = Path.GetFileNameWithoutExtension(imgSrc);
-               string newImageSrc = $"{newImgPath}\\{imageName}.jpg";
-               using (Image<Gray, byte> image = new Image<Gray, byte>(imgSrc))
-               using (Bitmap normallized = (Utils.ChangePixelFormat(image.Bitmap, PixelFormat.Format32bppArgb)))
-               {
-                  normallized.Save(newImageSrc, ImageFormat.Jpeg);
-               }
-            }
-            Console.WriteLine($"{++i} of {carModels.Count}");
-         }
+         Utils.ChangePixelFormatForDb();
          Console.WriteLine("Normalization finished");
       }
 
@@ -1142,7 +1129,8 @@ namespace IDS
          IRecogniser recogniser = new ModelRecogniser();
 
          Test test = new Test();
-         test.Execute(recogniser, TestingDbsModelMask, false);
+         //test.Execute(recogniser, TestingDbsModelMask, false);
+         test.Execute(recogniser, Enums.DbType.TestingMask);
       }
    }
 }

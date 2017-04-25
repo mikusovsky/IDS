@@ -66,5 +66,12 @@
          KNearest = 1,
          SVM = 2
       }
+
+      public enum MaskExtractorType
+      {
+         SPZ = 1,
+         BoudingBox = 2,
+         SlidingWindow = 3
+      }
    }
 }

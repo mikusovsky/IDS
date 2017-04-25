@@ -5,7 +5,7 @@ namespace IDS.IDS
 {
    public static class Deffinitions
    {
-      public const bool DEBUG_MODE = true;
+      public const bool DEBUG_MODE = false;
       public const string SUM_CARS = "sumCars";
       public const string SUM_TRUCKS = "sumTrucks";
       public const string TOTAL_SUM = "totalSum";
@@ -15,6 +15,7 @@ namespace IDS.IDS
       public const string OUTPUT_PATH = SOLUTION_PATH + "\\Output";
       public const string OUTPUT_PATH_IMAGES = OUTPUT_PATH + "\\Images";
       public const string OUTPUT_PATH_LOG = OUTPUT_PATH + "\\Log";
+      public const string OUTPUT_PATH_IMAGES_TEMP = OUTPUT_PATH + "\\Temp";
 
       public const string CACHE_PATH = SOLUTION_PATH + "\\Cache";
       public const string CACHE_PATH_DESCRIPTOR = CACHE_PATH + "\\Descriptor";
@@ -62,7 +63,6 @@ namespace IDS.IDS
 
       public const int NORMALIZE_MASK_WIDTH = 128;
       public const int NORMALIZE_MASK_HEIGHT = 128;
-
 
       public const int MASK_WIDTH_FROM_FRAME = 170;
       public const int MASK_HEIGHT_FROM_FRAME = 80;

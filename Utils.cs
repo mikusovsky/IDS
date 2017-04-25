@@ -141,8 +141,13 @@ namespace IDS.IDS
          return retImg;
       }
 
-      public static Image<Bgr, byte> ExtractMask3(Image<Bgr, byte> image)
+      public static Image<Bgr, byte> ExtractMask3(Image<Bgr, byte> image, bool? useDefault = null)
       {
+         if (useDefault.HasValue && useDefault.Value == true)
+         {
+            Deffinitions.USER_MASK_SIZE = new int[] { Deffinitions.MASK_WIDTH_FROM_FRAME, Deffinitions.MASK_HEIGHT_FROM_FRAME };
+         }
+
          if (Deffinitions.USER_MASK_SIZE == null)
          {
             MaskParamFrom maskParamFrom = new MaskParamFrom(image);
@@ -217,13 +222,17 @@ namespace IDS.IDS
          _DrawLineY(image, shadowPos, new Bgr(0,0,255));
          Utils.LogImage("original", image);
          Utils.LogImage("mask", retImg);
-         difs = difs.Select(x => 100*x/difs.Max()).ToList();
-         Plot(difs, "difs");
+         //difs = difs.Select(x => 100*x/difs.Max()).ToList();
+         //Plot(difs, "difs");
          return retImg;
       }
 
-      public static Image<Gray, byte> ExtractMask3(Image<Gray, byte> grayImage)
+      public static Image<Gray, byte> ExtractMask3(Image<Gray, byte> grayImage, bool? useDefault = null)
       {
+         if (useDefault.HasValue && useDefault.Value == true)
+         {
+            Deffinitions.USER_MASK_SIZE = new int[] { Deffinitions.MASK_WIDTH_FROM_FRAME, Deffinitions.MASK_HEIGHT_FROM_FRAME };
+         }
          if (Deffinitions.USER_MASK_SIZE == null)
          {
             MaskParamFrom maskParamFrom = new MaskParamFrom(grayImage);
@@ -518,7 +527,7 @@ namespace IDS.IDS
          {
             return null;
          }
-
+         //System.Threading.Thread.Sleep(20);
 
          /*** REMOVE START ***/
          CvInvoke.cvDrawContours(color, finalContour, new MCvScalar(255), new MCvScalar(255), -1, 1, Emgu.CV.CvEnum.LINE_TYPE.EIGHT_CONNECTED, new Point(0, 0));
@@ -1257,6 +1266,31 @@ namespace IDS.IDS
                   SaveImage(resizedImg, newImagePath, GetImageFormatFromFileExtension(extension));
                }
             }
+         }
+      }
+
+      /** Used in neuro recognition **/
+      public static void ChangePixelFormatForDb()
+      {
+         int i = 0;
+         List<CarModel> carModels = Utils.GetCarModelsForDb(Enums.DbType.TestingMask900);
+         foreach (CarModel carModel in carModels)
+         {
+            string imgPath = carModel.ImagePath;
+            string newImgPath = imgPath.Replace("TestingDbMask900", "NeuroTestingDb900");
+            Directory.CreateDirectory(newImgPath);
+            foreach (string imgSrc in carModel.ImagesPath)
+            {
+               ImageFormat imageFormat = Utils.GetImageFormatFromFileExtension(Path.GetExtension(imgSrc));
+               string imageName = Path.GetFileNameWithoutExtension(imgSrc);
+               string newImageSrc = $"{newImgPath}\\{imageName}.jpg";
+               using (Image<Gray, byte> image = new Image<Gray, byte>(imgSrc))
+               using (Bitmap normallized = (Utils.ChangePixelFormat(image.Bitmap, PixelFormat.Format32bppArgb)))
+               {
+                  normallized.Save(newImageSrc, ImageFormat.Jpeg);
+               }
+            }
+            Console.WriteLine($"{++i} of {carModels.Count}");
          }
       }
 
